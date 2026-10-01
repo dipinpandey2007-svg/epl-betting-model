@@ -1,6 +1,6 @@
 # EPL Betting Model — Current State
 
-_Last updated: 2026-10-01 (after Experiment 12, the time-weighted Poisson experiment)._
+_Last updated: 2026-10-01 (after the historical stage of Experiment 13, the online time-weighted Poisson diagnostic)._
 
 ## Current phase
 
@@ -12,6 +12,9 @@ Since then:
 - The pre-registered update-policy diagnostic has been run and recorded (Experiment 11).
 - The pre-registered time-weighted Poisson experiment has been run and recorded (Experiment 12). Its half-life
   H\* = 730 days is locked in `configs/time_weighted_poisson_v1.toml`.
+- The pre-registered online time-weighted Poisson diagnostic (Experiment 13) has run its **historical stage**, and the
+  result is locked in `configs/online_tw_poisson_diagnostic_v1.toml` `[historical_locked]`. Its 2024-25 stage is
+  pre-registered and **not yet run**.
 
 No established model or specification has been changed. `poisson_time_weighted_v1` is a new candidate, not a
 replacement for `poisson_static_v1`.
@@ -84,6 +87,24 @@ w = 2^(−age/H), age in days, the model still static in-season.
 - **The 2024-25 result must not be used to retune the candidate** (for example to choose another half-life). H\* stays
   730 days.
 
+**Experiment 13** (protocol `online_tw_poisson_diagnostic_v1`, diagnostic only) asks whether the time-weighted
+Poisson model also benefits from in-season updating once its weighting is fixed (H = 730). The online arm refits the
+same weighted likelihood before every target date on the history plus target matches dated strictly before it.
+Unseen-team matches are neither scored nor fitted.
+
+- **Historical stage** (targets 2017-18 … 2021-22, 1,604 common matches): online − frozen log loss **−0.0117**
+  (date-clustered SE 0.0027), Brier −0.0079, **negative in 5 of 5 folds**.
+  - **Criterion U met; the harm mirror not met.** Registered reading: `historical_evidence_online_refitting_helps`.
+  - It is diagnostic only: **no specification is adopted.**
+- **The gain is about the size of Elo's own updating gain** on the same folds (F1 − Online +0.0099). The two families
+  still differ in input, update mechanism and recency form.
+- **Caveats:**
+  - 2020-21 (crowd-free) has the largest gain, partly because the online model re-learns the lower home advantage.
+  - The registered accumulation pattern was not met: the gain is already distinguishable in matches 0–9.
+  - H = 730 was selected on these folds for the frozen arm.
+- **Next:** only the pre-registered 2024-25 diagnostic stage. Like every 2024-25 result, it cannot select, tune or
+  confirm anything.
+
 The 2025-26 holdout remains sealed and unacquired.
 
 ## Frozen specifications (`configs/baselines_v1.toml`)
@@ -108,7 +129,8 @@ The 2025-26 holdout remains sealed and unacquired.
    (about a third of the 2024-25 gap). The rest is a difference at the start of the season. Experiment 12 showed that
    recency weighting closes about 62% of the 2024-25 Poisson − F2 part of it, as a 2024-25-specific observation (the
    historical nested gain was not distinguishable from zero). The remainder still mixes model family with other
-   differences, and no goal model yet updates during the season.
+   differences. Experiment 13's historical stage found that refitting the time-weighted Poisson model during the
+   season helps (diagnostic; no spec adopted); its 2024-25 stage has not been run.
 3. **Dixon-Coles is staged, not joint MLE.** It showed no development-test benefit in this static setup.
 4. **Elo design choices not yet validated.**
    - Promoted teams start at 1500.
@@ -117,7 +139,7 @@ The 2025-26 holdout remains sealed and unacquired.
      training-fold experiment).
    - The 2014-15 burn-in season is used when fitting the regression.
 5. **Limited uncertainty estimates.**
-   - Experiments 10-12 report paired per-match differences with naive SEs; Experiments 11 and 12 add date-clustered
+   - Experiments 10-13 report paired per-match differences with naive SEs; Experiments 11-13 add date-clustered
      SEs.
    - The development-test results (Experiments 2-6) still have none.
    - With six folds, fold-to-fold variation is the main uncertainty.
@@ -135,7 +157,8 @@ The 2025-26 holdout remains sealed and unacquired.
 1. ~~Define and seal a final holdout before looking at it~~: done 2026-10-01 ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md),
    tag `holdout-freeze-v1`). 2024-25 was added as dataset dev_v2 and scored as validation (Experiment 10), then used
    by the update-policy diagnostic (Experiment 11) and the time-weighted Poisson experiment (Experiment 12), all on
-   2026-10-01. The sealed acquisition of 2025-26 has not been done.
+   2026-10-01. Experiment 13's 2024-25 stage, when run, will be its fourth exposure. The sealed acquisition of 2025-26
+   has not been done.
 2. Build one evaluation harness that scores every model on the same training-season walk-forward folds:
    - the same information and update policy for every model (for example, goal models refitted or time-weighted
      as each season progresses);
@@ -143,7 +166,8 @@ The 2025-26 holdout remains sealed and unacquired.
 3. Inside that harness, run the deferred experiments as separate, pre-registered comparisons:
    - promoted-team handling, for both the goal models and Elo;
    - home advantage inside the Elo updates;
-   - a dynamic (in-season updating) Poisson model; the static time-decayed version is done (Experiment 12);
+   - a dynamic (in-season updating) Poisson model: the static time-decayed version is done (Experiment 12), and an
+     online refitted diagnostic arm has run its historical stage (Experiment 13; 2024-25 stage pending);
    - joint Dixon-Coles.
 
 Only after this should the project move to stage 4+ features (xG, market odds) in `ROADMAP.md`.

@@ -1028,6 +1028,284 @@ The gain is already present in the first segment, as expected for a difference i
 
 Not yet locked by golden tests. The run is not in `experiments.run_all`.
 
+## Experiment 13 — Online vs frozen time-weighted Poisson: does in-season updating help within the Poisson family? (2026-10-01; historical stage)
+
+`experiments/online_tw_poisson_diagnostic.py`, protocol `online_tw_poisson_diagnostic_v1`
+(`configs/online_tw_poisson_diagnostic_v1.toml`), results in `results/online_tw_poisson_historical/metrics.json`.
+**Diagnostic only: no specification is adopted.** The 2024-25 stage is pre-registered and **not yet run**.
+
+### Pre-registration and run sequence
+
+| Step | Commit | What |
+|---|---|---|
+| Pre-registration | `b91217e` | Protocol and access-log entry V4, committed and pushed **before** any online weighted Poisson model was fitted on real data |
+| Implementation | `4ad9782` | Code and tests; no online fit on real data |
+| CI fix (test-only) | `7faadfc` | Two pre-existing end-to-end tests read the git-ignored dataset (CI red since `3d35c55`); fixed without touching library, model, experiment or config code |
+| Historical stage | run at `7faadfc` (`git_dirty: false`) | Online and frozen arms on targets 2017-18 … 2021-22; seasons up to 2021-22 only loaded |
+| Lock | commit "results: lock online Poisson historical diagnostic" | `[historical_locked]` records the historical metrics checksum and the run commit |
+
+Nothing was changed before or after the run. H, the refit cadence, the unseen-team treatment, the evidence criteria and
+the interpretation rules are exactly as registered.
+
+### Objective
+
+Experiment 11 showed that in-season updating explains part of online Elo's advantage (F1 − Online). Experiment 12
+showed that recency weighting (H\* = 730 days) improves the *static* Poisson model in 2024-25. This experiment asks
+whether the Poisson model also benefits from in-season updating once its recency weighting is fixed. The primary
+comparison is **within the Poisson family**: online minus frozen time-weighted Poisson on identical matches.
+
+### Arms
+
+- **Frozen** `poisson_time_weighted_v1`: H = 730 days (locked in Experiment 12), fitted once on the fold history,
+  never updated in-season. Reproduced from the Experiment 12 predictions.
+- **Online** `poisson_tw_online_h730_v1_diag` (the only new arm): the same weighted likelihood, w = 2^(−age/730),
+  refitted **once per target date** on
+
+  S(d) = fold history + common-group target matches dated **strictly before** d,
+
+  with age in days to the latest date in S(d).
+  - The reference date is a convention only. Weight ratios between matches do not depend on it, so the online arm
+    differs from the frozen arm only in which matches are in the likelihood.
+  - Every match on a date has the same information set, so one refit per date equals one refit per match.
+  - No outcome dated d enters any prediction on d.
+  - All parameters are refitted (intercept, attack, defence, IsHome). There are no warm starts.
+- **Unseen teams:** their target matches are neither scored nor used in any online fit. Both arms therefore keep the
+  fixed team parameter space of the history (decision approved before registration).
+- **Fit validity:** converged, finite parameters, finite positive rates. An invalid fit gets one retry of the same IRLS
+  with maxiter 1000; otherwise the stage aborts, with no fallback.
+- Established arms (online Elo, F1, F2, static Poisson, Dixon-Coles, baseline) are reproduced from the Experiment 11
+  predictions.
+
+### Data and evidence roles
+
+- Dataset `dev_v2` (SHA-256 `c726bd5c…39fd807`). The historical stage cut the data to seasons ≤ 2021-22 straight after
+  reading the file.
+- Targets 2017-18 … 2021-22 (`selection_folds`), common groups 306 / 272 / 342 / 342 / 342 (1,604 matches).
+- No hyperparameter is selected.
+  - **H = 730 was selected on these same folds for the frozen arm** (Experiment 12). The online arm inherits it, so any
+    selection bias favours the frozen arm.
+  - Elo's K = 25 was also selected on these folds.
+- 2024-25 was not loaded or scored. 2022-23 and 2023-24 are never targets. 2025-26 was not accessed.
+
+### Pre-scoring checks (all passed)
+
+- Protocol, data and recorded-prediction checksums; registered group sizes and unseen teams.
+- Registered online-fit counts: 98 / 98 / 110 / 128 / 119 (553).
+- Reproduction of the Experiment 11 and 12 predictions: largest difference 1.1e-16.
+- Online = frozen on each fold's first target date: largest gap 2.8e-17.
+- Decomposition identity: largest per-match residual 1.1e-16.
+
+### Primary result: online − frozen (negative = online better)
+
+| Target | n | Online LL / Brier | Frozen LL / Brier | ΔLL (naive / clustered SE) | ΔBrier (naive / clustered SE) |
+|---|---|---|---|---|---|
+| 2017-18 | 306 | 0.9629 / 0.5710 | 0.9780 / 0.5812 | −0.0151 (0.0053 / 0.0059) | −0.0102 (0.0037 / 0.0042) |
+| 2018-19 | 272 | 0.8874 / 0.5188 | 0.8972 / 0.5255 | −0.0097 (0.0043 / 0.0040) | −0.0067 (0.0030 / 0.0028) |
+| 2019-20 | 342 | 0.9620 / 0.5703 | 0.9659 / 0.5735 | −0.0039 (0.0049 / 0.0041) | −0.0032 (0.0034 / 0.0027) |
+| 2020-21 | 342 | 1.0202 / 0.6085 | 1.0418 / 0.6218 | −0.0217 (0.0081 / 0.0086) | −0.0133 (0.0051 / 0.0055) |
+| 2021-22 | 342 | 0.9397 / 0.5558 | 0.9479 / 0.5616 | −0.0082 (0.0050 / 0.0053) | −0.0059 (0.0035 / 0.0036) |
+| **Pooled** | **1,604** | **0.9572 / 0.5667** | **0.9689 / 0.5746** | **−0.0117** (0.0026 / 0.0027) | **−0.0079** (0.0017 / 0.0018) |
+
+Clusters are (target, date): 553. The equal-fold-weight mean ΔLL is −0.0117. The frozen scores equal Experiment 12's
+H = 730 values.
+
+| Criterion U check | Result |
+|---|---|
+| Pooled ΔLL < −0.002 | yes (−0.0117) |
+| \|mean\| > 2 clustered SEs | yes (4.4 SEs) |
+| ΔLL < 0 in ≥ 4 of 5 folds | yes (**5 of 5**) |
+| Pooled ΔBrier < 0 | yes (−0.0079) |
+
+**Criterion U: met. Mirror (harm) criterion: not met** (no fold positive). **Registered reading:
+`historical_evidence_online_refitting_helps`.**
+
+### Segments (pre-registered accumulation hypothesis; descriptive)
+
+Experiment 11 segments (mean prior target-season games of the two teams). Pooled historical, clustered SEs:
+
+| Segment | n | ΔLL | ΔBrier | Mean summed \|ΔP\| vs frozen | Elo F1 − Online (LL) |
+|---|---|---|---|---|---|
+| 0–9 | 422 | −0.0051 (0.0022) | −0.0035 (0.0014) | 0.030 | +0.0042 (0.0043) |
+| 10–18 | 385 | −0.0133 (0.0043) | −0.0091 (0.0029) | 0.064 | +0.0188 (0.0078) |
+| 19–28 | 418 | −0.0106 (0.0058) | −0.0069 (0.0038) | 0.077 | +0.0055 (0.0109) |
+| 29+ | 379 | −0.0187 (0.0078) | −0.0125 (0.0052) | 0.091 | +0.0123 (0.0137) |
+
+Per fold, ΔLL by segment:
+
+| Target | 0–9 | 10–18 | 19–28 | 29+ |
+|---|---|---|---|---|
+| 2017-18 | −0.0117 | −0.0139 | −0.0140 | −0.0209 |
+| 2018-19 | −0.0055 | −0.0091 | +0.0020 | −0.0278 |
+| 2019-20 | +0.0026 | −0.0105 | +0.0074 | −0.0168 |
+| 2020-21 | −0.0069 | −0.0318 | −0.0283 | −0.0207 |
+| 2021-22 | −0.0047 | −0.0002 | −0.0182 | −0.0091 |
+
+- **The registered accumulation pattern is not met.** The later segments are below 0–9, as hypothesised, but Δ(0–9)
+  is 2.3 clustered SEs from zero, outside the registered "near zero" band (≤ 2 SEs).
+- **The gain is already present early.** The 0–9 segment includes matches in which teams have played up to about nine
+  games, and shared parameters (intercept, IsHome, the connected team network) move after any target result.
+- **The size of the online adjustment grows steadily** through the season (mean |ΔP| 0.030 → 0.091).
+- Segment results are descriptive and do not affect the reading.
+
+### Comparison with Elo's updating gain (descriptive)
+
+Each family's updating gain within its own family (left − right; positive = the updating arm is better):
+
+| Target | Poisson: frozen TW − online TW | Elo: F1 − Online |
+|---|---|---|
+| 2017-18 | +0.0151 | +0.0138 |
+| 2018-19 | +0.0097 | +0.0102 |
+| 2019-20 | +0.0039 | +0.0002 |
+| 2020-21 | +0.0217 | +0.0188 |
+| 2021-22 | +0.0082 | +0.0071 |
+| Pooled | **+0.0117** (clustered SE 0.0027) | **+0.0099** (0.0048) |
+
+- The two updating gains are of similar size and move together across folds.
+- **The pre-registered expectation was not borne out.** It said the Poisson gain would be *smaller* than Elo's, because
+  the current season carries only part of the weight at H = 730. It was an expectation, not a criterion.
+- **The difference between the two gains is not a model-family effect.** The families differ in input (goals vs
+  results), update mechanism (global refit vs per-team sequential updates), recency form (days vs per match) and
+  calibration layer.
+
+### Decomposition and context comparisons (pooled historical; descriptive)
+
+Per match on the common group, checked to 1e-12 (left − right; positive = right-hand arm better):
+
+| Component | ΔLL (clustered SE) | ΔBrier |
+|---|---|---|
+| Static Poisson − frozen TW (weighting) | +0.0058 (0.0018) | +0.0039 |
+| Frozen TW − online TW (Poisson updating) | +0.0117 (0.0027) | +0.0079 |
+| Online TW − online Elo | −0.0131 (0.0046) | −0.0066 |
+| **Static Poisson − online Elo (total)** | **+0.0044** (0.0067) | +0.0051 |
+
+Context comparisons (not effects), log loss with clustered SE:
+
+| Comparison | ΔLL (clustered SE) |
+|---|---|
+| Online TW − online Elo | −0.0131 (0.0046) |
+| Frozen TW − F2 | −0.0110 (0.0039) |
+| Online TW − static Poisson | −0.0175 (0.0034) |
+| Online TW − frequency baseline | −0.1127 (0.0095) |
+| Frozen TW − frequency baseline | −0.1009 (0.0095) |
+
+Pooled historical scores (log loss / Brier):
+
+| Model | Log loss / Brier |
+|---|---|
+| Online TW | 0.9572 / 0.5667 |
+| Frozen TW | 0.9689 / 0.5746 |
+| Static Poisson | 0.9747 / 0.5785 |
+| Online Elo | 0.9703 / 0.5734 |
+| F1 | 0.9802 / 0.5803 |
+| F2 | 0.9799 / 0.5805 |
+| Dixon-Coles | 0.9752 / 0.5787 |
+| Frequency baseline | 1.0698 / 0.6479 |
+
+On these folds, online TW Poisson scores below online Elo. This mixes model family with update mechanism, recency form
+and hyperparameters chosen on these same folds (H = 730, K = 25). It is not evidence that one family is better.
+
+### Home advantage: the COVID caveat
+
+IsHome coefficient through each season (first fit, ¼, ½, ¾, last fit):
+
+| Target | Frozen | Online trajectory |
+|---|---|---|
+| 2017-18 | 0.268 | 0.268, 0.262, 0.255, 0.273, 0.272 |
+| 2018-19 | 0.278 | 0.278, 0.269, 0.262, 0.276, 0.276 |
+| 2019-20 | 0.259 | 0.259, 0.252, 0.234, 0.251, 0.248 |
+| 2020-21 | 0.251 | **0.251, 0.218, 0.203, 0.194, 0.172** |
+| 2021-22 | 0.173 | 0.173, 0.163, 0.178, 0.164, 0.161 |
+
+- **2020-21 was played largely without crowds** (public knowledge, stated in the protocol before the run).
+  - The online model re-learns the lower home advantage during the season; the frozen model cannot.
+  - Mean P(home win) in 2020-21: online 0.437, frozen 0.448, observed 0.371.
+- **2020-21 has the largest gain (−0.0217), and part of it is this home-advantage re-learning.** That is a component of
+  "updating" specific to that season. The other four folds are also negative (−0.0039 to −0.0151).
+
+### Other diagnostics (descriptive)
+
+- **Current-season weight share at the last fit:** 0.33, 0.28, 0.31, 0.30, 0.28.
+- **Kish effective sample size** grows by about 80–200 matches over a season (2017-18: 1,050 → 1,255; 2021-22: 1,827 →
+  1,909).
+- **Returning vs continuously present teams** (ΔLL): pooled returning −0.0173 (clustered SE 0.0088, 244 matches),
+  continuous −0.0107 (0.0027, 1,360). Per fold:
+
+  | Target | Returning teams (matches) | Returning ΔLL |
+  |---|---|---|
+  | 2017-18 | Newcastle (34) | −0.0270 |
+  | 2018-19 | none | — |
+  | 2019-20 | Aston Villa, Norwich (70) | −0.0129 |
+  | 2020-21 | Fulham, West Brom (70) | −0.0379 |
+  | 2021-22 | Norwich, Watford (70) | +0.0034 |
+
+- **Calibration and sharpness.** The online arm is sharper (lower entropy) in three folds and slightly less sharp in
+  2019-20 and 2020-21.
+
+  | Target | Online mean P(H/D/A), entropy | Frozen mean P(H/D/A), entropy | Observed H/D/A |
+  |---|---|---|---|
+  | 2017-18 | 0.455 / 0.234 / 0.311, 0.9792 | 0.457 / 0.235 / 0.307, 0.9859 | 0.451 / 0.252 / 0.297 |
+  | 2018-19 | 0.459 / 0.228 / 0.313, 0.9516 | 0.459 / 0.233 / 0.309, 0.9645 | 0.467 / 0.199 / 0.335 |
+  | 2019-20 | 0.453 / 0.227 / 0.319, 0.9624 | 0.456 / 0.228 / 0.316, 0.9579 | 0.456 / 0.234 / 0.310 |
+  | 2020-21 | 0.437 / 0.238 / 0.325, 0.9767 | 0.448 / 0.236 / 0.315, 0.9648 | 0.371 / 0.228 / 0.401 |
+  | 2021-22 | 0.433 / 0.229 / 0.338, 0.9638 | 0.432 / 0.231 / 0.337, 0.9750 | 0.430 / 0.237 / 0.333 |
+
+### Fitting statistics
+
+| Target | Online fits | Retries | Converged | IRLS iterations | max \|coef\| | Online runtime (s) |
+|---|---|---|---|---|---|---|
+| 2017-18 | 98 | 0 | all | 5 | 0.996 | 5.0 |
+| 2018-19 | 98 | 0 | all | 5 | 1.138 | 5.9 |
+| 2019-20 | 110 | 0 | all | 5 | 1.070 | 8.2 |
+| 2020-21 | 128 | 0 | all | 5 | 1.005 | 10.7 |
+| 2021-22 | 119 | 0 | all | 5 | 1.096 | 11.4 |
+
+553 fits in total, no retry, no failure. The whole stage took 53 s.
+
+### Interpretation (pre-registered reading)
+
+- **Criterion U met → historical evidence that in-season refitting improves the 730-day time-weighted Poisson.** The
+  gain is negative in every fold, in log loss and Brier, and 4.4 clustered SEs from zero pooled.
+- **It is about the size of Elo's own updating gain** on the same folds.
+- **Part of the gain is season-specific:** 2020-21 includes home-advantage re-learning during the crowd-free season.
+- **The pre-registered accumulation pattern was not met,** because the gain is already distinguishable in the first
+  segment. This is descriptive and does not change the reading.
+- **This is diagnostic evidence about update policy within the Poisson family.** It does not establish that the online
+  model is a better *specification* for deployment, and it says nothing about markets or profitability.
+
+### Limitations
+
+- H = 730 and K = 25 were selected on these folds. The online arm uses an H chosen for the frozen arm.
+- Date-clustered SEs do not capture serial correlation within a season (the online fits share one trajectory). The
+  5-of-5 sign count is the more robust evidence.
+- There are only five historical folds, and history length (3–7 seasons) is confounded with the fold.
+- Unseen/promoted teams are still excluded from scoring and from the online fits.
+- The 2024-25 stage has not been run. When run, it is a diagnostic observation only: it cannot select, tune or
+  confirm.
+
+### Decision
+
+- **Recorded and locked as is** in `[historical_locked]`. No model, hyperparameter, protocol, eligibility rule or
+  evidence criterion is changed because of these results.
+- **No specification is adopted.** `poisson_tw_online_h730_v1_diag` remains a diagnostic arm, not registered for
+  2022-24 or holdout scoring.
+- **Next step:** only the pre-registered 2024-25 diagnostic stage (`--stage validation`), unchanged.
+
+### Provenance
+
+| Item | Value |
+|---|---|
+| Pre-registration | commit `b91217e` (config and access-log entry V4) |
+| Implementation | commit `4ad9782`; test-only CI fix `7faadfc` |
+| Historical run | commit `7faadfc487c3d718122390a7dd23f332d09f2367`, `git_dirty: false` |
+| Metrics | `results/online_tw_poisson_historical/metrics.json`, content SHA-256 `c0f2e7b1558a4b5e0e232c21f19bb6fd10b31f28bf772634eb0ab2e263fa4379` |
+| Predictions | `results/online_tw_poisson_historical/predictions.csv`, 1,604 rows, git-ignored, content SHA-256 `c5cd256d1757d180ac7113bef391a87a990132a1c023b2b718ba14f515c587f9` |
+| Lock | commit "results: lock online Poisson historical diagnostic" |
+| Data | `data/processed/matches_dev_v2.csv`, SHA-256 `c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807` |
+| Reproduction references | Experiment 11 predictions `73251375…e5f8`; Experiment 12 development predictions `96831b96…c3ba` |
+| Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0, scikit-learn 1.9.0 |
+
+Not yet locked by golden tests. The run is not in `experiments.run_all`.
+
 ## Future experiment template
 
 ```

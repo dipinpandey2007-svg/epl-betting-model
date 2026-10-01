@@ -211,6 +211,25 @@ recency-weighted history (w = 2^(−age/H), age in days; not updated in-season).
 12). It must not be used to retune the Experiment 12 candidate or to confirm
 any future candidate or hypothesis.
 
+Experiment 13 (protocol `online_tw_poisson_diagnostic_v1`, diagnostic only)
+compares the frozen time-weighted Poisson (H = 730) with the same weighted
+likelihood refitted before every target date. The refit uses the history plus
+target matches dated strictly before that date; unseen-team matches are neither
+scored nor fitted.
+
+- Historical stage (2017-18 to 2021-22, 1,604 matches): online − frozen
+  −0.0117 log loss (clustered SE 0.0027), negative in 5 of 5 folds.
+  Criterion U met; the harm mirror not met. The reading is
+  `historical_evidence_online_refitting_helps`. No spec is adopted.
+- The gain is about the size of Elo's updating gain on the same folds
+  (+0.0099).
+- Caveats: 2020-21 includes home-advantage re-learning; the registered
+  accumulation pattern was not met; H = 730 was selected on these folds for
+  the frozen arm.
+- The result is locked in `[historical_locked]`. The only next step is the
+  pre-registered 2024-25 stage (`--stage validation`): diagnostic only, the
+  fourth exposure of 2024-25, and it cannot select, tune or confirm.
+
 ---
 
 ## 7. Known methodological issues and conventions

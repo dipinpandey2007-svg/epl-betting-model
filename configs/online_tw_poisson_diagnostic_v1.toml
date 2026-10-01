@@ -206,9 +206,9 @@ results_name = "online_tw_poisson_validation"
 
 [historical_locked]
 # Written ONLY from the historical stage output, in a separate commit, before the validation stage.
-status = "unlocked"
-historical_metrics_sha256 = ""
-historical_commit = ""
+status = "locked"
+historical_metrics_sha256 = "c0f2e7b1558a4b5e0e232c21f19bb6fd10b31f28bf772634eb0ab2e263fa4379"
+historical_commit = "7faadfc487c3d718122390a7dd23f332d09f2367"
 
 [outputs]
 in_run_all = false

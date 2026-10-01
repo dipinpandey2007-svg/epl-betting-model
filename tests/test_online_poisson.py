@@ -347,7 +347,6 @@ def test_registered_values_are_the_approved_ones():
     assert g["expected_online_fits"] == {"1718": 98, "1819": 98, "1920": 110, "2021": 128, "2122": 119, "2425": 109}
     assert OCFG["protocol"]["validation_evidence_class"] == "diagnostic_descriptive_cannot_confirm"
     assert OCFG["protocol"]["pool_validation_with_historical"] is False
-    assert OCFG["historical_locked"]["status"] == "unlocked"
 
 
 @pytest.mark.parametrize("section,key,value", [
@@ -432,6 +431,10 @@ def test_historical_loader_drops_later_rows_before_validation(monkeypatch):
 
 
 def test_validation_refuses_to_load_data_before_the_historical_lock(monkeypatch):
+    unlocked = json.loads(json.dumps(OCFG))
+    unlocked["historical_locked"] = {"status": "unlocked", "historical_metrics_sha256": "", "historical_commit": ""}
+    monkeypatch.setattr(otp, "load_all_configs", lambda: (unlocked, TCFG, VCFG, DCFG, load_config()))
+
     def forbidden(*args, **kwargs):
         raise AssertionError("2024-25 data must not be loaded before the historical lock")
 
@@ -440,6 +443,22 @@ def test_validation_refuses_to_load_data_before_the_historical_lock(monkeypatch)
     monkeypatch.setattr(otp, "verify_file", forbidden)
     with pytest.raises(otp.LockError, match="not locked"):
         otp.run_validation(write=False)
+
+
+def test_committed_lock_is_the_historical_stage_output():
+    """The committed [historical_locked] values match the historical metrics file, when it exists."""
+    lock = OCFG["historical_locked"]
+    assert lock["status"] == "locked"
+    assert lock["historical_commit"] == "7faadfc487c3d718122390a7dd23f332d09f2367"
+    path = PROJECT_ROOT / "results" / OCFG["historical_stage"]["results_name"] / "metrics.json"
+    if path.exists():
+        from eplmodel.data.checksums import content_sha256
+        assert content_sha256(path) == lock["historical_metrics_sha256"]
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        assert payload["results"]["stage"] == "historical"
+        assert payload["results"]["seasons_loaded"][-1] == "2122"
+        assert payload["provenance"]["git_commit"] == lock["historical_commit"]
+        assert payload["provenance"]["git_dirty"] is False
 
 
 def _locked_setup(tmp_path, monkeypatch, stage="historical", dirty=False, commit="abc", clean=True, ancestor=True,
