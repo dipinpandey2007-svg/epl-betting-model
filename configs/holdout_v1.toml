@@ -1,0 +1,30 @@
+# Final-holdout protocol v1, frozen at the git tag below. See docs/HOLDOUT_PROTOCOL.md.
+# Season roles are defined in src/eplmodel/splits.py; the values here must agree with it
+# (tests/test_holdout.py checks this). Any change to this file after the freeze tag is a
+# protocol change: it must be committed, and recorded in docs/TEST_SET_ACCESS_LOG.md,
+# BEFORE the holdout is accessed.
+
+[holdout]
+protocol_id = "holdout_v1"
+seasons = ["2526"]                 # sealed final holdout
+next_holdout_seasons = ["2627"]    # declared next holdout, used once 2025-26 has been opened
+freeze_tag = "holdout-freeze-v1"
+freeze_date = "2026-10-01"
+
+[metrics]
+# Declared before any access. Log loss and Brier use (H, D, A) columns
+# (eplmodel.evaluation.metrics); Brier is summed over the three outcomes.
+primary = "log_loss"
+secondary = ["brier", "calibration"]
+
+[registration]
+# Specifications to be scored on the holdout. Empty until the final candidates are
+# pre-registered in a commit made BEFORE access; while empty, no access is possible.
+spec_ids = []
+
+# Authorised access entries are added as [[access]] tables, each also recorded in
+# docs/TEST_SET_ACCESS_LOG.md, for example:
+#
+# [[access]]
+# entry_id = "H2"
+# spec_ids = ["<registered spec id>", ...]

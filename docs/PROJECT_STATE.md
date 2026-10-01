@@ -22,7 +22,8 @@ Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Cole
 |---|---|---|
 | Training (fitting + walk-forward selection) | 2014-15 … 2021-22 | 3,040 |
 | **Exposed development test benchmark** | 2022-23, 2023-24 | 760 |
-| Untouched final holdout | not yet defined (to come from additional historical data) | — |
+| Validation (model selection, with the training folds) | 2024-25 | not yet downloaded |
+| **Sealed final holdout** ([protocol](HOLDOUT_PROTOCOL.md)) | 2025-26 (next: 2026-27) | not yet downloaded |
 
 The development test has been scored several times (`TEST_SET_ACCESS_LOG.md`). It may be re-scored only for the
 registered, frozen specifications and must not be used to tune, select or compare new choices.
@@ -57,7 +58,8 @@ registered, frozen specifications and must not be used to tune, select or compar
 5. **No uncertainty estimates.** Differences between models (for example Poisson vs Dixon-Coles, 0.0014 log loss)
    have no standard errors or paired tests yet.
 6. **Calibration** is assessed only for P(home win), with decile bins, on the development test.
-7. **Exposed test set.** There is no untouched final holdout yet.
+7. **Exposed test set.** 2022-24 is exposed. The final holdout (2025-26) is sealed by protocol (2026-10-01) but its
+   data have not yet been acquired.
 8. **Limited data.** Only results are used. The raw files also contain shots and bookmaker odds (including
    closing odds), and these are not used yet. There are no xG, lineup or injury data, and no data from lower
    divisions.
@@ -66,10 +68,8 @@ registered, frozen specifications and must not be used to tune, select or compar
 
 **A common walk-forward evaluation harness, with a sealed final holdout defined first.**
 
-1. Define and seal a final holdout before looking at it:
-   - preferably seasons after 2023-24 (2024-25, and 2025-26 if complete), if football-data.co.uk provides them;
-   - optionally add earlier seasons for more training history;
-   - record the holdout definition and freeze date in `TEST_SET_ACCESS_LOG.md`.
+1. ~~Define and seal a final holdout before looking at it~~: done 2026-10-01 ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md),
+   tag `holdout-freeze-v1`). Next: add 2024-25 to the development data and perform the sealed acquisition of 2025-26.
 2. Build one evaluation harness that scores every model on the same training-season walk-forward folds:
    - the same information and update policy for every model (for example, goal models refitted or time-weighted
      as each season progresses);

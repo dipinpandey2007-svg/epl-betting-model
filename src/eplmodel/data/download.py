@@ -10,7 +10,11 @@ never overwritten. Because of the pandas round-trip, raw-file bytes can vary
 with pandas version or upstream edits; the processed dataset checksum in
 data/checksums.json is the authoritative reproducibility check.
 
-Usage:  python -m eplmodel.data.download
+Only development seasons can be downloaded here. Holdout seasons (see
+docs/HOLDOUT_PROTOCOL.md) are refused. By default the ten seasons of the
+recorded dataset (DATASET_V1_SEASONS) are downloaded.
+
+Usage:  python -m eplmodel.data.download [--seasons 1415 1516 ...]
 """
 
 import argparse
@@ -21,7 +25,7 @@ from pathlib import Path
 import pandas as pd
 
 from eplmodel.paths import RAW_DIR
-from eplmodel.splits import SEASON_ORDER
+from eplmodel.splits import DATASET_V1_SEASONS, assert_not_holdout
 
 BASE_URL = "https://www.football-data.co.uk/mmz4281/{season}/{league}.csv"
 LEAGUE = "E0"  # English Premier League
@@ -39,6 +43,7 @@ def download_season(
     retry_wait: float = 3.0,
 ) -> Path | None:
     """Download one season, skipping it if the local file already exists. Returns the path or None."""
+    assert_not_holdout([season_code])
     local_path = raw_season_path(season_code, raw_dir, league)
     if local_path.exists():
         print(f"{local_path} already exists, skipping download.")
@@ -60,7 +65,8 @@ def download_season(
     return None
 
 
-def download_all(season_codes=SEASON_ORDER, raw_dir: Path = RAW_DIR, pause: float = 1.0) -> list[Path | None]:
+def download_all(season_codes=DATASET_V1_SEASONS, raw_dir: Path = RAW_DIR, pause: float = 1.0) -> list[Path | None]:
+    assert_not_holdout(season_codes)
     paths = []
     for code in season_codes:
         paths.append(download_season(code, raw_dir))
@@ -71,11 +77,13 @@ def download_all(season_codes=SEASON_ORDER, raw_dir: Path = RAW_DIR, pause: floa
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--raw-dir", type=Path, default=RAW_DIR)
+    parser.add_argument("--seasons", nargs="+", default=list(DATASET_V1_SEASONS),
+                        help="season codes to download (default: the recorded dataset, 1415..2324)")
     args = parser.parse_args()
     print("Note: these files are third-party data from football-data.co.uk, not covered by this project's "
           "licence. Make sure your use complies with Football-Data's current terms.")
-    paths = download_all(raw_dir=args.raw_dir)
-    missing = [code for code, p in zip(SEASON_ORDER, paths) if p is None]
+    paths = download_all(args.seasons, raw_dir=args.raw_dir)
+    missing = [code for code, p in zip(args.seasons, paths) if p is None]
     if missing:
         raise SystemExit(f"Failed to download seasons: {missing}")
 

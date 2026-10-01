@@ -9,22 +9,28 @@ output is identical to the dataset used for every recorded result:
 - Season is taken from the file name (e.g. "1415");
 - rows are sorted by Date with pandas' default sort.
 
+The seasons are given explicitly (default: DATASET_V1_SEASONS, 1415..2324);
+files for other seasons in the raw directory are ignored, and holdout seasons
+are refused (docs/HOLDOUT_PROTOCOL.md).
+
 Within a single date the row order is arbitrary, which is harmless here: no
 team plays twice on one date, so sequential Elo updates do not depend on it
 (validate_matches checks this).
 
-Usage:  python -m eplmodel.data.build
+Usage:  python -m eplmodel.data.build [--seasons 1415 1516 ...]
 """
 
 import argparse
+from collections.abc import Sequence
 from pathlib import Path
 
 import pandas as pd
 
 from eplmodel.data.checksums import verify_file
-from eplmodel.data.download import LEAGUE
+from eplmodel.data.download import LEAGUE, raw_season_path
 from eplmodel.data.validate import validate_matches
 from eplmodel.paths import PROCESSED_MATCHES, RAW_DIR
+from eplmodel.splits import DATASET_V1_SEASONS, assert_not_holdout
 
 ESSENTIAL_COLUMNS = ["Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "FTR"]
 
@@ -39,18 +45,31 @@ def load_and_clean_season(path: Path) -> tuple[pd.DataFrame, int]:
     return df, before - len(df)
 
 
-def build_matches(raw_dir: Path = RAW_DIR, league: str = LEAGUE, verbose: bool = True) -> pd.DataFrame:
-    files = sorted(Path(raw_dir).glob(f"{league}_*.csv"))
-    if not files:
-        raise FileNotFoundError(f"No raw files found in {raw_dir}; run `python -m eplmodel.data.download` first.")
-    seasons = []
+def build_matches(
+    raw_dir: Path = RAW_DIR,
+    league: str = LEAGUE,
+    verbose: bool = True,
+    seasons: Sequence[str] = DATASET_V1_SEASONS,
+) -> pd.DataFrame:
+    """Combine the raw files of exactly `seasons`; other files in `raw_dir` are ignored.
+
+    Holdout seasons are refused, so a holdout file placed in the raw directory
+    by mistake can never enter a development dataset.
+    """
+    assert_not_holdout(seasons)
+    files = [raw_season_path(s, raw_dir, league) for s in sorted(seasons)]
+    missing = [f.name for f in files if not f.exists()]
+    if missing:
+        raise FileNotFoundError(f"Raw files {missing} not found in {raw_dir}; "
+                                "run `python -m eplmodel.data.download` first.")
+    frames = []
     for f in files:
         season_df, dropped = load_and_clean_season(f)
         if dropped and verbose:
             print(f"{f.name}: dropped {dropped} incomplete row(s)")
         season_df["Season"] = f.stem.split(f"{league}_")[1]
-        seasons.append(season_df)
-    matches = pd.concat(seasons, ignore_index=True)
+        frames.append(season_df)
+    matches = pd.concat(frames, ignore_index=True)
     return matches.sort_values("Date").reset_index(drop=True)
 
 
@@ -58,9 +77,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build data/processed/matches.csv from raw season files.")
     parser.add_argument("--raw-dir", type=Path, default=RAW_DIR)
     parser.add_argument("--output", type=Path, default=PROCESSED_MATCHES)
+    parser.add_argument("--seasons", nargs="+", default=list(DATASET_V1_SEASONS),
+                        help="season codes to include (default: the recorded dataset, 1415..2324)")
     args = parser.parse_args()
 
-    matches = build_matches(args.raw_dir)
+    matches = build_matches(args.raw_dir, seasons=args.seasons)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     matches.to_csv(args.output, index=False)
     print(f"Saved {len(matches)} rows to {args.output}")

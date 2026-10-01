@@ -9,3 +9,7 @@ __pycache__/
 # data/checksums.json records the exact content used for all results.
 data/raw/
 data/processed/
+
+# Sealed final holdout data (docs/HOLDOUT_PROTOCOL.md). Only data/holdout_manifest.json,
+# which records their checksums, is committed.
+data/holdout/

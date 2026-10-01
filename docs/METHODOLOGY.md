@@ -43,10 +43,13 @@ A model that fits training data better is not automatically a better predictive 
   exploratory work (`TEST_SET_ACCESS_LOG.md`) and must not be used to tune, select or compare new methodological
   choices. They may be re-scored only for the registered, frozen specifications; the code enforces this
   (`eplmodel.splits.require_registered_dev_test_spec`).
-- All new choices are made on walk-forward folds inside the training seasons. Functions that fit or select refuse
-  development-test seasons (`eplmodel.splits.assert_no_dev_test`).
-- A genuinely untouched final holdout will be defined from additional historical data, and its definition
-  recorded before it is looked at.
+- 2022-24 may be used as historical fitting information for later seasons, but never as a validation or
+  model-selection target (`eplmodel.splits.assert_valid_selection_target`).
+- New choices are made on `eplmodel.splits.selection_folds()`: the training-season folds validating 2017-18 to
+  2021-22, plus 2024-25, reported pooled and separately.
+- The final holdout is 2025-26, sealed by [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) before any of its data were
+  acquired; 2026-27 is the declared next holdout. Every data path refuses holdout seasons
+  (`eplmodel.splits.assert_not_holdout`); only `eplmodel.holdout` can open it.
 - Every access to a test period is recorded in `TEST_SET_ACCESS_LOG.md`.
 
 ## 4. Walk-forward evaluation

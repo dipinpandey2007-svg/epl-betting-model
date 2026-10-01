@@ -6,6 +6,7 @@
 | `processed/matches.csv` | no | 3,800 matches: Date, HomeTeam, AwayTeam, FTHG, FTAG, FTR, Season |
 | `reference/team_history.csv` | yes | Hand-compiled Premier League history of teams that join the league in the dataset window |
 | `checksums.json` | yes | Content SHA-256 of the files behind all recorded results |
+| `holdout/` | no | Sealed final-holdout data (2025-26), never in `raw/` or `processed/`; see [HOLDOUT_PROTOCOL.md](../docs/HOLDOUT_PROTOCOL.md). Not acquired yet |
 
 ## Why the match data are not in the repository
 

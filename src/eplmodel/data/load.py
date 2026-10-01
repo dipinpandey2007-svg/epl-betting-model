@@ -6,6 +6,7 @@ import pandas as pd
 
 from eplmodel.data.validate import validate_matches
 from eplmodel.paths import PROCESSED_MATCHES
+from eplmodel.splits import assert_not_holdout
 
 
 def load_matches(path: Path = PROCESSED_MATCHES, validate: bool = True) -> pd.DataFrame:
@@ -15,7 +16,20 @@ def load_matches(path: Path = PROCESSED_MATCHES, validate: bool = True) -> pd.Da
     predictions from different models instead of relying on row positions.
     The processed CSV stores goals as floats (an artefact of the NaN row in
     the raw data); they are cast to int here, which does not change any result.
+
+    This is the loader for development work: it raises HoldoutAccessError if
+    the file contains any sealed holdout season. Holdout data are loaded only
+    through eplmodel.holdout.load_holdout_matches.
     """
+    df = _read_matches(path)
+    assert_not_holdout(df["Season"].unique())
+    if validate:
+        validate_matches(df)
+    return df
+
+
+def _read_matches(path: Path) -> pd.DataFrame:
+    """Read and type a processed match file WITHOUT the holdout guard. Internal: use load_matches."""
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(
@@ -26,6 +40,4 @@ def load_matches(path: Path = PROCESSED_MATCHES, validate: bool = True) -> pd.Da
     df["FTHG"] = df["FTHG"].astype(int)
     df["FTAG"] = df["FTAG"].astype(int)
     df["match_id"] = df["Date"].dt.strftime("%Y-%m-%d") + "_" + df["HomeTeam"] + "_" + df["AwayTeam"]
-    if validate:
-        validate_matches(df)
     return df

@@ -93,7 +93,8 @@ Python 3.11-3.13, plus a minimum-dependency job; golden tests run manually.
   checksums), `models/` (elo, poisson, scoreline, dixon_coles), `evaluation/`
   (metrics, calibration, baselines, alignment, walk_forward), `analysis/`
   (promoted-team folds), `reporting/` (metrics.json with provenance, figures),
-  `splits.py` (season splits and dev-test guards), `constants.py`.
+  `splits.py` (season roles, selection folds, dev-test and holdout guards),
+  `holdout.py` (the only way to open the sealed holdout), `constants.py`.
 - `experiments/`: one module per recorded experiment, each with
   `run(write=True)`. The golden tests call these same functions.
 - `configs/baselines_v1.toml`: the frozen specifications (spec ids, K, rho,
@@ -110,10 +111,19 @@ Python 3.11-3.13, plus a minimum-dependency job; golden tests run manually.
 Data: EPL 2014-15 to 2023-24, 3,800 matches. Train = 2014-15 to 2021-22.
 
 **2022-23 and 2023-24 are an exposed development test benchmark**, not a
-final holdout. Never use them to tune, select or compare any new choice. Only
-specs in `REGISTERED_DEV_TEST_SPECS` (`splits.py`) may be scored on them, and
-any new access must be logged in `docs/TEST_SET_ACCESS_LOG.md` *first*. An
-untouched final holdout is still to be defined from additional data.
+final holdout. They may be used as historical fitting information for later
+seasons, but never to tune, select or compare any new choice (never a
+validation or selection target). Only specs in `REGISTERED_DEV_TEST_SPECS`
+(`splits.py`) may be scored on them, and any new access must be logged in
+`docs/TEST_SET_ACCESS_LOG.md` *first*.
+
+**Final holdout: 2025-26 is sealed** (`docs/HOLDOUT_PROTOCOL.md`, tag
+`holdout-freeze-v1`). Its outcomes must not be used for fitting, tuning,
+feature or spec selection, descriptive analysis or any development decision.
+Never download, inspect or load it outside `eplmodel.holdout`. 2026-27 is the
+declared next holdout, under the same rules. 2024-25 is the validation season;
+model selection uses `splits.selection_folds()` (validating 2017-18 to 2021-22
+and 2024-25), reporting 2024-25 both pooled and separately.
 
 | Spec | Dev-test log loss / Brier |
 |---|---|

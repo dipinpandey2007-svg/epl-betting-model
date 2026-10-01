@@ -15,8 +15,10 @@ Rules from now on:
    `REGISTERED_DEV_TEST_SPECS`.
 3. Scoring any other specification on 2022-24 needs a deliberate decision, recorded here *before* it happens,
    and then a new entry in `REGISTERED_DEV_TEST_SPECS`.
-4. A genuinely untouched final holdout will be created later from additional historical data. It will be
-   defined (seasons and freeze date) before anyone looks at the results for it.
+4. From 2026-10-01, 2022-24 may be used as **historical fitting information** when predicting later seasons, but
+   never as a validation or model-selection target (`eplmodel.splits.assert_valid_selection_target`).
+5. The final holdout is defined in [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md): 2025-26 is sealed and 2026-27 is
+   the declared next holdout. Holdout accesses are recorded below as entries H0, H1, … *before* they happen.
 
 ## Exposure history
 
@@ -42,3 +44,19 @@ is taken from the order of code in `archive/exploratory/elo.py`.
 - Goal-count means, variances and Poisson fit were inspected on all ten seasons; this informed the remark
   about mild overdispersion.
 - `explore_data.py` (now `archive/exploratory/explore_data.py`) inspected the 2023-24 raw file's columns and date range.
+
+## Final holdout (2025-26) — protocol `holdout_v1`
+
+Every action involving the holdout is recorded here **before** it happens. An entry id in the first column is what
+`eplmodel.holdout.open_final_holdout` looks for; an authorised evaluation entry must also appear as an `[[access]]`
+table in `configs/holdout_v1.toml`.
+
+| # | When | Action | Outcomes seen? | Specs scored | Notes |
+|---|---|---|---|---|---|
+| H0 | 2026-10-01 | Protocol `holdout_v1` frozen (tag `holdout-freeze-v1`): 2025-26 sealed, 2026-27 declared next holdout, metrics fixed (log loss primary; Brier, calibration secondary) | no | none | No 2024-25 or 2025-26 data downloaded or inspected by this project at the time of the freeze (the pre-freeze audit requested HTTP headers only, to confirm the file URLs exist). The season is public knowledge; the seal applies to this project's development process (protocol §2). |
+
+## Validation season (2024-25) usage
+
+2024-25 is a selection target and will be scored repeatedly. Each comparison scored on it is recorded in
+`RESULTS_LOG.md`, so the number of choices made with it can be audited. None so far: the season has not been
+downloaded.

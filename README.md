@@ -22,7 +22,8 @@ Trained on 2014-15 to 2021-22, scored on 2022-23 and 2023-24. Lower is better fo
 Read these with three caveats:
 
 1. **The 2022-24 period is an exposed development benchmark, not a clean holdout.** It was evaluated several times
-   during exploratory work ([access log](docs/TEST_SET_ACCESS_LOG.md)). A sealed final holdout will be defined later.
+   during exploratory work ([access log](docs/TEST_SET_ACCESS_LOG.md)). The sealed final holdout is 2025-26
+   ([holdout protocol](docs/HOLDOUT_PROTOCOL.md)); it has not been scored.
 2. **648-match subset.** The static goal models cannot predict for teams absent from training (Nott'm Forest, Luton),
    so 112 matches are excluded from the goal-model comparison.
 3. **Elo vs Poisson is not a like-for-like comparison.** Elo updates its ratings through the test seasons; the
@@ -102,7 +103,7 @@ archive/exploratory/   the original exploratory scripts, kept for reference
 - Dixon-Coles is staged, not jointly estimated.
 - No uncertainty estimates on differences between models.
 - Only match results are used so far.
-- There is no untouched final holdout yet.
+- The final holdout (2025-26) is sealed by protocol but has not been downloaded or scored yet.
 
 See [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md) for the full list and the next milestone, and
 [docs/ROADMAP.md](docs/ROADMAP.md) for the planned stages (xG, market odds, calibration, CLV) and how they will plug in.
