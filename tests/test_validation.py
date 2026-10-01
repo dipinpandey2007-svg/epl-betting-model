@@ -377,10 +377,16 @@ def test_experiment_runs_end_to_end_on_synthetic_data(tmp_path, monkeypatch):
     monkeypatch.setattr(validation_2425, "check_primary_counts", lambda fitted, vcfg: None)
     monkeypatch.setattr(validation_2425, "write_predictions",
                         lambda name, preds: write_predictions(name, preds, results_dir=tmp_path))
+    # Provenance checksums its data file: use a placeholder under tmp_path, not the git-ignored dataset
+    # (absent in CI). Provenance records that path relative to the project root, hence the second patch.
+    placeholder = tmp_path / "placeholder_matches.csv"
+    placeholder.write_text("Date,HomeTeam,AwayTeam\n", encoding="utf-8")
+    from eplmodel.reporting import results as reporting
+    monkeypatch.setattr(reporting, "PROJECT_ROOT", tmp_path)
     written = {}
     monkeypatch.setattr(validation_2425, "write_results",
                         lambda name, result, data_path: written.update(data_path=data_path) or
-                        write_results(name, result, results_dir=tmp_path, data_path=PROCESSED_MATCHES))
+                        write_results(name, result, results_dir=tmp_path, data_path=placeholder))
 
     out = validation_2425.run(write=True)
     assert [f["target"] for f in out["folds"]] == ["1718", "1819", "1920", "2021", "2122", "2425"]
@@ -390,5 +396,6 @@ def test_experiment_runs_end_to_end_on_synthetic_data(tmp_path, monkeypatch):
     assert out["primary_2425"]["groups"]["common"]["scores"]["poisson"]["n_matches"] == 20
     assert written["data_path"] == PROCESSED_DEV_V2                    # provenance points at dev_v2
     metrics = json.loads((tmp_path / "validation_2425" / "metrics.json").read_text(encoding="utf-8"))
+    assert metrics["provenance"]["data_sha256"] == content_sha256(placeholder)
     assert metrics["results"]["predictions"]["sha256"] == content_sha256(tmp_path / "validation_2425" / "predictions.csv")
     assert metrics["results"]["predictions"]["n_rows"] == 6 * 30

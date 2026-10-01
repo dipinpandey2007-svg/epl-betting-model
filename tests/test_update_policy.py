@@ -24,7 +24,7 @@ from eplmodel.models.elo import (
     run_elo,
     season_start_elo,
 )
-from eplmodel.paths import PROCESSED_DEV_V2, PROCESSED_MATCHES, PROJECT_ROOT
+from eplmodel.paths import PROCESSED_DEV_V2, PROJECT_ROOT
 from eplmodel.reporting.results import write_predictions, write_results
 from eplmodel.splits import (
     REGISTERED_DEV_TEST_SPECS,
@@ -455,10 +455,16 @@ def test_experiment_runs_end_to_end_on_synthetic_data(tmp_path, monkeypatch):
     monkeypatch.setattr(diag, "check_fold_counts", lambda target, preds, fitted, dcfg: None)
     monkeypatch.setattr(diag, "write_predictions",
                         lambda name, preds: write_predictions(name, preds, results_dir=tmp_path))
+    # Provenance checksums its data file: use a placeholder under tmp_path, not the git-ignored dataset
+    # (absent in CI). Provenance records that path relative to the project root, hence the second patch.
+    placeholder = tmp_path / "placeholder_matches.csv"
+    placeholder.write_text("Date,HomeTeam,AwayTeam\n", encoding="utf-8")
+    from eplmodel.reporting import results as reporting
+    monkeypatch.setattr(reporting, "PROJECT_ROOT", tmp_path)
     written = {}
     monkeypatch.setattr(diag, "write_results",
                         lambda name, result, data_path: written.update(data_path=data_path) or
-                        write_results(name, result, results_dir=tmp_path, data_path=PROCESSED_MATCHES))
+                        write_results(name, result, results_dir=tmp_path, data_path=placeholder))
 
     out = diag.run(write=True)
     assert out["diagnostic_only"] is True
@@ -475,5 +481,6 @@ def test_experiment_runs_end_to_end_on_synthetic_data(tmp_path, monkeypatch):
     assert written["data_path"] == PROCESSED_DEV_V2
     path = tmp_path / "update_policy_diagnostic" / "predictions.csv"
     metrics = json.loads((tmp_path / "update_policy_diagnostic" / "metrics.json").read_text(encoding="utf-8"))
+    assert metrics["provenance"]["data_sha256"] == content_sha256(placeholder)
     assert metrics["results"]["predictions"]["sha256"] == content_sha256(path)
     assert metrics["results"]["predictions"]["n_rows"] == 6 * 30
