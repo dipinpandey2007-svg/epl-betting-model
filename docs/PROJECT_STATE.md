@@ -1,11 +1,17 @@
 # EPL Betting Model — Current State
 
-_Last updated: 2026-10-01 (after the repository refactor)._
+_Last updated: 2026-10-01 (after Experiment 11, the update-policy diagnostic)._
 
 ## Current phase
 
 The refactor is complete: the exploratory script is now a tested package that reproduces every recorded result.
-No new methodological experiment has been started since.
+Since then:
+
+- 2024-25 has been acquired (Experiment 9).
+- The established specs have been scored on the selection folds (Experiment 10).
+- The pre-registered update-policy diagnostic has been run and recorded (Experiment 11).
+
+No model or specification has been changed.
 
 Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Coles (see `RESULTS_LOG.md`).
 
@@ -24,7 +30,7 @@ Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Cole
 |---|---|---|
 | Training (fitting + walk-forward selection) | 2014-15 … 2021-22 | 3,040 |
 | **Exposed development test benchmark** | 2022-23, 2023-24 | 760 |
-| Validation (model selection, with the training folds) | 2024-25 | 380, **scored once** (2026-10-01, Experiment 10) |
+| Validation (model selection, with the training folds) | 2024-25 | 380, **scored in two pre-registered runs** (2026-10-01: Experiments 10 and 11) |
 | **Sealed final holdout** ([protocol](HOLDOUT_PROTOCOL.md)) | 2025-26 (next: 2026-27) | not yet downloaded |
 
 The development test has been scored several times (`TEST_SET_ACCESS_LOG.md`). It may be re-scored only for the
@@ -38,6 +44,26 @@ registered, frozen specifications and must not be used to tune, select or compar
 | common (342; Ipswich excluded) | 0.9836 / 0.5879 | 1.0760 / 0.6520 | 1.0854 / 0.6573 | 1.0857 / 0.6572 |
 
 Elo is online through the season, while the goal models are static, so the gap mixes model family with update policy.
+
+**Experiment 11** (protocol `update_policy_diagnostic_v1`, diagnostic only) decomposed this 2024-25 gap on the 342
+common matches. It added two frozen season-start Elo arms:
+
+- **F1:** ratings frozen at the start of the season, with online Elo's own layer;
+- **F2:** the same frozen ratings, with its own season-start layer.
+
+> Poisson − Online (+0.1019) = (Poisson − F2) + (F2 − F1) + (F1 − Online)
+
+| Component | 2024-25 log loss (clustered SE) | Pre-registered rule |
+|---|---|---|
+| F1 − Online: updating | +0.0327 (0.0106) | distinguishable; positive in all 5 historical folds |
+| F2 − F1: calibration layer | −0.0020 (0.0018) | not distinguishable |
+| Poisson − F2: remaining static-model / history difference | +0.0712 (0.0132) | 2024-25-specific observation (opposite sign in 4 of 5 historical folds); does not establish its cause |
+
+- **In-season updating explains about a third of the 2024-25 gap.** Most of the gap is already present at the start of
+  the season.
+- **Poisson − F2 mixes history weighting with model family.** This design does not separate them.
+- **The pooled six-fold figures are not an unbiased estimate.**
+
 The 2025-26 holdout remains sealed and unacquired.
 
 ## Frozen specifications (`configs/baselines_v1.toml`)
@@ -58,8 +84,9 @@ The 2025-26 holdout remains sealed and unacquired.
    - Elo hides the same problem by starting new teams at the league average.
    - Excluding these matches is not an acceptable final policy.
 2. **Unfair Elo vs goal-model comparison.** Elo updates dynamically through the test period; the Poisson model is
-   static and assumes constant team strength for eight seasons. The current gap mixes model family with update
-   dynamics.
+   static and assumes constant team strength over its whole history. Experiment 11 isolated the updating component
+   (about a third of the 2024-25 gap). The rest is a difference at the start of the season, in which history weighting
+   and model family are still confounded. No goal model yet updates or time-weights its history.
 3. **Dixon-Coles is staged, not joint MLE.** It showed no development-test benefit in this static setup.
 4. **Elo design choices not yet validated.**
    - Promoted teams start at 1500.
@@ -67,8 +94,10 @@ The 2025-26 holdout remains sealed and unacquired.
    - Home advantage is applied only through the regression intercept, not inside the updates (any change needs a
      training-fold experiment).
    - The 2014-15 burn-in season is used when fitting the regression.
-5. **No uncertainty estimates.** Differences between models (for example Poisson vs Dixon-Coles, 0.0014 log loss)
-   have no standard errors or paired tests yet.
+5. **Limited uncertainty estimates.**
+   - Experiments 10 and 11 report paired per-match differences with naive SEs; Experiment 11 adds date-clustered SEs.
+   - The development-test results (Experiments 2-6) still have none.
+   - With six folds, fold-to-fold variation is the main uncertainty.
 6. **Calibration** is assessed only for P(home win), with decile bins, on the development test.
 7. **Exposed test set.** 2022-24 is exposed. The final holdout (2025-26) is sealed by protocol (2026-10-01) but its
    data have not yet been acquired.
@@ -81,8 +110,9 @@ The 2025-26 holdout remains sealed and unacquired.
 **A common walk-forward evaluation harness, with a sealed final holdout defined first.**
 
 1. ~~Define and seal a final holdout before looking at it~~: done 2026-10-01 ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md),
-   tag `holdout-freeze-v1`). 2024-25 was added as dataset dev_v2 and scored once as validation (Experiment 10) on
-   2026-10-01. The sealed acquisition of 2025-26 has not been done.
+   tag `holdout-freeze-v1`). 2024-25 was added as dataset dev_v2 and scored as validation (Experiment 10), then used
+   by the update-policy diagnostic (Experiment 11), both on 2026-10-01. The sealed acquisition of 2025-26 has not been
+   done.
 2. Build one evaluation harness that scores every model on the same training-season walk-forward folds:
    - the same information and update policy for every model (for example, goal models refitted or time-weighted
      as each season progresses);

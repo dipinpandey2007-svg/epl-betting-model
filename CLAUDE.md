@@ -110,7 +110,8 @@ Python 3.11-3.13, plus a minimum-dependency job; golden tests run manually.
 
 - `src/eplmodel/`: library code. `data/` (download, build, load, validate,
   checksums), `models/` (elo, poisson, scoreline, dixon_coles), `evaluation/`
-  (metrics, calibration, baselines, alignment, walk_forward), `analysis/`
+  (metrics, calibration, baselines, alignment, walk_forward,
+  validation, update_policy), `analysis/`
   (promoted-team folds), `reporting/` (metrics.json with provenance, figures),
   `splits.py` (season roles, selection folds, dev-test and holdout guards),
   `holdout.py` (the only way to open the sealed holdout), `constants.py`.
@@ -148,9 +149,12 @@ validation (protocol `validation_2425_v1`, RESULTS_LOG Experiment 10): Elo
 0.9848 log loss on all 380 matches; on the 342 without Ipswich, Elo 0.9836,
 frequency baseline 1.0760, static Poisson 1.0854, staged Dixon-Coles 1.0857.
 These are observed validation evidence and must NOT be used to tune the
-established specifications. The rule for future selection work is
-`splits.selection_folds()` (validating 2017-18 to 2021-22 and 2024-25),
-reporting 2024-25 both pooled and separately. The recorded experiments
+established specifications. 2024-25 was then used once more by the
+pre-registered update-policy diagnostic (protocol `update_policy_diagnostic_v1`,
+RESULTS_LOG Experiment 11; diagnostic only, nothing selected or changed).
+The rule for future selection work is `splits.selection_folds()`
+(validating 2017-18 to 2021-22 and 2024-25), reporting 2024-25 both pooled
+and separately. The recorded experiments
 predate this rule and use training folds only.
 
 | Spec | Dev-test log loss / Brier |
@@ -171,6 +175,23 @@ training-fold experiment.
 Do not describe the Elo vs Poisson gap as Elo being intrinsically better: Elo
 updates through the test seasons while the Poisson model is static, so the
 comparison mixes model family with update dynamics.
+
+Experiment 11 decomposed the 2024-25 gap on the 342 common matches:
+Poisson − Online (+0.1019) = (Poisson − F2) + (F2 − F1) + (F1 − Online).
+F1 = frozen season-start ratings with online Elo's layer; F2 = frozen ratings
+with its own season-start layer.
+
+- F1 − Online is the updating component: +0.0327. It is distinguishable under
+  the pre-registered rule and positive in all five historical folds.
+- F2 − F1 is the calibration-layer component: −0.0020, not distinguishable.
+- Poisson − F2 is the remaining static-model / history difference: +0.0712.
+  This is a 2024-25-specific observation (opposite sign in 4 of 5 historical
+  folds). It does not establish its cause, and history weighting and model
+  family are not separated.
+
+So updating explains about a third of the 2024-25 gap. The pooled six-fold
+figures are not an unbiased estimate. Do not use these results to tune
+anything. A hypothesis prompted by them cannot be confirmed on 2024-25.
 
 ---
 
