@@ -26,8 +26,8 @@ deliberately *not* stubbed out: each will be added when real data and a validati
 - **Same interface for every model.** A model produces an (n, 3) array of (H, D, A) probabilities for a set of
   fixtures, keyed by `match_id`, so it can be scored by `eplmodel.evaluation.metrics` and compared on the same matches.
 - **Selection on the selection folds only.** New selection work must use `eplmodel.splits.selection_folds`
-  (training folds plus 2024-25). 2024-25 has been acquired and validated but has not yet been used for model
-  selection or scoring. The development test benchmark may only be re-scored for registered specifications; the
+  (training folds plus 2024-25). 2024-25 has been scored once as validation (Experiment 10); its results must not be
+  used to tune the established specifications. The development test benchmark may only be re-scored for registered specifications; the
   2025-26 holdout is sealed ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md)).
 - **Each experiment** gets a script in `experiments/`, a results folder, a `RESULTS_LOG.md` entry and, once frozen, a
   spec id in `configs/` and golden values in the tests.

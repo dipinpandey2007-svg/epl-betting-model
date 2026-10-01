@@ -13,7 +13,7 @@ Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Cole
 
 - Dataset v1: 10 EPL seasons, 2014-15 to 2023-24, 3,800 matches (football-data.co.uk). All recorded results use it.
 - Dataset dev_v2 (2026-10-01): v1 plus the 2024-25 validation season, 4,180 matches (`RESULTS_LOG.md` Experiment 9).
-  It has not yet been used for any model.
+  Used by the 2024-25 validation run (Experiment 10).
 - Raw and processed files are not committed. Recreate them with the download and build commands in the README;
   `data/checksums.json` identifies the exact dataset behind all results.
 - Hand-compiled reference table: `data/reference/team_history.csv` (every row sourced and checked on 2026-10-01).
@@ -24,11 +24,21 @@ Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Cole
 |---|---|---|
 | Training (fitting + walk-forward selection) | 2014-15 … 2021-22 | 3,040 |
 | **Exposed development test benchmark** | 2022-23, 2023-24 | 760 |
-| Validation (model selection, with the training folds) | 2024-25 | 380, acquired 2026-10-01, not scored |
+| Validation (model selection, with the training folds) | 2024-25 | 380, **scored once** (2026-10-01, Experiment 10) |
 | **Sealed final holdout** ([protocol](HOLDOUT_PROTOCOL.md)) | 2025-26 (next: 2026-27) | not yet downloaded |
 
 The development test has been scored several times (`TEST_SET_ACCESS_LOG.md`). It may be re-scored only for the
 registered, frozen specifications and must not be used to tune, select or compare new choices.
+
+2024-25 has now been scored once as validation (protocol `validation_2425_v1`, RESULTS_LOG Experiment 10). Its results are observed validation evidence and must not be used to tune the established specifications. The 2024-25 results (log loss / Brier, from `results/validation_2425/metrics.json`) were:
+
+| Group | Elo K=25 | Frequency baseline | Static Poisson | Staged Dixon-Coles (rho = −0.02, refitted on 2014-24) |
+|---|---|---|---|---|
+| full (380) | 0.9848 / 0.5887 | 1.0812 / 0.6558 | — | — |
+| common (342; Ipswich excluded) | 0.9836 / 0.5879 | 1.0760 / 0.6520 | 1.0854 / 0.6573 | 1.0857 / 0.6572 |
+
+Elo is online through the season, while the goal models are static, so the gap mixes model family with update policy.
+The 2025-26 holdout remains sealed and unacquired.
 
 ## Frozen specifications (`configs/baselines_v1.toml`)
 
@@ -71,7 +81,8 @@ registered, frozen specifications and must not be used to tune, select or compar
 **A common walk-forward evaluation harness, with a sealed final holdout defined first.**
 
 1. ~~Define and seal a final holdout before looking at it~~: done 2026-10-01 ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md),
-   tag `holdout-freeze-v1`). 2024-25 was added as dataset dev_v2 on 2026-10-01. Next: the sealed acquisition of 2025-26.
+   tag `holdout-freeze-v1`). 2024-25 was added as dataset dev_v2 and scored once as validation (Experiment 10) on
+   2026-10-01. The sealed acquisition of 2025-26 has not been done.
 2. Build one evaluation harness that scores every model on the same training-season walk-forward folds:
    - the same information and update policy for every model (for example, goal models refitted or time-weighted
      as each season progresses);

@@ -1,8 +1,9 @@
 # EPL Betting Model — Results Log
 
 This file records important experiments and decisions so that results do not exist only inside individual chat
-conversations. Every model result below is reproduced by `python -m experiments.run_all` (written to
-`results/<experiment>/metrics.json`) and locked by `tests/test_golden_results.py`. Data-acquisition records are not
+conversations. Every model result in Experiments 2–7 is reproduced by `python -m experiments.run_all` (written to
+`results/<experiment>/metrics.json`) and locked by `tests/test_golden_results.py`. Experiment 10 is reproduced by
+`python -m experiments.validation_2425`. It is not yet in `run_all` or locked by golden tests. Data-acquisition records are not
 produced by `run_all`. Their checksums and coverage are locked by `tests/test_data.py` against
 `data/checksums.json`: dataset v1 also through the golden data fixture, and dataset dev_v2 (Experiment 9) by the
 `dev_v2` tests.
@@ -301,6 +302,158 @@ bytes.
   the row-order check above, Elo was run through `dev_v2`, but only ratings for 2014-24 matches were compared.
 - `data/reference/team_history.csv` has no row for Ipswich (2024-25 entrant). It must be sourced before the
   promoted-team analysis is extended to the 2024-25 fold.
+
+## Experiment 10 — Established specifications on the selection folds; 2024-25 validation (2026-10-01)
+
+`experiments/validation_2425.py`, protocol `validation_2425_v1` (`configs/validation_2425_v1.toml`), results in
+`results/validation_2425/metrics.json`.
+
+### Pre-registration
+
+The protocol and access-log entry V1 were committed and pushed (commit `3d35c55`, 11:18 UTC) **before** any
+2024-25 prediction was generated. The experiment was then run once, from that clean commit (11:19 UTC). Nothing was
+changed before or after the run.
+
+### Objective
+
+Score the established specifications on the six selection folds under one information policy, so that future
+candidate models have a baseline row in every fold. No decision about the established specifications is taken from
+these results.
+
+### Data and folds
+
+- Dataset `dev_v2` (`matches_dev_v2.csv`, SHA-256 `c726bd5c…39fd807`).
+- Targets: 2017-18, 2018-19, 2019-20, 2020-21, 2021-22 and **2024-25**. Each target is predicted from every development
+  season before it (`eplmodel.splits.selection_folds`). 2022-24 is history only, in the 2024-25 fold.
+- **2024-25 is the primary new validation result.** Folds 2017-18 to 2021-22 were used during development, including
+  the selection of K = 25 (Experiment 2a), so they are historical context.
+
+### Specifications and information policy (all frozen before the run)
+
+| Spec | Frozen | Re-estimated once on the fold history | During the target season |
+|---|---|---|---|
+| `elo_k25_logreg_v1` | K = 25, start 1500, no home advantage in updates, logistic C = 1.0, tol = 1e-4 | home shift (redundant) and logistic regression | ratings updated **online**; each prediction uses pre-match ratings from earlier-dated matches only |
+| `poisson_static_v1` | formula, 10-goal grid with H/D/A renormalisation | GLM coefficients | **static** (not updated) |
+| `dixon_coles_staged_v1` | staged method, rho grid −0.30 … 0.28 (step 0.02), invalid values never selected | Poisson coefficients, then rho by history likelihood | **static** |
+| `frequency_baseline_v1` | — | H/D/A rates | static |
+
+Groups (fixed in advance; models are compared only within a group, aligned by `match_id`):
+
+- **full**: all target matches; Elo and the baseline.
+- **common**: target matches in which neither team is absent from the history; all four models.
+
+### 2024-25: primary validation result
+
+**Eligibility.** 380 matches. Ipswich is the only team absent from 2014-15 to 2023-24, so 38 matches are excluded from
+the common group, leaving **342**. All three numbers equal the registered values and were checked before scoring.
+
+| Group | Model | n | Log loss | Brier |
+|---|---|---|---|---|
+| full | Elo K=25 | 380 | 0.9848 | 0.5887 |
+| full | Frequency baseline | 380 | 1.0812 | 0.6558 |
+| common | Elo K=25 | 342 | 0.9836 | 0.5879 |
+| common | Frequency baseline | 342 | 1.0760 | 0.6520 |
+| common | Static Poisson | 342 | 1.0854 | 0.6573 |
+| common | Staged Dixon-Coles | 342 | 1.0857 | 0.6572 |
+
+Paired per-match differences (model minus reference; negative = model better). The standard errors are naive: they
+ignore correlation between matches on the same date.
+
+| Group | Comparison | Log loss (SE) | Brier (SE) |
+|---|---|---|---|
+| full | baseline − Elo | +0.0964 (0.0216) | +0.0671 (0.0150) |
+| common | baseline − Elo | +0.0924 (0.0227) | +0.0641 (0.0157) |
+| common | Poisson − Elo | +0.1019 (0.0188) | +0.0695 (0.0133) |
+| common | Dixon-Coles − Elo | +0.1022 (0.0190) | +0.0694 (0.0133) |
+| common | Poisson − baseline | +0.0094 (0.0207) | +0.0053 (0.0145) |
+| common | Dixon-Coles − baseline | +0.0098 (0.0209) | +0.0052 (0.0145) |
+
+**Values fitted on 2014-15 to 2023-24 (3,800 matches):**
+
+- Elo home shift: 46.1679 (redundant).
+- Elo logistic regression, classes in sklearn's (A, D, H) order; predictions are reordered to (H, D, A):
+  - intercepts 0.080876, −0.237062, 0.156186;
+  - coefficients on the rating difference −0.0038644, 0.0000365, 0.0038279.
+- Poisson IsHome coefficient: 0.217549. The smallest captured grid mass was 0.99940.
+- Dixon-Coles **rho = −0.02**, re-estimated on this history as registered (Experiment 5's −0.04 came from 2014-15 to
+  2021-22).
+  - Valid range for these fixtures: (−0.2425, 0.2908). Grid values −0.30, −0.28 and −0.26 were invalid and never
+    eligible.
+  - History log-likelihood: −11094.242 at rho = −0.02 against −11094.738 at rho = 0.
+- Frequency baseline: H 0.44947, D 0.23316, A 0.31737.
+
+### Historical folds 2017-18 to 2021-22: development context
+
+These folds were used during development and for selecting K = 25.
+
+| Target | Common n (excluded teams) | Elo full (380) | Baseline full | Elo common | Baseline common | Poisson common | DC common | rho |
+|---|---|---|---|---|---|---|---|---|
+| 2017-18 | 306 (Brighton, Huddersfield) | 0.9666 / 0.5729 | 1.0668 / 0.6444 | 0.9665 / 0.5720 | 1.0670 / 0.6449 | 0.9836 / 0.5847 | 0.9833 / 0.5845 | −0.02 |
+| 2018-19 | 272 (Cardiff, Fulham, Wolves) | 0.9110 / 0.5324 | 1.0459 / 0.6313 | 0.9020 / 0.5265 | 1.0518 / 0.6353 | 0.9033 / 0.5303 | 0.9047 / 0.5313 | −0.04 |
+| 2019-20 | 342 (Sheffield United) | 0.9786 / 0.5812 | 1.0645 / 0.6434 | 0.9737 / 0.5766 | 1.0611 / 0.6412 | 0.9708 / 0.5768 | 0.9711 / 0.5768 | −0.04 |
+| 2020-21 | 342 (Leeds) | 1.0480 / 0.6199 | 1.0890 / 0.6629 | 1.0489 / 0.6207 | 1.0944 / 0.6665 | 1.0482 / 0.6263 | 1.0499 / 0.6268 | −0.04 |
+| 2021-22 | 342 (Brentford) | 0.9544 / 0.5660 | 1.0697 / 0.6479 | 0.9460 / 0.5613 | 1.0709 / 0.6485 | 0.9539 / 0.5651 | 0.9537 / 0.5650 | −0.04 |
+
+Each cell is log loss / Brier. The Elo full-group log losses reproduce Experiment 2a's K = 25 fold values. This is
+checked to 1e-9 by `tests/test_validation.py`.
+
+### Pooled six folds: descriptive context, not an unbiased estimate
+
+**K = 25 was selected on folds 2017-18 to 2021-22, so this aggregate is not an unbiased estimate of out-of-sample
+performance.** The common group is the union of each fold's common matches.
+
+| Group | Model | n | Log loss | Brier |
+|---|---|---|---|---|
+| full | Elo K=25 | 2,280 | 0.9739 | 0.5769 |
+| full | Frequency baseline | 2,280 | 1.0695 | 0.6476 |
+| common | Elo K=25 | 1,946 | 0.9726 | 0.5759 |
+| common | Frequency baseline | 1,946 | 1.0709 | 0.6486 |
+| common | Static Poisson | 1,946 | 0.9942 | 0.5923 |
+| common | Staged Dixon-Coles | 1,946 | 0.9947 | 0.5925 |
+
+Pooled paired log-loss differences (common group, naive SE in brackets):
+
+- Poisson − Elo: +0.0215 (0.0062)
+- Dixon-Coles − Elo: +0.0220 (0.0063)
+- Poisson − baseline: −0.0768 (0.0090)
+- baseline − Elo: +0.0983 (0.0109)
+
+### Interpretation
+
+- **Elo beats the frequency baseline in every fold**, by 0.04–0.13 log loss. In 2024-25 the gap is 0.096, about 4.5
+  naive SEs.
+- **The goal models score at the level of the baseline in 2024-25.** Poisson − baseline was +0.009 (SE 0.021),
+  indistinguishable from it. In folds 1–5 they were close to Elo. That a static goal model fell this far in one season
+  is an observation, not an explanation.
+- **Information-policy caveat** (stated before the run):
+  - Elo updates its ratings online through the target season, while Poisson and Dixon-Coles are fitted once at the
+    start of the season.
+  - The goal models also assume each team's strength was constant across the whole history, which is ten seasons in
+    this fold.
+  - The Elo vs goal-model gap therefore mixes **model family** with **update policy**. It does not show that rating
+    models are intrinsically better than goal models.
+- **Dixon-Coles and Poisson are indistinguishable** in every fold (differences ≤ 0.002), as in Experiment 6.
+- **The SEs understate the uncertainty**, because they ignore correlation between matches on the same date. This is a
+  single validation season of 380 matches.
+
+### Decision
+
+- The results are recorded as observed validation evidence. **No specification, hyperparameter, eligibility rule or
+  promoted-team treatment is changed because of them**, and they must not be used to tune the established
+  specifications.
+- New candidate models (for example a dynamic goal model, or the deferred frozen-start Elo diagnostic) need their own
+  pre-registered experiment on the same folds.
+
+### Provenance
+
+| Item | Value |
+|---|---|
+| Code | commit `3d35c550971dc4eaa93d78179d92eb423fc8610b`, `git_dirty: false` |
+| Data | `data/processed/matches_dev_v2.csv`, SHA-256 `c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807` |
+| Predictions | `results/validation_2425/predictions.csv`, 2,280 rows, git-ignored. Content SHA-256 (CRLF normalised to LF) `4e1db61efe28c9961cc5dc46c4ffe5cee6e5ac67c5672a6d8fec63507029c80f` |
+| Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0, scikit-learn 1.9.0 |
+
+Not yet locked by golden tests. The run is not in `experiments.run_all`.
 
 ## Future experiment template
 

@@ -47,8 +47,9 @@ A model that fits training data better is not automatically a better predictive 
   model-selection target (`eplmodel.splits.assert_valid_selection_target`).
 - The rule for future and new selection work is `eplmodel.splits.selection_folds()`: the training-season folds
   validating 2017-18 to 2021-22, plus 2024-25, reported pooled and separately. The recorded experiments predate this
-  rule and used training folds only. 2024-25 has been acquired and validated (dataset dev_v2, 2026-10-01) but has
-  **not yet** been used for model selection or scoring.
+  rule and used training folds only. 2024-25 has been scored once as validation (protocol `validation_2425_v1`, Experiment 10, 2026-10-01). Its
+  results are observed validation evidence and must not be used to tune the established specifications. No model
+  selection has yet been made with it.
 - The final holdout is 2025-26, sealed by [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) before any of its data were
   acquired; 2026-27 is the declared next holdout. Every data path refuses holdout seasons
   (`eplmodel.splits.assert_not_holdout`); only `eplmodel.holdout` can open it.

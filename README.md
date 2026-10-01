@@ -23,7 +23,9 @@ Read these with three caveats:
 
 1. **The 2022-24 period is an exposed development benchmark, not a clean holdout.** It was evaluated several times
    during exploratory work ([access log](docs/TEST_SET_ACCESS_LOG.md)). The sealed final holdout is 2025-26
-   ([holdout protocol](docs/HOLDOUT_PROTOCOL.md)); it has not been scored.
+   ([holdout protocol](docs/HOLDOUT_PROTOCOL.md)); it has not been scored. 2024-25 has been scored once as a
+   validation season ([Experiment 10](docs/RESULTS_LOG.md)). Its results must not be used to tune these
+   specifications.
 2. **648-match subset.** The static goal models cannot predict for teams absent from training (Nott'm Forest, Luton),
    so 112 matches are excluded from the goal-model comparison.
 3. **Elo vs Poisson is not a like-for-like comparison.** Elo updates its ratings through the test seasons; the
@@ -109,6 +111,9 @@ archive/exploratory/   the original exploratory scripts, kept for reference
 - No uncertainty estimates on differences between models.
 - Only match results are used so far.
 - The final holdout (2025-26) is sealed by protocol but has not been downloaded or scored yet.
+- 2024-25 validation (one season, 380 matches): Elo 0.9848 log loss. On the 342 matches without Ipswich, the static
+  goal models (1.0854 / 1.0857) scored no better than the frequency baseline (1.0760). One season, naive uncertainty
+  only, and Elo updates in-season while the goal models are static.
 
 See [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md) for the full list and the next milestone, and
 [docs/ROADMAP.md](docs/ROADMAP.md) for the planned stages (xG, market odds, calibration, CLV) and how they will plug in.

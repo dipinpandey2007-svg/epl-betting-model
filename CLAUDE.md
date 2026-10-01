@@ -129,7 +129,7 @@ Python 3.11-3.13, plus a minimum-dependency job; golden tests run manually.
 
 Data: dataset v1 = EPL 2014-15 to 2023-24, 3,800 matches (all recorded results).
 Dataset dev_v2 = v1 + 2024-25, 4,180 matches (`load_dev_matches()`), acquired
-2026-10-01 and not yet used by any model. Train = 2014-15 to 2021-22.
+2026-10-01 and used by the 2024-25 validation run. Train = 2014-15 to 2021-22.
 
 **2022-23 and 2023-24 are an exposed development test benchmark**, not a
 final holdout. They may be used as historical fitting information for later
@@ -142,9 +142,13 @@ validation or selection target). Only specs in `REGISTERED_DEV_TEST_SPECS`
 `holdout-freeze-v1`). Its outcomes must not be used for fitting, tuning,
 feature or spec selection, descriptive analysis or any development decision.
 Never download, inspect or load it outside `eplmodel.holdout`. 2026-27 is the
-declared next holdout, under the same rules. 2024-25 is the validation season.
-It has been acquired and validated (dataset dev_v2) but has NOT yet been used
-for model selection or scoring. The rule for future selection work is
+declared next holdout, under the same rules; 2025-26 remains sealed and
+unacquired. 2024-25 is the validation season. It has been scored once as
+validation (protocol `validation_2425_v1`, RESULTS_LOG Experiment 10): Elo
+0.9848 log loss on all 380 matches; on the 342 without Ipswich, Elo 0.9836,
+frequency baseline 1.0760, static Poisson 1.0854, staged Dixon-Coles 1.0857.
+These are observed validation evidence and must NOT be used to tune the
+established specifications. The rule for future selection work is
 `splits.selection_folds()` (validating 2017-18 to 2021-22 and 2024-25),
 reporting 2024-25 both pooled and separately. The recorded experiments
 predate this rule and use training folds only.
