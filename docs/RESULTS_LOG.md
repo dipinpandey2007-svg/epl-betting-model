@@ -1582,7 +1582,7 @@ model is refitted.
 |---|---|
 | Pre-registration | commit `ac6069394aa56ad0309dca19336c03c1caed9537` |
 | Implementation and run | commit `e2ecf00704dca4f1e8435aadbb0b3872ef07a53a`, `git_dirty: false` |
-| Metrics | `results/market_benchmark/metrics.json`, content SHA-256 `7b394229eb23858bc7c95134b7b6b37c032194212d9a670b1bfaf728d1c673d9` |
+| Metrics | `results/market_benchmark/metrics.json`, content SHA-256 `55a77b4f57a0f55a8a6daf68aabba12bc552972bda98e837ea05ccac6eebcf56` |
 | Predictions | `results/market_benchmark/predictions.csv`, 1,900 rows (all six arms), git-ignored, content SHA-256 `79fb6b34dc5251f114e8ac9d7a01145f3c65135b1fc8570417fa7bcc39efc9c8` |
 | Odds | raw `E0_1415.csv` … `E0_2122.csv`, each matching `data/checksums.json` |
 | Outcomes | `data/processed/matches_dev_v2.csv`, SHA-256 `c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807`, cut to ≤ 2021-22 |
