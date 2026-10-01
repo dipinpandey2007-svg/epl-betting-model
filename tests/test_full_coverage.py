@@ -370,7 +370,30 @@ def test_holdout_rows_are_refused(fold, eb):
         fc.online_fold(fold.history_rows, hold, M2_HIERARCHICAL, eb, H, 10)
 
 
+# Canonical SHA-256 (sorted-key JSON of the parsed TOML) of the config as frozen at the pre-registration commit
+# 10e99d1, without [historical_locked], the only section written after registration. Checkable without git history.
+FROZEN_CONFIG_CANONICAL_SHA256 = "4eb3dda75b774137e592c997472f47731f8d84d78cd46ca1bb3a90b92481f968"
+
+
+def test_config_equals_the_frozen_preregistration_without_git_history():
+    import hashlib
+    import json
+
+    cfg = dict(load_config(fcp.FULL_COVERAGE_CONFIG))
+    cfg.pop("historical_locked")
+    assert hashlib.sha256(json.dumps(cfg, sort_keys=True).encode()).hexdigest() == FROZEN_CONFIG_CANONICAL_SHA256
+
+
 def test_config_is_the_frozen_preregistration():
+    """The run-time check (git show of the pre-registration commit); needs history, so CI's shallow checkout skips it."""
+    import subprocess
+
+    from eplmodel.paths import PROJECT_ROOT
+
+    present = subprocess.run(["git", "cat-file", "-e", f"{fcp.PREREG_COMMIT}^{{commit}}"], cwd=PROJECT_ROOT,
+                             capture_output=True).returncode == 0
+    if not present:
+        pytest.skip("pre-registration commit not in this checkout (shallow clone)")
     frozen = fcp.check_frozen(load_config(fcp.FULL_COVERAGE_CONFIG))
     assert frozen["prereg_commit"] == fcp.PREREG_COMMIT
 
