@@ -101,6 +101,19 @@ RECORDED_EXPOSED_VALIDATION_PROTOCOLS = {
 }
 REGISTERED_EXPOSED_VALIDATION_SPECS = frozenset().union(*RECORDED_EXPOSED_VALIDATION_PROTOCOLS.values())
 
+# Descriptive accesses to the exposed validation season logged after amendment A1 (rule 6): access-log entry id ->
+# the exact specs that entry may score. Kept separate from the reproduction set above (whose protocols are
+# frozen). Opened only through eplmodel.evaluation.folds.build_exposed_validation_fold; descriptive only.
+LOGGED_EXPOSED_VALIDATION_ACCESSES = {
+    "V5": frozenset({
+        "poisson_fc_promoted_prior_h730_v1", "poisson_fc_hierarchical_h730_v1",
+        "poisson_fc_hierarchical_break_h730_v1_sens",
+        "market_pinnacle_close_shin_v1", "market_pinnacle_close_proportional_v1", "market_pinnacle_close_power_v1",
+        "market_pinnacle_preclose_shin_v1", "market_pinnacle_preclose_proportional_v1",
+        "market_pinnacle_preclose_power_v1",
+    }),
+}
+
 # Model specifications that have already been scored on the development test
 # benchmark. Re-scoring one of these reproduces a recorded result and adds no
 # new exposure. Scoring anything else requires a deliberate decision and a new
@@ -203,6 +216,15 @@ def require_registered_exposed_validation_spec(spec_id: str) -> None:
             f"Spec {spec_id!r} has not been scored on 2024-25 by a recorded protocol. Any new 2024-25 scoring "
             "must be recorded in docs/TEST_SET_ACCESS_LOG.md first and is descriptive only."
         )
+
+
+def require_logged_exposed_validation_access(entry_id: str, spec_ids) -> None:
+    """Allow a descriptive access to the exposed validation season only for a logged entry and exactly its specs."""
+    if entry_id not in LOGGED_EXPOSED_VALIDATION_ACCESSES:
+        raise ExposedValidationError(f"{entry_id!r} is not a logged exposed-validation access.")
+    if set(spec_ids) != LOGGED_EXPOSED_VALIDATION_ACCESSES[entry_id]:
+        raise ExposedValidationError(f"Access {entry_id!r} authorises exactly "
+                                     f"{sorted(LOGGED_EXPOSED_VALIDATION_ACCESSES[entry_id])}.")
 
 
 def assert_history_precedes(history_seasons: Iterable[str], target_season: str) -> None:

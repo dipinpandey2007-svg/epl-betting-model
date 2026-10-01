@@ -17,18 +17,25 @@ model-specific code.
   Models are only ever compared within one group.
 """
 
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 
 import pandas as pd
 
 from eplmodel.evaluation.alignment import involves_teams, teams_in
+from eplmodel.paths import TEST_SET_ACCESS_LOG
 from eplmodel.splits import (
+    DEVELOPMENT_SEASONS,
+    EXPOSED_VALIDATION_SEASONS,
     SEASON_ORDER,
+    ExposedValidationError,
     SplitAccessError,
     assert_history_precedes,
     assert_not_holdout,
     assert_selection_target,
+    require_logged_exposed_validation_access,
 )
 
 
@@ -110,6 +117,34 @@ class Fold:
         if not set(target["match_id"]) <= set(self.target_rows["match_id"]):
             raise SplitAccessError("eligible target rows must come from this fold's target season")
         return rows_strictly_before(self.history_rows, target, date)
+
+
+def _logged_entry_ids(log_path: Path) -> set[str]:
+    """Entry ids in the first column of the access log's markdown tables (e.g. '| V5 | ...')."""
+    text = Path(log_path).read_text(encoding="utf-8")
+    return set(re.findall(r"^\|\s*([^|\s]+)\s*\|", text, flags=re.MULTILINE))
+
+
+def build_exposed_validation_fold(matches: pd.DataFrame, entry_id: str, spec_ids: Sequence[str],
+                                  log_path: Path = TEST_SET_ACCESS_LOG) -> Fold:
+    """The fold of the exposed validation season, for a logged descriptive access only (amendment A1 rule 6).
+
+    The entry must be in eplmodel.splits.LOGGED_EXPOSED_VALIDATION_ACCESSES with exactly `spec_ids`, and recorded
+    in docs/TEST_SET_ACCESS_LOG.md. History = every development season before the target (the exposed
+    2022-24 seasons as history only). Holdout seasons are refused.
+    """
+    require_logged_exposed_validation_access(entry_id, spec_ids)
+    if entry_id not in _logged_entry_ids(log_path):
+        raise ExposedValidationError(f"access {entry_id!r} is not recorded in {Path(log_path).name}")
+    assert_not_holdout(matches["Season"].unique())
+    (target,) = EXPOSED_VALIDATION_SEASONS
+    history = tuple(s for s in DEVELOPMENT_SEASONS if SEASON_ORDER.index(s) < SEASON_ORDER.index(target))
+    assert_history_precedes(history, target)
+    data = matches[matches["Season"].isin([*history, target])].reset_index(drop=True)
+    missing = sorted((set(history) | {target}) - set(data["Season"]))
+    if missing:
+        raise ValueError(f"Fold seasons {missing} are missing from the match table")
+    return Fold(history, target, data[data["Season"].isin(history)], data[data["Season"] == target])
 
 
 def build_fold(matches: pd.DataFrame, history: Sequence[str], target: str) -> Fold:

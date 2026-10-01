@@ -1,0 +1,89 @@
+# Protocol exposed_validation_descriptive_v1: exposed, DESCRIPTIVE validation of the frozen Experiment 15
+# (full_coverage_poisson_v1) and Experiment 14 (market_benchmark_v1) specifications on the exposed validation
+# season (amendment A1 rule 6; access-log entry V5, registered before any data was read).
+#
+# Evidence class: exposed/descriptive only. Nothing may be selected, tuned or confirmed from the result, and no
+# parameter, prior, hyperparameter, arm, market specification, scoring rule or evidence criterion of Experiments
+# 14-15 or of any future experiment may be changed because of it. No criterion is applied; the Experiment 15
+# non-inferiority rule is not applied here. The season itself is never named in code: it is opened only by
+# eplmodel.evaluation.folds.build_exposed_validation_fold for this logged entry. 2025-26 and 2026-27 are untouched.
+
+[protocol]
+protocol_id = "exposed_validation_descriptive_v1"
+registered = "2026-10-02"
+access_entry = "V5"
+evidence_class = "exposed_descriptive_cannot_select_tune_or_confirm"
+criteria_applied = false
+specs_frozen_in = ["full_coverage_poisson_v1 (10e99d1, locked 3591160)", "market_benchmark_v1 (ac60693)"]
+
+[access]
+# Exactly the specs authorised for entry V5 (eplmodel.splits.LOGGED_EXPOSED_VALIDATION_ACCESSES).
+spec_ids = [
+  "poisson_fc_promoted_prior_h730_v1",
+  "poisson_fc_hierarchical_h730_v1",
+  "poisson_fc_hierarchical_break_h730_v1_sens",
+  "market_pinnacle_close_shin_v1",
+  "market_pinnacle_close_proportional_v1",
+  "market_pinnacle_close_power_v1",
+  "market_pinnacle_preclose_shin_v1",
+  "market_pinnacle_preclose_proportional_v1",
+  "market_pinnacle_preclose_power_v1",
+]
+
+[experiment_15]
+# Frozen arms run unchanged (same code path as the locked historical stage): M1, M2 (primary), S1. M0 is the
+# recorded Experiment 13 online prediction (it cannot score matches of a team unseen in the history).
+arms = ["fc_promoted", "fc_hier", "fc_hier_break"]
+m0 = "poisson_tw_online"
+# Fixture-level facts already recorded by Experiments 10-13 (Ipswich unseen; Leicester and Southampton returning).
+expected_full = 380
+expected_common = 342
+expected_unseen = 38
+expected_promoted_teams = ["Ipswich", "Leicester", "Southampton"]
+expected_unseen_teams = ["Ipswich"]
+expected_returning_teams = ["Leicester", "Southampton"]
+expected_eb_team_seasons = [24, 136]          # promoted, continuing team-seasons in 2015-16 .. 2023-24
+online_fits = "one_per_distinct_target_date"
+anchor_tolerance = 1e-7                       # M0 reproduction check against the recorded Experiment 13 predictions
+# Same comparisons as the Experiment 15 protocol, reported descriptively (no reading, no label).
+comparisons = [
+  ["fc_hier", "poisson_tw_online", "common"],
+  ["fc_hier", "elo", "unseen"],
+  ["fc_hier", "frequency_baseline", "unseen"],
+  ["fc_promoted", "poisson_tw_online", "common"],
+  ["fc_hier", "fc_promoted", "full"],
+  ["fc_hier", "fc_promoted", "common"],
+  ["fc_hier", "fc_promoted", "promoted"],
+  ["fc_hier", "fc_promoted", "continuing_only"],
+  ["fc_hier_break", "fc_hier", "returning"],
+  ["fc_hier", "elo", "full"],
+  ["fc_hier", "market_close_shin", "full"],
+]
+# Exp 7 taxonomy: a promoted team unseen in the history and absent from team_history.csv is reported as
+# unclassified (no reference row is invented).
+taxonomy_missing_team = "unclassified"
+
+[experiment_14]
+# Frozen market benchmark run unchanged on the same matches: all six registered arms reported separately;
+# closing + Shin primary; validity rules of market_benchmark_v1 [validity].
+arms = ["market_close_shin", "market_close_proportional", "market_close_power", "market_pre_shin",
+        "market_pre_proportional", "market_pre_power"]
+paired = "market_benchmark_v1 [evaluation] paired"
+context_full = ["elo", "frequency_baseline"]
+context_common = ["poisson", "poisson_tw", "poisson_tw_online", "elo"]
+
+[evaluation]
+harness = "eplmodel.evaluation"
+metrics = ["log_loss", "brier"]
+clusters = "target_date"
+report = ["coverage", "per_group", "paired_descriptive", "segments", "calibration_in_the_large",
+          "historical_side_by_side"]
+ranking_claims = false
+
+[locked]
+# Written only from this single scored run, in the results commit.
+status = "not_run"
+
+[outputs]
+results_name = "exposed_validation_descriptive"
+in_run_all = false
