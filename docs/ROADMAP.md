@@ -25,11 +25,13 @@ deliberately *not* stubbed out: each will be added when real data and a validati
   xG) for a match may only be used for *later* matches.
 - **Same interface for every model.** A model produces an (n, 3) array of (H, D, A) probabilities for a set of
   fixtures, keyed by `match_id`, so it can be scored by `eplmodel.evaluation.metrics` and compared on the same matches.
-- **Selection on the selection folds only.** New selection work must use `eplmodel.splits.selection_folds`
-  (training folds plus 2024-25). 2024-25 has been scored in four pre-registered runs (Experiments 10, 11, 12 and 13);
-  its results must not be used to tune the
-  established specifications or to retune the Experiment 12 candidate (its half-life stays 730 days). The development test benchmark may only be re-scored for registered specifications; the
-  2025-26 holdout is sealed ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md)).
+- **Selection on the historical folds only.** New selection work must use `eplmodel.splits.selection_folds()`
+  (targets 2017-18 … 2021-22, `SELECTION_TARGET_SEASONS`) and the guard `eplmodel.splits.assert_selection_target`.
+  2024-25 was scored in four pre-registered runs (Experiments 10, 11, 12 and 13) and is retired as a selection target
+  (amendment A1, [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) §9): it is history only for new work, and its results must
+  not be used to tune the established specifications, to retune the Experiment 12 candidate (its half-life stays 730
+  days) or to select or confirm anything. The development test benchmark and 2024-25 may only be re-scored for
+  registered specifications; the 2025-26 holdout is sealed ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md)).
 - **Each experiment** gets a script in `experiments/`, a results folder, a `RESULTS_LOG.md` entry and, once frozen, a
   spec id in `configs/` and golden values in the tests.
 

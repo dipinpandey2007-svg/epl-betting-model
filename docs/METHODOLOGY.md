@@ -45,11 +45,14 @@ A model that fits training data better is not automatically a better predictive 
   (`eplmodel.splits.require_registered_dev_test_spec`).
 - 2022-24 may be used as historical fitting information for later seasons, but never as a validation or
   model-selection target (`eplmodel.splits.assert_valid_selection_target`).
-- The rule for future and new selection work is `eplmodel.splits.selection_folds()`: the training-season folds
-  validating 2017-18 to 2021-22, plus 2024-25, reported pooled and separately. The recorded experiments predate this
-  rule and used training folds only. 2024-25 has been scored once as validation (protocol `validation_2425_v1`, Experiment 10, 2026-10-01). Its
-  results are observed validation evidence and must not be used to tune the established specifications. No model
-  selection has yet been made with it.
+- The rule for new selection work is `eplmodel.splits.selection_folds()`: the training-season folds validating
+  2017-18 to 2021-22 only (`SELECTION_TARGET_SEASONS`), with the strict guard `eplmodel.splits.assert_selection_target`.
+- **2024-25 is an exposed validation season** (amendment A1, [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) §9, access-log
+  entry P1, 2026-10-01). It was scored in four pre-registered protocols (Experiments 10-13). It may be used as
+  historical fitting information for later seasons, but never to select, tune or confirm anything. It may be
+  re-scored only to reproduce those protocols (`eplmodel.splits.require_registered_exposed_validation_spec`). Before
+  A1 it was a selection target alongside the training folds; the recorded protocols keep that legacy definition
+  (`SELECTION_VALIDATION_SEASONS`) so they reproduce unchanged.
 - The final holdout is 2025-26, sealed by [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) before any of its data were
   acquired; 2026-27 is the declared next holdout. Every data path refuses holdout seasons
   (`eplmodel.splits.assert_not_holdout`); only `eplmodel.holdout` can open it.

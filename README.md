@@ -23,9 +23,9 @@ Read these with three caveats:
 
 1. **The 2022-24 period is an exposed development benchmark, not a clean holdout.** It was evaluated several times
    during exploratory work ([access log](docs/TEST_SET_ACCESS_LOG.md)). The sealed final holdout is 2025-26
-   ([holdout protocol](docs/HOLDOUT_PROTOCOL.md)); it has not been scored. 2024-25 has been scored once as a
-   validation season ([Experiment 10](docs/RESULTS_LOG.md)). Its results must not be used to tune these
-   specifications.
+   ([holdout protocol](docs/HOLDOUT_PROTOCOL.md)); it has not been scored. 2024-25 was scored as a validation
+   season in four pre-registered experiments ([Experiments 10-13](docs/RESULTS_LOG.md)) and has since been retired as
+   a selection target (holdout protocol, Amendment A1). Its results must not be used to tune these specifications.
 2. **648-match subset.** The static goal models cannot predict for teams absent from training (Nott'm Forest, Luton),
    so 112 matches are excluded from the goal-model comparison.
 3. **Elo vs Poisson is not a like-for-like comparison.** Elo updates its ratings through the test seasons; the

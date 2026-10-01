@@ -19,6 +19,18 @@ Rules from now on:
    never as a validation or model-selection target (`eplmodel.splits.assert_valid_selection_target`).
 5. The final holdout is defined in [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md): 2025-26 is sealed and 2026-27 is
    the declared next holdout. Holdout accesses are recorded below as entries H0, H1, … *before* they happen.
+6. From amendment A1 (entry P1, 2026-10-01), 2024-25 is an **exposed validation season** under the same kind of
+   rules: history for later seasons only, never a selection, tuning or confirmation target
+   (`eplmodel.splits.assert_selection_target`), and re-scored only for the specs in
+   `REGISTERED_EXPOSED_VALIDATION_SPECS` (`eplmodel.splits.require_registered_exposed_validation_spec`).
+
+## Protocol changes
+
+Changes to the season roles or the selection rules, recorded here *before* any work relies on them.
+
+| # | When | Change | Outcomes seen? | Notes |
+|---|---|---|---|---|
+| P1 | 2026-10-01 | Amendment A1 ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) §9): 2024-25 retired as a selection target and becomes an exposed validation season. New selection uses only 2017-18 … 2021-22 (`SELECTION_TARGET_SEASONS`, `selection_folds()` default) under the strict guard `assert_selection_target`. 2024-25 may be re-scored only to reproduce the recorded protocols V1-V4, for the eight specs in `REGISTERED_EXPOSED_VALIDATION_SPECS`; any other 2024-25 scoring needs an entry here first and is descriptive only. The legacy definitions `SELECTION_VALIDATION_SEASONS` and `assert_valid_selection_target` are kept unchanged for those protocols; a static test refuses their use, and the 2024-25 season code, in any other experiment module or config. | no | Made after V4 and before any new candidate. Reason: four scored uses of 2024-25 (V1-V4), and the Experiment 12 and 13 hypotheses were partly prompted by it; the change rests on that exposure, not on any result. No data read, no prediction made, nothing scored. Recorded configs, experiments and results unchanged. 2025-26 (sealed, not acquired), 2026-27, `configs/holdout_v1.toml` and the tag `holdout-freeze-v1` unchanged. |
 
 ## Exposure history
 
@@ -57,8 +69,11 @@ table in `configs/holdout_v1.toml`.
 
 ## Validation season (2024-25) usage
 
-2024-25 is a selection target and will be scored repeatedly. Each comparison scored on it is recorded in
-`RESULTS_LOG.md`, so the number of choices made with it can be audited.
+Until amendment A1 (entry P1, 2026-10-01): 2024-25 is a selection target and will be scored repeatedly. Each
+comparison scored on it is recorded in `RESULTS_LOG.md`, so the number of choices made with it can be audited.
+
+From P1 on, 2024-25 is an exposed validation season and no longer a selection target (rule 6 above). Entries V1-V4
+below remain the complete record of its scored uses.
 
 | # | When | Action | Scored? |
 |---|---|---|---|

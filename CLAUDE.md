@@ -144,7 +144,7 @@ validation or selection target). Only specs in `REGISTERED_DEV_TEST_SPECS`
 feature or spec selection, descriptive analysis or any development decision.
 Never download, inspect or load it outside `eplmodel.holdout`. 2026-27 is the
 declared next holdout, under the same rules; 2025-26 remains sealed and
-unacquired. 2024-25 is the validation season. It has been scored once as
+unacquired. 2024-25 was the validation season. It has been scored once as
 validation (protocol `validation_2425_v1`, RESULTS_LOG Experiment 10): Elo
 0.9848 log loss on all 380 matches; on the 342 without Ipswich, Elo 0.9836,
 frequency baseline 1.0760, static Poisson 1.0854, staged Dixon-Coles 1.0857.
@@ -152,10 +152,16 @@ These are observed validation evidence and must NOT be used to tune the
 established specifications. 2024-25 was then used once more by the
 pre-registered update-policy diagnostic (protocol `update_policy_diagnostic_v1`,
 RESULTS_LOG Experiment 11; diagnostic only, nothing selected or changed).
-The rule for future selection work is `splits.selection_folds()`
-(validating 2017-18 to 2021-22 and 2024-25), reporting 2024-25 both pooled
-and separately. The recorded experiments
-predate this rule and use training folds only.
+**Amendment A1 (access-log entry P1, 2026-10-01) retired 2024-25 as a
+selection target.** It is now an exposed validation season: history for later
+seasons only, never a selection, tuning or confirmation target, and re-scored
+only for `REGISTERED_EXPOSED_VALIDATION_SPECS` to reproduce Experiments 10-13.
+New selection work uses `splits.selection_folds()` (default targets 2017-18 to
+2021-22, `SELECTION_TARGET_SEASONS`) and the strict guard
+`splits.assert_selection_target`. `SELECTION_VALIDATION_SEASONS` and
+`assert_valid_selection_target` are frozen legacy definitions kept only so the
+recorded protocols reproduce; a static test in `tests/test_splits.py` refuses
+their use (or the code `2425`) in any other experiment module or config.
 
 | Spec | Dev-test log loss / Brier |
 |---|---|

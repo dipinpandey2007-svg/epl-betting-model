@@ -1,6 +1,6 @@
 # EPL Betting Model — Current State
 
-_Last updated: 2026-10-01 (after Experiment 13, the online time-weighted Poisson diagnostic)._
+_Last updated: 2026-10-01 (after Experiment 13 and protocol amendment A1, which retired 2024-25 as a selection target)._
 
 ## Current phase
 
@@ -15,6 +15,8 @@ Since then:
 - The pre-registered online time-weighted Poisson diagnostic (Experiment 13) has been run and recorded: the historical
   stage (locked in `configs/online_tw_poisson_diagnostic_v1.toml` `[historical_locked]`), then the 2024-25 stage
   (diagnostic only).
+- Protocol amendment A1 (access-log entry P1): 2024-25 is retired as a selection target. New selection uses only the
+  2017-18 … 2021-22 folds; the recorded protocols keep their legacy definition and reproduce unchanged.
 
 No established model or specification has been changed. `poisson_time_weighted_v1` is a new candidate, not a
 replacement for `poisson_static_v1`.
@@ -36,11 +38,16 @@ Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Cole
 |---|---|---|
 | Training (fitting + walk-forward selection) | 2014-15 … 2021-22 | 3,040 |
 | **Exposed development test benchmark** | 2022-23, 2023-24 | 760 |
-| Validation (model selection, with the training folds) | 2024-25 | 380, **scored in four pre-registered runs** (2026-10-01: Experiments 10, 11, 12 and 13) |
+| **Exposed validation season** (history only for new work; amendment A1) | 2024-25 | 380, **scored in four pre-registered runs** (2026-10-01: Experiments 10, 11, 12 and 13), then retired from selection |
 | **Sealed final holdout** ([protocol](HOLDOUT_PROTOCOL.md)) | 2025-26 (next: 2026-27) | not yet downloaded |
 
 The development test has been scored several times (`TEST_SET_ACCESS_LOG.md`). It may be re-scored only for the
 registered, frozen specifications and must not be used to tune, select or compare new choices.
+
+Since amendment A1 ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) §9), 2024-25 follows the same kind of rules: it may be
+history for later seasons, may be re-scored only to reproduce the recorded protocols of Experiments 10-13
+(`REGISTERED_EXPOSED_VALIDATION_SPECS`), and can never select, tune or confirm anything. New selection work uses
+`selection_folds()`, whose default is now 2017-18 … 2021-22 only.
 
 2024-25 has now been scored once as validation (protocol `validation_2425_v1`, RESULTS_LOG Experiment 10). Its results are observed validation evidence and must not be used to tune the established specifications. The 2024-25 results (log loss / Brier, from `results/validation_2425/metrics.json`) were:
 
@@ -167,6 +174,7 @@ The 2025-26 holdout remains sealed and unacquired.
    by the update-policy diagnostic (Experiment 11) and the time-weighted Poisson experiment (Experiment 12), all on
    2026-10-01, and by Experiment 13's 2024-25 stage (its fourth exposure). The sealed acquisition of 2025-26
    has not been done.
+   ~~Retire 2024-25 as a selection target~~: done 2026-10-01 (amendment A1, access-log entry P1).
 2. Build one evaluation harness that scores every model on the same training-season walk-forward folds:
    - the same information and update policy for every model (for example, goal models refitted or time-weighted
      as each season progresses);

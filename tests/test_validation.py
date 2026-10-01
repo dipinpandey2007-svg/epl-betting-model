@@ -328,7 +328,7 @@ def dev_v2():
 
 def test_ipswich_is_the_only_unseen_team_in_2425(dev_v2):
     """Uses the 2024-25 fixtures only (team names); no prediction or result is computed."""
-    history, target = selection_folds()[-1]
+    history, target = selection_folds(VCFG["protocol"]["targets"])[-1]  # the recorded protocol's own targets
     assert target == "2425"
     data = fold_data(dev_v2, history, target)
     tgt = data[data["Season"] == target][["HomeTeam", "AwayTeam"]]

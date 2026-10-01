@@ -18,7 +18,7 @@ project.
 |---|---|---|
 | Training | 2014-15 … 2021-22 | Fitting; walk-forward selection folds |
 | Exposed development benchmark | 2022-23, 2023-24 | **Historical fitting information only** when predicting later seasons. Never a validation or model-selection target. Registered specs may be re-scored to reproduce recorded results. |
-| Validation | 2024-25 | Recent validation season, part of model selection |
+| Validation | 2024-25 | Recent validation season, part of model selection. **Superseded by Amendment A1 (2026-10-01): now an exposed validation season, history only for new work; see §9** |
 | **Final holdout (sealed)** | **2025-26** | Opened once, by the procedure in §5 |
 | Next holdout (declared) | 2026-27 | Treated exactly like the final holdout by every guard |
 
@@ -45,6 +45,10 @@ the promoted clubs is not sealed, because a pre-kickoff forecaster would have it
 recorded like any other reference data.
 
 ## 3. Model selection before the holdout
+
+> **Superseded for new work by Amendment A1 (§9, 2026-10-01).** New selection uses only the 2017-18 … 2021-22 folds;
+> 2024-25 is no longer a selection or confirmation target. The text below is the original rule, kept unchanged because
+> the recorded protocols of Experiments 10-13 were registered under it.
 
 Selection uses `eplmodel.splits.selection_folds()`:
 
@@ -118,3 +122,36 @@ This is recorded as an access-log entry ("sealed, not scored"). Until then there
 
 Any change to this document, `configs/holdout_v1.toml` or the season roles in `splits.py` is a protocol change. It
 must be committed and recorded in `TEST_SET_ACCESS_LOG.md` before any holdout access that relies on it.
+
+## 9. Amendment A1 (2026-10-01): 2024-25 retired as a selection target
+
+Recorded in `TEST_SET_ACCESS_LOG.md` as entry **P1** before any work relying on it. It changes the role of 2024-25
+only. The holdout (2025-26), the next holdout (2026-27), `configs/holdout_v1.toml` and the tag `holdout-freeze-v1`
+are unchanged.
+
+**Reason.** 2024-25 has been scored in four pre-registered protocols (entries V1-V4: Experiments 10, 11, 12 and 13),
+and the hypotheses of Experiments 12 and 13 were partly prompted by 2024-25 observations. Using it again to select,
+tune or confirm anything would be selection on an exposed season. The amendment rests on this exposure count, not on
+any result, and was made before any new candidate was scored.
+
+**Rules from this amendment on:**
+
+| | Before A1 | After A1 |
+|---|---|---|
+| Role of 2024-25 | Validation season, part of model selection | **Exposed validation season** (`SeasonRole.EXPOSED_VALIDATION`) |
+| New selection targets | 2017-18 … 2021-22 and 2024-25 | **2017-18 … 2021-22 only** (`splits.SELECTION_TARGET_SEASONS`, `splits.selection_folds()` default) |
+| Guard for new selection work | `assert_valid_selection_target` | `assert_selection_target`, which refuses 2024-25, the exposed 2022-24 seasons and the holdout seasons |
+| Scoring on 2024-25 | Any selection comparison, logged in `RESULTS_LOG.md` | Only to reproduce the recorded protocols V1-V4, for the specs in `splits.REGISTERED_EXPOSED_VALIDATION_SPECS` (no new exposure). Any other spec needs an entry in `TEST_SET_ACCESS_LOG.md` first and is descriptive only: it can never select, tune or confirm anything |
+| "Report 2024-25 pooled and separately" | Required for selection | Withdrawn for new work |
+| 2024-25 as fitting information | Allowed for later seasons | Unchanged: allowed when predicting later seasons (for example in the history of the 2025-26 holdout evaluation) |
+
+**Recorded protocols are unchanged.** `splits.SELECTION_VALIDATION_SEASONS` (2017-18 … 2021-22 and 2024-25) and
+`splits.assert_valid_selection_target` keep their earlier behaviour as frozen legacy definitions, so the recorded
+protocols `validation_2425_v1`, `update_policy_diagnostic_v1`, `time_weighted_poisson_v1` and
+`online_tw_poisson_diagnostic_v1` reproduce exactly. Their configs, code and results are not modified. New code must
+not use the legacy definitions; `tests/test_splits.py` checks every experiment module and config other than those of
+the four recorded protocols for any use of them or of the 2024-25 season code.
+
+**Evidence that remains.** Future selection uses the historical folds 2017-18 … 2021-22, which have themselves been
+used repeatedly and must be used with nested, pre-registered selection. Confirmation of any hypothesis, including those
+of Experiments 12 and 13, is possible only on the sealed holdout (2025-26, if pre-registered there) or a later season.
