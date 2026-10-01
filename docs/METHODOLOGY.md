@@ -84,6 +84,20 @@ Later, when market data are incorporated:
 
 Accuracy should never be treated as the sole success criterion.
 
+### Market benchmark (protocol `market_benchmark_v1`, Experiment 14)
+
+- **Source and meaning.** Pinnacle 1X2 odds from the football-data.co.uk files. Per the site's notes
+  (`data/reference/football_data_odds_columns.md`), `PSH/PSD/PSA` are pre-closing and `PSCH/PSCD/PSCA` closing odds.
+- **Primary benchmark:** closing odds, Shin margin removal (`market_pinnacle_close_shin_v1`). Secondary snapshot:
+  pre-closing. Sensitivity methods: proportional and power. All six arms are fixed in advance and reported separately;
+  none is chosen by score, the two snapshots are never mixed, and invalid or missing prices are excluded, never
+  imputed.
+- **Not a model and not a selection candidate.** Comparisons with it are context (claim 4 in §7), never evidence for
+  a model choice. Scored only on the historical folds 2017-18 … 2021-22.
+- **Odds are not features.** Closing odds are known only at kickoff, and the pre-closing collection time is not
+  documented per match. Using either as a model input, or computing CLV, needs a separately defined snapshot and an
+  explicit information cutoff for every prediction; neither exists yet.
+
 ## 6. Baselines
 
 Every more-complex model should be compared against appropriate simpler baselines.

@@ -11,11 +11,11 @@ deliberately *not* stubbed out: each will be added when real data and a validati
 | 4 | xG and team-performance features | not started | new data source → `eplmodel.data`; features → a future `eplmodel.features` package |
 | 5 | Squad / injury / lineup information | not started | needs a timestamped data source (must be known before kickoff) |
 | 6 | Tactical / contextual features | not started | `eplmodel.features` |
-| 7 | Market odds benchmark | not started (the data exist in the raw files) | see below |
+| 7 | Market odds benchmark | **done** (Experiment 14, `market_benchmark_v1`): Pinnacle closing odds with Shin margin removal as primary; pre-closing snapshot and proportional/power methods as registered sensitivity arms; historical folds only | `eplmodel.market` |
 | 8 | Machine-learning models | not started | `eplmodel.models`; must beat stages 2-3 on the same folds |
 | 9 | Probability calibration | partial: home-win reliability table only | `eplmodel.evaluation.calibration` |
 | 10 | Walk-forward / backtesting | **common evaluation harness done** (2026-10-02): folds and information sets, forecast frames, scoring with clustered SEs, reproduction gate for Experiments 10-13 | `eplmodel.evaluation.folds`, `.forecasts`, `.scoring`, `.segments`, `.reproduction` (see METHODOLOGY §9) |
-| 11 | Closing-line value | not started | needs stage 7 |
+| 11 | Closing-line value | not started | needs a separately defined pre-match snapshot and an explicit per-prediction information cutoff (not established by the current data) |
 | 12 | ROI and proper scoring metrics | partial: log loss and Brier done; ROI not started | `eplmodel.evaluation.metrics` |
 | 13 | Structured football knowledge | started: `data/reference/team_history.csv` | `data/reference/` |
 
@@ -35,7 +35,7 @@ deliberately *not* stubbed out: each will be added when real data and a validati
 - **Each experiment** gets a script in `experiments/`, a results folder, a `RESULTS_LOG.md` entry and, once frozen, a
   spec id in `configs/` and golden values in the tests.
 
-## Notes for stage 7 (market odds), when it starts
+## Notes for stage 7 (market odds), as implemented
 
 - The raw football-data files already contain opening and closing odds from several bookmakers (for example
   `B365H/D/A`, `PSH/D/A`, `PSCH/D/A`, and market averages and maxima). The column set changes between seasons
@@ -46,3 +46,7 @@ deliberately *not* stubbed out: each will be added when real data and a validati
   any comparison.
 - Opening and closing prices must not be mixed. Using closing odds as a *feature* for a pre-kickoff prediction made
   earlier would be leakage.
+- Implemented in Experiment 14. The meaning of the columns was checked against the site's notes
+  (`data/reference/football_data_odds_columns.md`): `PSH/PSD/PSA` are **pre-closing**, not opening. The odds are read
+  directly from the raw files, keyed by `match_id`, so `matches.csv` is unchanged. Proportional, power and Shin
+  methods are all implemented; Shin was fixed in advance as primary.

@@ -114,7 +114,8 @@ Python 3.11-3.13, plus a minimum-dependency job; golden tests run manually.
   harness `forecasts`/`folds`/`scoring`/`segments`/`reproduction`, and the
   recorded-protocol modules validation, update_policy, time_weighting,
   online_poisson), `analysis/`
-  (promoted-team folds), `reporting/` (metrics.json with provenance, figures),
+  (promoted-team folds), `market/` (Pinnacle odds snapshots, margin removal,
+  validity, market forecast frames), `reporting/` (metrics.json with provenance, figures),
   `splits.py` (season roles, selection folds, dev-test and holdout guards),
   `holdout.py` (the only way to open the sealed holdout), `constants.py`.
 - `experiments/`: one module per recorded experiment, each with
@@ -255,6 +256,24 @@ scored nor fitted.
   The remainder is not attributed to a single cause.
 
 2024-25 has now been scored in four pre-registered experiments (10-13).
+
+Experiment 14 (protocol `market_benchmark_v1`, pre-registered in `ac60693`)
+is a market benchmark, not a model or selection candidate.
+
+- Column meanings were verified from football-data's notes
+  (`data/reference/football_data_odds_columns.md`): `PSH/PSD/PSA` are
+  Pinnacle pre-closing odds and `PSCH/PSCD/PSCA` closing odds.
+- The primary arm is closing odds with Shin margin removal. Pre-closing odds
+  and proportional/power methods are registered sensitivity arms, all reported
+  separately; none was chosen by score.
+- It is scored on 2017-18 to 2021-22 only, with 100% coverage. The primary
+  arm scores 0.9475 log loss / 0.5597 Brier on 1,900 matches.
+- On the same matches, every established arm scores worse. For example,
+  market − online Elo is −0.0242 (clustered SE 0.0051). This is context
+  only, never selection evidence.
+- 2022-25 odds were neither read nor scored. Odds are not model features.
+  CLV is not implemented: it needs a defined pre-match snapshot and an
+  explicit information cutoff.
 
 ---
 

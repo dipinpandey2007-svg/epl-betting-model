@@ -17,6 +17,12 @@ Since then:
   (diagnostic only).
 - Protocol amendment A1 (access-log entry P1): 2024-25 is retired as a selection target. New selection uses only the
   2017-18 … 2021-22 folds; the recorded protocols keep their legacy definition and reproduce unchanged.
+- The common evaluation harness has been built (2026-10-02; METHODOLOGY §9).
+- **Experiment 14** (protocol `market_benchmark_v1`): a pre-registered market benchmark from Pinnacle 1X2 odds on the
+  historical folds 2017-18 … 2021-22. Primary arm: closing odds with Shin margin removal, 0.9475 log loss / 0.5597
+  Brier on 1,900 matches (100% coverage). It is a reference, not a model: nothing was selected or ranked, and CLV is
+  not implemented. On the same matches, every established arm scores worse than the closing market. For example,
+  market − online Elo is −0.0242 (clustered SE 0.0051). See `RESULTS_LOG.md` Experiment 14.
 
 No established model or specification has been changed. `poisson_time_weighted_v1` is a new candidate, not a
 replacement for `poisson_static_v1`.
@@ -161,8 +167,8 @@ The 2025-26 holdout remains sealed and unacquired.
 6. **Calibration** is assessed only for P(home win), with decile bins, on the development test.
 7. **Exposed test set.** 2022-24 is exposed. The final holdout (2025-26) is sealed by protocol (2026-10-01) but its
    data have not yet been acquired.
-8. **Limited data.** Only results are used. The raw files also contain shots and bookmaker odds (including
-   closing odds), and these are not used yet. There are no xG, lineup or injury data, and no data from lower
+8. **Limited data.** Models use only results. Pinnacle odds are used only as the Experiment 14 benchmark, not as
+   model inputs; shots are not used yet. There are no xG, lineup or injury data, and no data from lower
    divisions.
 
 ## Recommended next research milestone

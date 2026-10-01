@@ -4,8 +4,11 @@ This file records important experiments and decisions so that results do not exi
 conversations. Every model result in Experiments 2–7 is reproduced by `python -m experiments.run_all` (written to
 `results/<experiment>/metrics.json`) and locked by `tests/test_golden_results.py`. Experiment 10 is reproduced by
 `python -m experiments.validation_2425`, Experiment 11 by `python -m experiments.update_policy_diagnostic`, and
-Experiment 12 by `python -m experiments.time_weighted_poisson --stage development` then `--stage validation`.
-None of them is in `run_all` or locked by golden tests yet. Data-acquisition records are not
+Experiment 12 by `python -m experiments.time_weighted_poisson --stage development` then `--stage validation`,
+Experiment 13 by `python -m experiments.online_tw_poisson_diagnostic --stage historical` then `--stage validation`,
+and Experiment 14 by `python -m experiments.market_benchmark`. None of them is in `run_all`. The recorded predictions
+of Experiments 10-13 are regenerated row by row by `tests/test_reproduction_recorded.py`, and Experiment 14's
+metrics by `tests/test_market.py` (both golden). Data-acquisition records are not
 produced by `run_all`. Their checksums and coverage are locked by `tests/test_data.py` against
 `data/checksums.json`: dataset v1 also through the golden data fixture, and dataset dev_v2 (Experiment 9) by the
 `dev_v2` tests.
@@ -1430,6 +1433,162 @@ Other 2024-25 scores reproduce Experiments 10–12 (log loss / Brier):
 | Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0, scikit-learn 1.9.0 |
 
 Not yet locked by golden tests. The run is not in `experiments.run_all`.
+
+## Experiment 14 — Market-implied benchmark from Pinnacle 1X2 odds (2026-10-02)
+
+Protocol `market_benchmark_v1` (`configs/market_benchmark_v1.toml`). Script `experiments/market_benchmark.py`,
+library `eplmodel.market`. **A benchmark, not a model:** nothing is fitted, tuned or selected, and no arm is ranked.
+
+### Pre-registration and run sequence
+
+1. Column meanings were checked against football-data.co.uk's own notes, not assumed. The source is recorded in
+   `data/reference/football_data_odds_columns.md` (fetched 2026-10-02, SHA-256 `6ecd41a9…452d`). In the notes'
+   words, the odds keys "are for pre-closing odds. For the closing odds, as below but with an additional "C"
+   character…", and "PSH and PH = Pinnacle home win odds".
+2. Outcome-free checks of the raw files followed: headers in all development seasons, plus values for 2014-15 …
+   2021-22 (presence, validity, booksums, a 1:1 join to the processed matches, and the raw checksums).
+3. The protocol was committed in `ac60693` **before any market probability was computed**.
+4. The implementation was committed in `e2ecf00`.
+5. The recorded run used commit `e2ecf00` (`git_dirty: false`).
+6. One earlier run of the same code from the uncommitted tree was discarded. Its output was deleted unrecorded, it
+   was not used for any decision, and it was identical to the recorded run.
+
+### Objective
+
+Provide a fixed market-implied reference against which future football models can be compared on the same matches.
+
+### Data and evidence roles
+
+| Seasons | Use |
+|---|---|
+| 2014-15 … 2021-22 | Odds values read for coverage and validity (outcome-free) |
+| 2017-18 … 2021-22 | Scored: the historical selection targets (`SELECTION_TARGET_SEASONS`; `assert_selection_target`). Outcomes from dev_v2, cut to seasons ≤ 2021-22 straight after reading |
+| 2014-15 | Burn-in for the comparison models; coverage only |
+| 2022-23, 2023-24 (exposed), 2024-25 (retired, amendment A1) | **Not read for odds values and not scored.** The specification was fixed without any 2024-25 information |
+| 2025-26, 2026-27 | Sealed; refused by the odds reader |
+
+### Specification (fixed before scoring)
+
+| Item | Value |
+|---|---|
+| Primary snapshot | Pinnacle **closing** `PSCH`, `PSCD`, `PSCA` |
+| Secondary snapshot | Pinnacle **pre-closing** `PSH`, `PSD`, `PSA` (not "opening") |
+| Primary margin removal | **Shin**: p_k = (√(z² + 4(1−z)π_k²/B) − z) / (2(1−z)), z ∈ [0, 1) solving Σp = 1 |
+| Sensitivity methods | proportional p_k = π_k / B; power p_k = π_k^c with Σπ_k^c = 1 |
+| Definitions | π_k = 1/odds_k, B = Σπ_k; brentq with xtol 1e-15, then division by the sum |
+| Validity | All three prices present, numeric, finite and > 1.0; booksum in [1.0, 1.10]. Invalid price sets are counted by reason and excluded; no imputation, no fallback to the other snapshot or another bookmaker |
+| Arms | 2 snapshots × 3 methods = 6, each reported separately; spec id of the primary arm `market_pinnacle_close_shin_v1` |
+| Scoring | The common harness: forecast frames checked; log loss and Brier score in (H, D, A) order; calibration in the large with date-clustered SEs; paired (left − right) differences with naive and date-clustered SEs |
+
+The probabilities use the odds only. The reader takes Date, HomeTeam, AwayTeam and the six odds columns, so no
+result column is read.
+
+### Coverage (both snapshots)
+
+Every season from 2014-15 to 2021-22 has 380 matches with valid closing and pre-closing prices. There are no
+missing, non-numeric, ≤ 1.0 or out-of-range price sets, so coverage is 100%.
+
+| Season | Closing booksum (min / median / max) | Pre-closing booksum (min / median / max) |
+|---|---|---|
+| 2014-15 | 1.0141 / 1.0203 / 1.0266 | 1.0125 / 1.0202 / 1.0251 |
+| 2015-16 | 1.0170 / 1.0203 / 1.0263 | 1.0172 / 1.0203 / 1.0238 |
+| 2016-17 | 1.0168 / 1.0205 / 1.0299 | 1.0151 / 1.0203 / 1.0324 |
+| 2017-18 | 1.0123 / 1.0206 / 1.0340 | 1.0166 / 1.0203 / 1.0454 |
+| 2018-19 | 1.0176 / 1.0223 / 1.0380 | 1.0173 / 1.0223 / 1.0379 |
+| 2019-20 | 1.0209 / 1.0289 / 1.0413 | 1.0210 / 1.0295 / 1.0453 |
+| 2020-21 | 1.0172 / 1.0233 / 1.0388 | 1.0183 / 1.0236 / 1.0591 |
+| 2021-22 | 1.0005 / 1.0238 / 1.0442 | 1.0205 / 1.0240 / 1.0470 |
+
+Median Shin z per season is 0.010–0.015 for both snapshots.
+
+### Results by season (log loss / Brier; 380 matches each, 1,900 pooled)
+
+| Arm | 2017-18 | 2018-19 | 2019-20 | 2020-21 | 2021-22 | Pooled |
+|---|---|---|---|---|---|---|
+| **close, Shin (primary)** | 0.9406 / 0.5570 | 0.8897 / 0.5202 | 0.9731 / 0.5746 | 0.9979 / 0.5924 | 0.9363 / 0.5541 | **0.9475 / 0.5597** |
+| close, proportional | 0.9405 / 0.5569 | 0.8907 / 0.5208 | 0.9722 / 0.5744 | 0.9971 / 0.5921 | 0.9367 / 0.5543 | 0.9474 / 0.5597 |
+| close, power | 0.9409 / 0.5571 | 0.8890 / 0.5200 | 0.9733 / 0.5747 | 0.9983 / 0.5926 | 0.9360 / 0.5540 | 0.9475 / 0.5597 |
+| pre-closing, Shin | 0.9447 / 0.5595 | 0.8913 / 0.5211 | 0.9732 / 0.5749 | 1.0071 / 0.5981 | 0.9357 / 0.5536 | 0.9504 / 0.5614 |
+| pre-closing, proportional | 0.9446 / 0.5594 | 0.8925 / 0.5218 | 0.9722 / 0.5747 | 1.0059 / 0.5978 | 0.9363 / 0.5538 | 0.9503 / 0.5615 |
+| pre-closing, power | 0.9450 / 0.5596 | 0.8906 / 0.5208 | 0.9733 / 0.5749 | 1.0075 / 0.5983 | 0.9356 / 0.5535 | 0.9504 / 0.5614 |
+
+Calibration in the large of the primary arm, pooled (observed − mean predicted, date-clustered SE): H +0.0007
+(0.0103), D −0.0127 (0.0097), A +0.0120 (0.0097). Mean entropy is 0.9457 nats.
+
+### Paired differences (pooled over 1,900 matches; left − right; descriptive)
+
+| Difference | Log loss (clustered SE) | Brier |
+|---|---|---|
+| close proportional − close Shin | −0.00009 (0.00033) | +0.00003 |
+| close power − close Shin | −0.00001 (0.00017) | −0.00002 |
+| pre proportional − pre Shin | −0.00013 (0.00033) | +0.00002 |
+| pre power − pre Shin | −0.00002 (0.00017) | −0.00001 |
+| pre Shin − close Shin | +0.00289 (0.00167) | +0.00175 |
+
+The three margin-removal methods differ by at most about 0.001 log loss in any season, with signs that change from
+season to season. The pre-closing snapshot scores worse than the closing one in 3 of 5 seasons, ties in 2019-20 and
+scores better in 2021-22. The pooled difference is 1.7 clustered SEs.
+
+### Context: primary benchmark vs recorded model predictions (same matches; descriptive, not selection evidence)
+
+Recorded, checksum-verified predictions of Experiments 10 (full group) and 13 (historical stage, common group). No
+model is refitted.
+
+| Comparison | Matches | Log loss (clustered SE) | Brier | Per season (log loss) |
+|---|---|---|---|---|
+| market − online Elo (full) | 1,900 | −0.0242 (0.0051) | −0.0148 | −0.0260, −0.0213, −0.0054, −0.0501, −0.0181 |
+| market − frequency baseline (full) | 1,900 | −0.1197 (0.0101) | −0.0863 | all negative |
+| market − static Poisson (common) | 1,604 | −0.0296 (0.0069) | −0.0205 | all negative |
+| market − time-weighted Poisson (common) | 1,604 | −0.0238 (0.0066) | −0.0166 | all negative |
+| market − online time-weighted Poisson (common) | 1,604 | −0.0121 (0.0051) | −0.0088 | 4 of 5 negative (2019-20 +0.0016) |
+| market − online Elo (common) | 1,604 | −0.0252 (0.0055) | −0.0154 | all negative |
+
+### Interpretation
+
+- **The benchmark is established.** Pinnacle closing odds with Shin margin removal score 0.9475 log loss and 0.5597
+  Brier on the 1,900 historical-fold matches, with full coverage.
+- **The margin-removal choice barely matters for these scores.** Pinnacle's booksum is only about 2–3%, so the methods
+  differ by about 1e-4 pooled. This does not make the choice irrelevant for edge or CLV calculations on longshots,
+  where the methods differ most.
+- **Closing vs pre-closing.** The closing snapshot is lower in pooled loss, which is consistent with later prices
+  carrying more information. The difference is not distinguishable at 2 SEs and is not uniform across seasons.
+- **On the same matches, every established arm scores worse than the closing market** (METHODOLOGY §7, claim 4).
+  For example, the market is 0.0242 log loss below online Elo and 0.0121 below the online time-weighted Poisson
+  diagnostic arm.
+- **These are context, not evidence for any model choice.** The models use only past results, while the closing
+  price reflects all information up to kickoff. The model arms were also tuned or selected on these same folds.
+
+### Limitations
+
+- The closing time is not documented. The per-match collection time of the pre-closing prices (and so the
+  information they contain) is not established; no information cutoff is inferred.
+- One bookmaker. A single sharp book is not the whole market, and other books are deliberately not used.
+- Five seasons; the date-clustered SEs ignore any serial correlation within a season.
+- The source notes are football-data's current version; the historical files may have been compiled under earlier
+  wording.
+
+### Decision
+
+- **Fixed as the reference benchmark** for future comparisons on the historical folds: primary arm
+  `market_pinnacle_close_shin_v1`. The other five arms remain registered sensitivity analyses.
+- **Nothing is selected or changed** because of these results.
+- **Not registered** for 2022-24, 2024-25 or holdout scoring. Any such use needs its own logged registration.
+- **CLV is not implemented.** It needs a separately defined pre-match snapshot and an explicit per-prediction
+  information cutoff, which the current data do not establish.
+
+### Provenance
+
+| Item | Value |
+|---|---|
+| Pre-registration | commit `ac6069394aa56ad0309dca19336c03c1caed9537` |
+| Implementation and run | commit `e2ecf00704dca4f1e8435aadbb0b3872ef07a53a`, `git_dirty: false` |
+| Metrics | `results/market_benchmark/metrics.json`, content SHA-256 `7b394229eb23858bc7c95134b7b6b37c032194212d9a670b1bfaf728d1c673d9` |
+| Predictions | `results/market_benchmark/predictions.csv`, 1,900 rows (all six arms), git-ignored, content SHA-256 `79fb6b34dc5251f114e8ac9d7a01145f3c65135b1fc8570417fa7bcc39efc9c8` |
+| Odds | raw `E0_1415.csv` … `E0_2122.csv`, each matching `data/checksums.json` |
+| Outcomes | `data/processed/matches_dev_v2.csv`, SHA-256 `c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807`, cut to ≤ 2021-22 |
+| Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1 |
+
+Reproduced by `tests/test_market.py::test_recorded_market_benchmark_reproduces` (golden). Not in `experiments.run_all`.
 
 ## Future experiment template
 

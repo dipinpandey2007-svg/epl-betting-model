@@ -81,6 +81,7 @@ src/eplmodel/          reusable library code
   models/              elo, poisson, scoreline, dixon_coles
   evaluation/          metrics, calibration, baselines, alignment, walk_forward;
                        common harness: forecasts, folds, scoring, segments, reproduction
+  market/              Pinnacle odds snapshots, margin removal, market benchmark
   analysis/            promoted/unseen-team fold analysis
   reporting/           results files with provenance, figures
   splits.py            season splits and development-test guards
