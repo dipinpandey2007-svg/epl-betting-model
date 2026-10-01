@@ -165,8 +165,8 @@
     "configured_rho_matches_selection": true
   },
   "provenance": {
-    "git_commit": null,
-    "git_dirty": true,
+    "git_commit": "ffcdd9ac2526e9e22c415a30475f9ef834bdf00f",
+    "git_dirty": false,
     "data_file": "data/processed/matches.csv",
     "data_sha256": "f51862c7a21ecdb16b3ad76a94c95bee6eede528bbde8c08ef933114f04a45d0",
     "python": "3.13.15",
