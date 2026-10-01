@@ -69,7 +69,7 @@ python -m eplmodel.data.build               # build + validate data/processed/ma
 python -m eplmodel.data.download --seasons 2425 && python -m eplmodel.data.build --dataset dev_v2
 
 python -m experiments.run_all               # reproduce every recorded result into results/
-python -m pytest                            # unit + golden regression tests (~5 s)
+python -m pytest                            # unit + golden regression tests (~2 min with data, incl. the Exp 10-13 reproduction gate)
 python -m pytest -m "not golden"            # unit tests only (no data needed)
 ```
 
@@ -79,7 +79,8 @@ python -m pytest -m "not golden"            # unit tests only (no data needed)
 src/eplmodel/          reusable library code
   data/                download, build, load, validate, checksums
   models/              elo, poisson, scoreline, dixon_coles
-  evaluation/          metrics, calibration, baselines, alignment, walk_forward
+  evaluation/          metrics, calibration, baselines, alignment, walk_forward;
+                       common harness: forecasts, folds, scoring, segments, reproduction
   analysis/            promoted/unseen-team fold analysis
   reporting/           results files with provenance, figures
   splits.py            season splits and development-test guards

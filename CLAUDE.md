@@ -95,7 +95,7 @@ python -m eplmodel.data.download --seasons 2425 && python -m eplmodel.data.build
                                         # -> data/processed/matches_dev_v2.csv (adds 2024-25 validation)
 python -m experiments.run_all           # reproduce all results -> results/<experiment>/metrics.json
 python -m experiments.elo_k_selection   # or any single experiment
-python -m pytest                        # all tests (~5 s)
+python -m pytest                        # all tests (~2 min with data: the Exp 10-13 reproduction gate refits 662 online models)
 python -m pytest -m "not golden"        # skip golden regression tests
 python -m pytest tests/test_elo.py::test_run_elo_has_no_lookahead
 ```
@@ -110,8 +110,10 @@ Python 3.11-3.13, plus a minimum-dependency job; golden tests run manually.
 
 - `src/eplmodel/`: library code. `data/` (download, build, load, validate,
   checksums), `models/` (elo, poisson, scoreline, dixon_coles), `evaluation/`
-  (metrics, calibration, baselines, alignment, walk_forward,
-  validation, update_policy), `analysis/`
+  (metrics, calibration, baselines, alignment, walk_forward, the common
+  harness `forecasts`/`folds`/`scoring`/`segments`/`reproduction`, and the
+  recorded-protocol modules validation, update_policy, time_weighting,
+  online_poisson), `analysis/`
   (promoted-team folds), `reporting/` (metrics.json with provenance, figures),
   `splits.py` (season roles, selection folds, dev-test and holdout guards),
   `holdout.py` (the only way to open the sealed holdout), `constants.py`.
@@ -121,6 +123,17 @@ Python 3.11-3.13, plus a minimum-dependency job; golden tests run manually.
   grids). Changing a value there is a methodological change.
 - `tests/golden/golden_values.json`: full-precision values captured from the
   original script; `tests/test_golden_results.py` must keep passing.
+- Common evaluation harness (2026-10-02). New experiments use
+  `evaluation.folds.build_fold` (strict A1 guard), forecast frames
+  (`evaluation.forecasts`: match_id index, `<arm>_H/D/A`, no result columns)
+  and `evaluation.scoring` (losses, paired and date-clustered differences,
+  calibration). Model-specific prediction code stays outside it. Experiments
+  10-13 are frozen records: their scripts are unchanged and their library
+  modules re-export the harness implementations. Two gates protect them:
+  `tests/test_evaluation_harness.py` (CI; exact match to the pre-harness
+  synthetic snapshot `tests/golden/recorded_synthetic_snapshot.json`) and
+  `tests/test_reproduction_recorded.py` (golden; regenerates every recorded
+  prediction row, tolerance 1e-12).
 - `docs/`: METHODOLOGY, RESULTS_LOG, PROJECT_STATE, TEST_SET_ACCESS_LOG,
   ROADMAP, PROJECT_OVERVIEW.
 

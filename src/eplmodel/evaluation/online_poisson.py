@@ -37,14 +37,12 @@ from collections.abc import Mapping, Sequence
 import numpy as np
 import pandas as pd
 
-from eplmodel.evaluation.alignment import involves_teams, teams_in
-from eplmodel.evaluation.update_policy import (
-    check_decomposition,
-    paired_difference_clustered,
-    per_match_losses,
-    split_difference,
-)
-from eplmodel.evaluation.validation import fold_data, prob_columns, unseen_teams
+from eplmodel.evaluation import scoring
+from eplmodel.evaluation.alignment import teams_in
+from eplmodel.evaluation.folds import common_group, rows_strictly_before, summarize_fits
+from eplmodel.evaluation.scoring import paired_difference_clustered, split_difference  # noqa: F401  (re-exported)
+from eplmodel.evaluation.update_policy import check_decomposition, per_match_losses
+from eplmodel.evaluation.validation import fold_data, prob_columns
 from eplmodel.models.poisson import PoissonGoalModel
 from eplmodel.models.scoreline import outcome_probabilities_from_rates
 from eplmodel.models.time_weights import exponential_decay_weights, kish_effective_sample_size
@@ -76,8 +74,7 @@ def assert_no_team_twice_per_date(rows: pd.DataFrame) -> None:
 
 def fit_set(history_rows: pd.DataFrame, eligible_target_rows: pd.DataFrame, date) -> pd.DataFrame:
     """History rows, then the eligible target rows dated strictly before `date` (chronological order)."""
-    earlier = eligible_target_rows[eligible_target_rows["Date"] < pd.Timestamp(date)]
-    return pd.concat([history_rows, earlier], ignore_index=True)
+    return rows_strictly_before(history_rows, eligible_target_rows, date)
 
 
 def online_weights(rows: pd.DataFrame, half_life_days: float) -> np.ndarray:
@@ -137,8 +134,7 @@ def online_fold_predictions(matches: pd.DataFrame, history: Sequence[str], targe
     history_rows = data[data["Season"].isin(history)]
     tgt = data[data["Season"] == target]
     assert_no_team_twice_per_date(tgt)
-    unseen = unseen_teams(history_rows, tgt)
-    common = tgt[~involves_teams(tgt, unseen)]
+    unseen, common = common_group(history_rows, tgt)
     history_teams = frozenset(teams_in(history_rows))
     dates = sorted(pd.unique(common["Date"]))
 
@@ -179,10 +175,7 @@ def online_fold_predictions(matches: pd.DataFrame, history: Sequence[str], targe
         "n_full": int(len(tgt)),
         "n_common": int(len(common)),
         "n_unseen_target_matches_excluded_from_fit": int(len(tgt) - len(common)),
-        "n_fits": len(fits),
-        "n_retried": int(sum(f["retried"] for f in fits)),
-        "all_converged": all(f["converged"] for f in fits),
-        "max_iterations": max((f["iterations"] for f in fits), default=0),
+        **summarize_fits(fits),
         "runtime_seconds": time.perf_counter() - started,
         "fits": fits,
     }
@@ -202,14 +195,7 @@ def first_date_gap(preds: pd.DataFrame) -> float:
 def differences(losses: Mapping[str, Mapping[str, np.ndarray]], names: Sequence[str], clusters,
                 mask=None) -> dict:
     """Paired (left - right) per-match differences with naive and clustered SEs, for each metric."""
-    clusters = np.asarray(clusters)
-    mask = np.ones(len(clusters), dtype=bool) if mask is None else np.asarray(mask, dtype=bool)
-    out = {}
-    for name in names:
-        left, right = split_difference(name)
-        out[name] = {m: paired_difference_clustered(losses[left][m][mask], losses[right][m][mask], clusters[mask])
-                     for m in METRICS}
-    return out
+    return scoring.differences(losses, names, clusters, mask, METRICS)
 
 
 def mean_abs_prob_change(preds: pd.DataFrame, mask=None) -> float:

@@ -149,6 +149,33 @@ How this is implemented:
 - `tests/test_golden_results.py` reproduces every established result within stated tolerances. A deliberate
   methodological change must update the golden values *and* the results log together, with the reason.
 
+### Common evaluation harness (2026-10-02)
+
+Every new experiment is evaluated through one layer in `eplmodel.evaluation`. Model-specific prediction code stays
+outside it; the harness receives standard forecast frames and evaluates them the same way every time.
+
+| Module | Role |
+|---|---|
+| `folds` | `build_fold()` for new selection targets (strict guard of amendment A1; later seasons never enter); frozen inputs (history only) vs online inputs (history plus target matches dated *strictly* before the match date); the common/unseen split from fixtures; online-refit accounting |
+| `forecasts` | the forecast frame: indexed by unique `match_id`, columns `<arm>_H`, `<arm>_D`, `<arm>_A`, rows summing to 1, no result columns; outcomes are joined by `match_id` only when scoring |
+| `scoring` | per-match log loss and Brier (via `metrics`, never sklearn's A/D/H ordering), paired (left − right) differences with naive and date-clustered SEs, decomposition residuals, calibration in the large per outcome with SEs; `EvaluationSet` bundles a frame with its outcomes and clusters |
+| `segments` | the within-season segments registered in Experiment 11 (unchanged) |
+| `reproduction` | the recorded prediction files of Experiments 10-13 (checksums from their committed metrics.json) and the row-by-row comparison at the registered tolerance 1e-12 |
+
+**Relationship to the recorded experiments.** Experiments 10-13 are frozen records. Their scripts in `experiments/`,
+configs and results are unchanged. The library modules they call (`validation`, `update_policy`, `time_weighting`,
+`online_poisson`) now import the shared implementations under their old names, with identical code. This is checked
+in two ways:
+
+- `tests/test_evaluation_harness.py` (runs in CI) requires every prediction and scoring output of those modules on the
+  synthetic league to equal, exactly, a snapshot captured from the code *before* the harness was introduced
+  (`tests/golden/recorded_synthetic_snapshot.json`).
+- `tests/test_reproduction_recorded.py` (golden, needs the data) regenerates every row of the six recorded prediction
+  files and compares them at 1e-12. It scores nothing and changes no conclusion.
+
+The recorded scripts keep their own private helpers (for example `date_clusters` and the lock checks); a test checks
+that these agree with the harness versions.
+
 ## 9a. Scoring conventions
 
 - Probability arrays always have columns in the order (H, D, A) (`eplmodel.constants.OUTCOMES`).

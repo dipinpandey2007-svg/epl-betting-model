@@ -14,7 +14,7 @@ deliberately *not* stubbed out: each will be added when real data and a validati
 | 7 | Market odds benchmark | not started (the data exist in the raw files) | see below |
 | 8 | Machine-learning models | not started | `eplmodel.models`; must beat stages 2-3 on the same folds |
 | 9 | Probability calibration | partial: home-win reliability table only | `eplmodel.evaluation.calibration` |
-| 10 | Walk-forward / backtesting | partial: folds for Elo K selection and the promoted-team analysis | `eplmodel.splits`, `eplmodel.evaluation.walk_forward` (next milestone: common harness) |
+| 10 | Walk-forward / backtesting | **common evaluation harness done** (2026-10-02): folds and information sets, forecast frames, scoring with clustered SEs, reproduction gate for Experiments 10-13 | `eplmodel.evaluation.folds`, `.forecasts`, `.scoring`, `.segments`, `.reproduction` (see METHODOLOGY §9) |
 | 11 | Closing-line value | not started | needs stage 7 |
 | 12 | ROI and proper scoring metrics | partial: log loss and Brier done; ROI not started | `eplmodel.evaluation.metrics` |
 | 13 | Structured football knowledge | started: `data/reference/team_history.csv` | `data/reference/` |

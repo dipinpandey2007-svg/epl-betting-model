@@ -24,15 +24,18 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
-from eplmodel.constants import OUTCOMES
 from eplmodel.evaluation.alignment import involves_teams, teams_in
-from eplmodel.evaluation.metrics import per_match_brier, per_match_log_loss
-from eplmodel.evaluation.update_policy import paired_difference_clustered
-from eplmodel.evaluation.validation import fold_data, prob_columns, unseen_teams
+from eplmodel.evaluation.folds import assert_max_season, common_group, restrict_to_max_season
+from eplmodel.evaluation.scoring import (  # noqa: F401  (per_match_losses re-exported)
+    calibration_in_the_large,
+    paired_difference_clustered,
+    per_match_losses,
+)
+from eplmodel.evaluation.validation import fold_data, prob_columns
 from eplmodel.models.poisson import PoissonGoalModel
 from eplmodel.models.scoreline import outcome_probabilities_from_rates
 from eplmodel.models.time_weights import exponential_decay_weights, kish_effective_sample_size
-from eplmodel.splits import SEASON_ORDER, SplitAccessError
+from eplmodel.splits import SEASON_ORDER
 
 STATIC_ARM = "poisson"
 METRICS = ("log_loss", "brier")
@@ -57,21 +60,9 @@ def grid_arm(h: float) -> str:
 
 # --- Development-stage data guard ------------------------------------------------------------
 
-def restrict_to_development(matches: pd.DataFrame, max_season: str) -> pd.DataFrame:
-    """Drop every row from a season after `max_season`, then check that none is left."""
-    limit = SEASON_ORDER.index(max_season)
-    keep = matches["Season"].map(SEASON_ORDER.index) <= limit
-    out = matches[keep.to_numpy()].reset_index(drop=True)
-    assert_development_only(out, max_season)
-    return out
-
-
-def assert_development_only(matches: pd.DataFrame, max_season: str) -> None:
-    """Raise unless every row belongs to `max_season` or an earlier season."""
-    limit = SEASON_ORDER.index(max_season)
-    late = sorted(s for s in matches["Season"].unique() if SEASON_ORDER.index(s) > limit)
-    if late:
-        raise SplitAccessError(f"Development stage must not see seasons after {max_season}: found {late}")
+# Names used by the recorded experiments; the implementations live in eplmodel.evaluation.folds.
+restrict_to_development = restrict_to_max_season
+assert_development_only = assert_max_season
 
 
 # --- Fitting and predicting -------------------------------------------------------------------
@@ -129,8 +120,7 @@ def tw_fold_predictions(matches: pd.DataFrame, history: Sequence[str], target: s
     data = fold_data(matches, history, target)
     history_rows = data[data["Season"].isin(history)]
     tgt = data[data["Season"] == target]
-    unseen = unseen_teams(history_rows, tgt)
-    common = tgt[~involves_teams(tgt, unseen)]
+    unseen, common = common_group(history_rows, tgt)
     returning = returning_teams(history_rows, tgt)
 
     preds = common.set_index("match_id")[["Date", "Season", "HomeTeam", "AwayTeam"]].copy()
@@ -152,23 +142,9 @@ def tw_fold_predictions(matches: pd.DataFrame, history: Sequence[str], target: s
 
 # --- Scoring ----------------------------------------------------------------------------------
 
-def per_match_losses(preds: pd.DataFrame, results, arms: Sequence[str]) -> dict[str, dict[str, np.ndarray]]:
-    results = np.asarray(results)
-    out = {}
-    for arm in arms:
-        p = preds[prob_columns(arm)].to_numpy(dtype=float)
-        out[arm] = {"log_loss": per_match_log_loss(results, p), "brier": per_match_brier(results, p)}
-    return out
-
-
 def sharpness_and_calibration(preds: pd.DataFrame, results, arm: str) -> dict:
     """Descriptive: mean predicted vs observed H/D/A frequencies and mean entropy (nats)."""
-    p = preds[prob_columns(arm)].to_numpy(dtype=float)
-    results = np.asarray(results)
-    entropy = -np.sum(np.where(p > 0, p * np.log(np.where(p > 0, p, 1.0)), 0.0), axis=1)
-    return {"mean_predicted": dict(zip(OUTCOMES, p.mean(axis=0).tolist())),
-            "observed": {o: float(np.mean(results == o)) for o in OUTCOMES},
-            "mean_entropy_nats": float(entropy.mean())}
+    return calibration_in_the_large(preds[prob_columns(arm)].to_numpy(dtype=float), results)
 
 
 # --- Selection of the half-life (hyperparameter) --------------------------------------------

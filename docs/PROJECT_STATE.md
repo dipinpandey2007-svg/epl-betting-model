@@ -175,7 +175,8 @@ The 2025-26 holdout remains sealed and unacquired.
    2026-10-01, and by Experiment 13's 2024-25 stage (its fourth exposure). The sealed acquisition of 2025-26
    has not been done.
    ~~Retire 2024-25 as a selection target~~: done 2026-10-01 (amendment A1, access-log entry P1).
-2. Build one evaluation harness that scores every model on the same training-season walk-forward folds:
+2. ~~Build one evaluation harness~~: done 2026-10-02 (`eplmodel.evaluation.folds`, `.forecasts`, `.scoring`,
+   `.segments`, `.reproduction`; METHODOLOGY §9). Experiments 10-13 reproduce row for row. Original plan:
    - the same information and update policy for every model (for example, goal models refitted or time-weighted
      as each season progresses);
    - paired comparisons with uncertainty estimates (for example, bootstrap over matches).

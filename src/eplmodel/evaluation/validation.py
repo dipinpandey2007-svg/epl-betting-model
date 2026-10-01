@@ -28,10 +28,13 @@ import numpy as np
 import pandas as pd
 
 from eplmodel.constants import OUTCOMES
-from eplmodel.evaluation.alignment import involves_teams, teams_in
+from eplmodel.evaluation.alignment import teams_in
 from eplmodel.evaluation.baselines import frequency_baseline
 from eplmodel.evaluation.calibration import calibration_table
+from eplmodel.evaluation.folds import common_group, unseen_teams  # noqa: F401  (unseen_teams re-exported)
+from eplmodel.evaluation.forecasts import outcomes_for, prob_columns  # noqa: F401  (re-exported)
 from eplmodel.evaluation.metrics import per_match_brier, per_match_log_loss, score
+from eplmodel.evaluation.scoring import paired_difference  # noqa: F401  (re-exported)
 from eplmodel.models.dixon_coles import rho_bounds, rho_grid_search
 from eplmodel.models.elo import EloOutcomeModel, elo_difference, home_shift_from_results, run_elo
 from eplmodel.models.poisson import PoissonGoalModel
@@ -40,10 +43,6 @@ from eplmodel.splits import assert_history_precedes, assert_not_holdout, assert_
 
 MODELS = ("elo", "frequency_baseline", "poisson", "dixon_coles")
 GROUP_MODELS = {"full": ("elo", "frequency_baseline"), "common": MODELS}
-
-
-def prob_columns(model: str) -> list[str]:
-    return [f"{model}_{o}" for o in OUTCOMES]
 
 
 def fold_data(matches: pd.DataFrame, history: Sequence[str], target: str) -> pd.DataFrame:
@@ -56,11 +55,6 @@ def fold_data(matches: pd.DataFrame, history: Sequence[str], target: str) -> pd.
     if missing:
         raise ValueError(f"Fold seasons {missing} are missing from the match table")
     return data
-
-
-def unseen_teams(history_rows: pd.DataFrame, target_rows: pd.DataFrame) -> list[str]:
-    """Teams in the target fixtures that never appear in the history (needs fixtures only, not results)."""
-    return sorted(teams_in(target_rows) - teams_in(history_rows))
 
 
 def online_elo_layer(
@@ -110,8 +104,7 @@ def goal_models_fold(
     """
     train = data[data["Season"].isin(history)]
     tgt = data[data["Season"] == target]
-    unseen = unseen_teams(train, tgt)
-    common = tgt[~involves_teams(tgt, unseen)]
+    unseen, common = common_group(train, tgt)
 
     goal_model = PoissonGoalModel().fit(train)
     if goal_model.unseen_teams(teams_in(tgt)) != set(unseen):
@@ -171,22 +164,6 @@ def fold_predictions(matches: pd.DataFrame, history: Sequence[str], target: str,
         "n_common": int(preds["in_common"].sum()),
     }
     return preds, fitted
-
-
-def outcomes_for(matches: pd.DataFrame, match_ids) -> pd.Series:
-    """Observed results (H/D/A) for the given match ids, in that order."""
-    return matches.set_index("match_id").loc[list(match_ids), "FTR"]
-
-
-def paired_difference(model_losses: np.ndarray, reference_losses: np.ndarray) -> dict:
-    """Mean per-match difference (model minus reference; negative = model better) with a naive standard error.
-
-    The standard error treats matches as independent, ignoring correlation between matches on the same date.
-    """
-    d = np.asarray(model_losses, dtype=float) - np.asarray(reference_losses, dtype=float)
-    n = len(d)
-    sd = float(d.std(ddof=1)) if n > 1 else float("nan")
-    return {"n_matches": n, "mean": float(d.mean()), "sd": sd, "naive_se": sd / np.sqrt(n) if n > 1 else float("nan")}
 
 
 def score_groups(preds: pd.DataFrame, results: pd.Series, reference_models: Sequence[str]) -> dict:

@@ -33,9 +33,17 @@ from collections.abc import Mapping, Sequence
 import numpy as np
 import pandas as pd
 
-from eplmodel.constants import OUTCOMES
 from eplmodel.evaluation.calibration import calibration_table
-from eplmodel.evaluation.metrics import per_match_brier, per_match_log_loss, score
+from eplmodel.evaluation.metrics import score
+from eplmodel.evaluation.scoring import (  # noqa: F401  (re-exported for the recorded experiments)
+    calibration_in_the_large,
+    differences,
+    identity_residual,
+    paired_difference_clustered,
+    per_match_losses,
+    split_difference,
+)
+from eplmodel.evaluation.segments import assign_segments, prior_games_played  # noqa: F401  (re-exported)
 from eplmodel.evaluation.validation import fold_data, fold_predictions, online_elo_layer, prob_columns
 from eplmodel.models.elo import (
     EloOutcomeModel,
@@ -66,14 +74,6 @@ METRICS = ("log_loss", "brier")
 
 class DiagnosticCheckError(RuntimeError):
     """A registered invariant of the diagnostic does not hold."""
-
-
-def split_difference(name: str) -> tuple[str, str]:
-    """'poisson_minus_elo_f2' -> ('poisson', 'elo_f2')."""
-    left, sep, right = name.partition("_minus_")
-    if not sep or not left or not right:
-        raise ValueError(f"{name!r} is not of the form '<model>_minus_<model>'")
-    return left, right
 
 
 # --- Predictions ------------------------------------------------------------------------------
@@ -130,31 +130,6 @@ def season_start_elo_fold(
     return out, fitted, online_from_layer
 
 
-def prior_games_played(target_rows: pd.DataFrame) -> pd.Series:
-    """Mean, over the two teams, of the target-season matches each played on dates strictly before this one.
-
-    Uses fixtures (teams and dates) only, indexed by match_id.
-    """
-    dates = {team: np.sort(pd.concat([target_rows.loc[target_rows["HomeTeam"] == team, "Date"],
-                                      target_rows.loc[target_rows["AwayTeam"] == team, "Date"]]).to_numpy())
-             for team in set(target_rows["HomeTeam"]) | set(target_rows["AwayTeam"])}
-    before = lambda team, date: int(np.searchsorted(dates[team], np.datetime64(date), side="left"))
-    values = [(before(h, d) + before(a, d)) / 2
-              for h, a, d in zip(target_rows["HomeTeam"], target_rows["AwayTeam"], target_rows["Date"])]
-    return pd.Series(values, index=pd.Index(target_rows["match_id"], name="match_id"), name="prior_games")
-
-
-def assign_segments(prior_games, lower_edges: Sequence[float], labels: Sequence[str]) -> np.ndarray:
-    """Label of the segment whose lower edge is the largest edge <= the value (so 9.5 falls in '0-9')."""
-    prior_games = np.asarray(prior_games, dtype=float)
-    if len(lower_edges) != len(labels) or list(lower_edges) != sorted(lower_edges):
-        raise ValueError("lower_edges must be sorted and match labels one to one")
-    if np.any(prior_games < lower_edges[0]):
-        raise ValueError("a value lies below the first segment edge")
-    idx = np.searchsorted(np.asarray(lower_edges, dtype=float), prior_games, side="right") - 1
-    return np.asarray(labels, dtype=object)[idx]
-
-
 def diagnostic_fold_predictions(
     matches: pd.DataFrame, history: Sequence[str], target: str, vcfg: dict, dcfg: dict
 ) -> tuple[pd.DataFrame, dict]:
@@ -191,63 +166,17 @@ def diagnostic_fold_predictions(
 
 # --- Scoring ----------------------------------------------------------------------------------
 
-def paired_difference_clustered(left_losses, right_losses, clusters) -> dict:
-    """Mean of (left - right) per match, with a naive SE and a cluster-robust SE.
-
-    Clustered SE^2 = G / (G - 1) * sum_g (sum_{i in g} (d_i - mean d))^2 / n^2, with G clusters.
-    With one match per cluster it equals the naive SE^2 = var(d, ddof=1) / n.
-    """
-    d = np.asarray(left_losses, dtype=float) - np.asarray(right_losses, dtype=float)
-    clusters = np.asarray(clusters)
-    if len(clusters) != len(d):
-        raise ValueError("clusters must have one label per match")
-    n = len(d)
-    out = {"n_matches": n, "mean": float(d.mean()) if n else float("nan"),
-           "sd": float("nan"), "naive_se": float("nan"), "clustered_se": float("nan"), "n_clusters": 0}
-    if n == 0:
-        return out
-    sums = pd.Series(d - d.mean()).groupby(clusters).sum().to_numpy()
-    g = len(sums)
-    out["n_clusters"] = int(g)
-    if n > 1:
-        out["sd"] = float(d.std(ddof=1))
-        out["naive_se"] = out["sd"] / float(np.sqrt(n))
-    if g > 1:
-        out["clustered_se"] = float(np.sqrt(g / (g - 1) * np.sum(sums ** 2)) / n)
-    return out
-
-
-def per_match_losses(preds: pd.DataFrame, results, models: Sequence[str]) -> dict[str, dict[str, np.ndarray]]:
-    results = np.asarray(results)
-    out = {}
-    for m in models:
-        probs = preds[prob_columns(m)].to_numpy(dtype=float)
-        out[m] = {"log_loss": per_match_log_loss(results, probs), "brier": per_match_brier(results, probs)}
-    return out
-
-
 def check_decomposition(losses: Mapping[str, np.ndarray], components: Sequence[str], total: str,
                         tolerance: float) -> float:
     """Raise unless the components add up to the total for every match; return the largest residual."""
-    parts = []
-    for name in components:
-        left, right = split_difference(name)
-        parts.append(losses[left] - losses[right])
-    left, right = split_difference(total)
-    residual = (losses[left] - losses[right]) - np.sum(parts, axis=0)
-    worst = float(np.max(np.abs(residual))) if residual.size else 0.0
+    worst = identity_residual(losses, components, total)
     if worst > tolerance:
         raise DiagnosticCheckError(f"decomposition of {total} fails: max residual {worst:.3e} > {tolerance:.0e}")
     return worst
 
 
 def _differences(losses, names, clusters) -> dict:
-    out = {}
-    for name in names:
-        left, right = split_difference(name)
-        out[name] = {"label": LABELS.get(name),
-                     **{m: paired_difference_clustered(losses[left][m], losses[right][m], clusters) for m in METRICS}}
-    return out
+    return {name: {"label": LABELS.get(name), **d} for name, d in differences(losses, names, clusters).items()}
 
 
 def score_block(preds: pd.DataFrame, results, clusters, models: Sequence[str], decomposition: str | None,
@@ -282,15 +211,11 @@ def score_block(preds: pd.DataFrame, results, clusters, models: Sequence[str], d
 def calibration_summary(preds: pd.DataFrame, results, models: Sequence[str], n_bins: int) -> dict:
     """Descriptive: mean prediction vs observed rate per outcome, mean entropy, home-win reliability table."""
     results = np.asarray(results)
-    observed = {o: float(np.mean(results == o)) for o in OUTCOMES}
     out = {}
     for m in models:
         probs = preds[prob_columns(m)].to_numpy(dtype=float)
-        entropy = -np.sum(np.where(probs > 0, probs * np.log(np.where(probs > 0, probs, 1.0)), 0.0), axis=1)
         out[m] = {
-            "mean_predicted": dict(zip(OUTCOMES, probs.mean(axis=0).tolist())),
-            "observed": observed,
-            "mean_entropy_nats": float(entropy.mean()),
+            **calibration_in_the_large(probs, results),
             "home_win_table": calibration_table(probs[:, 0], results == "H", n_bins).reset_index().astype({"bin": str}),
         }
     return out
