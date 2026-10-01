@@ -275,6 +275,21 @@ is a market benchmark, not a model or selection candidate.
   CLV is not implemented: it needs a defined pre-match snapshot and an
   explicit information cutoff.
 
+Experiment 15 (protocol `full_coverage_poisson_v1`) is PRE-REGISTERED ONLY
+(2026-10-02): `docs/preregistration/full_coverage_poisson_v1.md`,
+`configs/full_coverage_poisson_v1.toml`, typed view
+`eplmodel.models.full_coverage_spec`.
+
+- Model: online time-weighted Poisson (H = 730, inherited) as a MAP fit with
+  empirical-Bayes Gaussian priors on attack and defence. Promoted teams
+  (absent from the previous season) get the mean first-season strength of
+  earlier promoted team-seasons; continuing teams get a centred mean. Returning
+  teams use the promoted prior plus their decayed history.
+- Home advantage is global. Effects sum to zero over the 20 target teams.
+- Priors are re-applied at every refit; no value is tuned.
+- Primary arm `fc_hier`; arms M1 and S1 are ablation/sensitivity.
+- Scored only on 2017-18 to 2021-22. Nothing is implemented or scored yet.
+
 ---
 
 ## 7. Known methodological issues and conventions

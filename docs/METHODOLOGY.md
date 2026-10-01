@@ -190,6 +190,25 @@ in two ways:
 The recorded scripts keep their own private helpers (for example `date_clusters` and the lock checks); a test checks
 that these agree with the harness versions.
 
+### Pre-registered next model: full-coverage dynamic Poisson (`full_coverage_poisson_v1`, planned Experiment 15)
+
+Registered 2026-10-02; design only, nothing implemented or scored. See `docs/preregistration/full_coverage_poisson_v1.md`
+and `configs/full_coverage_poisson_v1.toml`. It links the earlier stages as follows:
+
+- **Experiments 12-13:** it inherits H = 730 days, exponential weights and the once-per-date online refits. It adds
+  empirical-Bayes Gaussian priors on team attack and defence:
+  - promoted teams (absent from the previous season) are centred on the mean first-season strength of earlier promoted
+    team-seasons;
+  - continuing teams use a centred mean;
+  - the variance is pooled and deconvolved.
+
+  This lets every match of a 20-team season be forecast. All prior hyperparameters are estimated inside each fold from
+  seasons before the target only, and no value is tuned.
+- **Experiment 7:** its promoted-team taxonomy is used for diagnostics only.
+- **Experiment 14:** the market benchmark is context only; odds are never a model input.
+- **Evidence.** Scored only on the amendment-A1 selection targets. The primary reading is coverage plus common-group
+  non-inferiority against the Experiment 13 online arm.
+
 ## 9a. Scoring conventions
 
 - Probability arrays always have columns in the order (H, D, A) (`eplmodel.constants.OUTCOMES`).

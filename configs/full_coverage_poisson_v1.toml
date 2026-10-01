@@ -1,0 +1,159 @@
+# Pre-registered protocol full_coverage_poisson_v1 (planned Experiment 15): a dynamic, full-coverage
+# time-weighted Poisson goal model with empirical-Bayes season-start priors.
+#
+# DESIGN / PRE-REGISTRATION ONLY (registered 2026-10-02). No model of this protocol has been implemented, fitted
+# or scored. The full rationale is docs/preregistration/full_coverage_poisson_v1.md. Changing anything here after
+# the first scored run is a protocol change that must be logged.
+#
+# Evidence roles: scored on the historical selection targets only (amendment A1). No season after 2021-22 is read.
+# The exposed seasons, the retired validation season, the sealed holdout (2025-26) and the declared next holdout
+# (2026-27) play no role in this protocol. A later descriptive stage on the retired validation season would need
+# its own access-log entry, after the historical results below are locked.
+# No market, shots/xG, squad, injury or tactical information enters any arm.
+
+[protocol]
+protocol_id = "full_coverage_poisson_v1"
+registered = "2026-10-02"
+status = "registered_not_implemented"
+experiment = 15
+dataset = "dev_v2"
+max_season = "2122"                         # data cut to seasons <= 2021-22 straight after reading
+targets = ["1718", "1819", "1920", "2021", "2122"]   # = eplmodel.splits.SELECTION_TARGET_SEASONS
+hyperparameter_selection = "none"           # no hyperparameter is tuned on any target (see [selection])
+inputs = ["match_results", "fixture_list_of_target", "data/reference/team_history.csv"]
+forbidden_inputs = ["market_odds", "shots", "xg", "lineups", "injuries", "squad", "tactics", "championship_data"]
+
+[inherited]
+# Locked choices inherited unchanged from Experiments 12 and 13.
+half_life_days = 730.0                      # time_weighted_poisson_v1 [locked]; never retuned
+weighting = "exponential_half_life_days"    # w = 2 ** (-age / H)
+age_unit = "days"
+refit_cadence = "once_per_target_date"      # one refit per distinct target date
+information_policy = "strictly_earlier_dates"
+likelihood = "independent_poisson"          # log E[home goals] = mu + h + att(home) + def(away); away: mu + att(away) + def(home)
+max_goals = 10                              # scoreline grid truncation, H/D/A renormalised by captured mass
+warm_start = false
+
+[model]
+form = "independent_poisson_map"            # maximum a posteriori; no Dixon-Coles adjustment (separate future arm)
+home_advantage = "global"                   # one league-wide parameter h, no prior, re-estimated at every refit
+intercept_prior = "none"
+# Identification: sum of attack effects = 0 and sum of defence effects = 0 over the 20 teams of the target fixture
+# list, at every refit. Teams present only in the history are free parameters (no prior).
+identification = "sum_to_zero_over_target_teams"
+# Weight reference: age in days from each match date to the refit date d (the target date being predicted).
+# With priors the absolute weight scale matters, so this is fixed here; w <= 1 for every fitted match.
+weight_reference = "refit_date"
+# Fitting set for target date d: every fold-history match plus every target-season match dated strictly before d.
+# All target-season matches enter (full coverage), including those of promoted and unseen teams.
+fit_set = "history_plus_all_target_matches_strictly_before_date"
+priors_on_every_refit = true                # priors are part of the posterior: continuing regularisation by construction
+hyperparameters_frozen_within_season = true # empirical-Bayes values computed once, before the first target match
+
+[prior]
+# Gaussian priors on the attack and defence effects of the 20 target teams.
+#   attack_t ~ N(a_t, tau_att^2),  defence_t ~ N(b_t, tau_def^2), independent.
+# Groups are defined from fixtures only: "promoted" = a target team absent from the Premier League in the season
+# before the target (newly promoted, returning or never-before PL); "continuing" = played in the previous season.
+group_rule = "membership_of_previous_season"
+promoted_mean = "empirical_bayes"           # mean first-season effect of promoted team-seasons in the EB seasons
+continuing_mean = "centred"                 # a_C = -n_P * a_P / (20 - n_P), so prior means sum to zero over the target teams
+variance = "pooled_within_group_deconvolved" # one tau_att and one tau_def, shared by both groups
+variance_floor = 0.05                       # tau >= 0.05 (log goal-rate units), fixed a priori
+attack_defence_correlation = "independent"
+# Returning teams (absent from the previous season but present earlier in the fold history) use the promoted prior;
+# their earlier matches stay in the likelihood with their time-decay weights (no identity break) in the primary arm.
+returning_rule = "promoted_prior_plus_decayed_history"
+
+[empirical_bayes]
+# For target season S: EB seasons = every development season s with first_data_season < s < S, so that membership
+# of s - 1 is observed in the data (2014-15 is the first data season; its promoted clubs are not identifiable from
+# the project data and no external source is added).
+seasons_rule = "after_first_data_season_and_before_target"
+per_season_fit = "unweighted_mle_single_season_sum_to_zero"
+standard_errors = "inverse_fisher_information"   # attack/defence SEs of the single-season fit (incl. the implied 20th team)
+# m_P = mean over promoted team-seasons of the single-season effect estimate (attack and defence separately).
+# tau^2 = max(pooled within-group variance (ddof = number of groups) - mean squared SE, variance_floor^2).
+pooling = "equal_weight_per_team_season"
+expected_team_seasons = { "1718" = [6, 34], "1819" = [9, 51], "1920" = [12, 68], "2021" = [15, 85], "2122" = [18, 102] }  # [promoted, continuing]
+
+[solver]
+method = "damped_newton"                    # exact gradient and Hessian of the concave penalised objective
+start = "deterministic_cold"                # mu = log weighted mean goals of the fit set, h = 0, target effects = prior means, others 0
+gradient_tolerance = 1e-9                   # max |gradient| at convergence
+max_iterations = 200
+step_halvings = 40
+on_failure = "abort_stage_no_fallback"
+
+[arms]
+# Prediction-column prefix -> spec id. fc_hier is the frozen primary arm.
+poisson_tw_online = "poisson_tw_online_h730_v1_diag"        # M0: Experiment 13 online arm, recorded predictions (common group)
+fc_promoted = "poisson_fc_promoted_prior_h730_v1"            # M1: promoted prior only; continuing teams unpenalised
+fc_hier = "poisson_fc_hierarchical_h730_v1"                  # M2 (PRIMARY): promoted and continuing priors
+fc_hier_break = "poisson_fc_hierarchical_break_h730_v1_sens" # S1: M2 + identity break for returning teams
+primary = "fc_hier"
+# S1 identity break: a returning team's matches before its absence are attributed to a separate history-only
+# identity (free, no prior), so its current parameters start from the promoted prior and target-season data only.
+
+[groups]
+# Defined from fixtures (and team_history.csv) only; registered before any fit. Matches per target.
+full = { "1718" = 380, "1819" = 380, "1920" = 380, "2021" = 380, "2122" = 380 }
+common = { "1718" = 306, "1819" = 272, "1920" = 342, "2021" = 342, "2122" = 342 }   # neither team unseen in the fold history (Experiments 11-13)
+unseen = { "1718" = 74, "1819" = 108, "1920" = 38, "2021" = 38, "2122" = 38 }
+promoted = { "1718" = 108, "1819" = 108, "1920" = 108, "2021" = 108, "2122" = 108 }
+returning = { "1718" = 38, "1819" = 0, "1920" = 74, "2021" = 74, "2122" = 74 }      # promoted team present earlier in the fold history
+continuing_only = { "1718" = 272, "1819" = 272, "1920" = 272, "2021" = 272, "2122" = 272 }
+online_fits = { "1718" = 105, "1819" = 108, "1920" = 115, "2021" = 135, "2122" = 123 }
+promoted_teams = { "1718" = ["Brighton", "Huddersfield", "Newcastle"], "1819" = ["Cardiff", "Fulham", "Wolves"], "1920" = ["Aston Villa", "Norwich", "Sheffield United"], "2021" = ["Fulham", "Leeds", "West Brom"], "2122" = ["Brentford", "Norwich", "Watford"] }
+# Diagnostic taxonomy (Experiment 7, eplmodel.analysis.promoted_teams, yoyo_threshold = 2): seasons out of the PL
+# before return from the fold history when the team is in it, otherwise from team_history.csv (empty = never PL).
+yoyo_threshold = 2
+recent_yoyo_teams = { "1718" = ["Newcastle"], "1819" = [], "1920" = [], "2021" = ["Fulham", "West Brom"], "2122" = ["Norwich", "Watford"] }
+
+[evaluation]
+harness = "eplmodel.evaluation"
+metrics = ["log_loss", "brier"]             # log loss primary
+clusters = "target_date"                    # "<target>_<YYYY-MM-DD>"; pooled clusters are (target, date)
+segments_lower_edges = [0, 10, 19, 29]      # Experiment 11 segments (unchanged)
+segments_labels = ["0-9", "10-18", "19-28", "29+"]
+report = ["per_target", "pooled", "per_group", "per_segment", "calibration_in_the_large"]
+# Recorded comparators (checksum-verified, never refitted): M0 from Experiment 13 historical; online Elo and the
+# frequency baseline from Experiment 10; the Experiment 14 market benchmark as context only.
+recorded_comparators = ["poisson_tw_online", "elo", "frequency_baseline", "market_close_shin"]
+
+[evidence]
+practical_floor_log_loss = 0.002
+clustered_se_multiple = 2.0
+min_folds_same_sign = 4
+# COV: fc_hier produces a valid (H, D, A) distribution for all 1,900 target matches (380 x 5).
+# NI (primary): pooled common-group (fc_hier - poisson_tw_online) log loss, 1,604 matches:
+#   mean + 2 clustered SE < +floor  -> "non_inferior_on_common_group"
+#   mean - 2 clustered SE > +floor  -> "inferior_on_common_group"
+#   otherwise                       -> "inconclusive_on_common_group"
+# Key secondary, unseen group (296 matches): (fc_hier - elo) and (fc_hier - frequency_baseline), read with the
+#   Experiment 13 U rule (floor, 2 clustered SE, >= 4 of 5 folds, Brier same sign); descriptive per fold.
+# Decomposition (descriptive): fc_promoted - poisson_tw_online (common); fc_hier - fc_promoted (full, common,
+#   promoted, continuing_only); fc_hier_break - fc_hier (returning).
+# Context only: fc_hier - elo (full); fc_hier - market_close_shin (full). Never selection evidence.
+readings = ["full_coverage_non_inferior", "full_coverage_inconclusive", "full_coverage_inferior", "coverage_failed"]
+
+[selection]
+# No hyperparameter is selected: H is inherited; prior means and variances are fitted by empirical Bayes inside each
+# fold from seasons before the target; the variance floor is fixed a priori. The primary arm is fixed above and is
+# never replaced by M1 or S1 because of their scores. If a future revision adds a tunable value, it must use nested
+# forward-chaining selection on these targets with the one-SE rule (as Experiment 12) and be registered first.
+tuned_values = []
+
+[implementation_checks]
+# Must pass before any outcome of a target is joined (see the pre-registration document, section O).
+anchor_tolerance = 1e-7      # M2 with no priors and unseen-team matches excluded reproduces Experiment 13 online predictions
+identity_tolerance = 1e-12
+
+[historical_locked]
+# Written only from the scored historical run, in a separate commit.
+status = "not_run"
+
+[outputs]
+results_name = "full_coverage_poisson_historical"
+in_run_all = false
+not_registered_for = ["dev_test", "exposed_validation", "holdout"]

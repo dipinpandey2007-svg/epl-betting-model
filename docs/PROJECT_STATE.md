@@ -23,6 +23,10 @@ Since then:
   Brier on 1,900 matches (100% coverage). It is a reference, not a model: nothing was selected or ranked, and CLV is
   not implemented. On the same matches, every established arm scores worse than the closing market. For example,
   market − online Elo is −0.0242 (clustered SE 0.0051). See `RESULTS_LOG.md` Experiment 14.
+- **Experiment 15 is pre-registered, not implemented** (`full_coverage_poisson_v1`, 2026-10-02). It is a
+  full-coverage online time-weighted Poisson model (H = 730) with empirical-Bayes season-start priors for promoted,
+  returning and continuing teams, scored on the selection targets only. See
+  `docs/preregistration/full_coverage_poisson_v1.md`. No prediction or result exists yet.
 
 No established model or specification has been changed. `poisson_time_weighted_v1` is a new candidate, not a
 replacement for `poisson_static_v1`.
