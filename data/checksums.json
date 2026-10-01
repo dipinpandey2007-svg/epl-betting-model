@@ -1,0 +1,16 @@
+{
+  "description": "Content SHA-256 (CRLF normalised to LF) of the data used for all recorded results. data/processed/matches.csv is authoritative; raw-file hashes are informative because the download re-writes files through pandas.",
+  "files": {
+    "data/raw/E0_1415.csv": "5f93f5f6489511c86d8136e8cc422889de3171811ef93cf78cc79be89a899505",
+    "data/raw/E0_1516.csv": "21f7674afa9175b7508ef6c1dfa28b0a0607fd33e7fbf5ef64e096b1cbcffcf8",
+    "data/raw/E0_1617.csv": "ea2166a51ed2da0cdcd99782c32895ec637b21a9645648bf25465119481de92d",
+    "data/raw/E0_1718.csv": "6198a3965509ccea6be922c3e736ef0d6cc4f73b08de80bf8a4f82c4075cbde9",
+    "data/raw/E0_1819.csv": "6811e9d855938773a8724bc46df3b53206b2020f643e2aa6229a4bf904ff7c19",
+    "data/raw/E0_1920.csv": "0a4a75a71e263c17a024f7a7ffe85b30b89d0822195f55b4c0ca36b6d9a7dfd9",
+    "data/raw/E0_2021.csv": "feca59b3a8638c26f0877aeb3e8aa6f540cb6113b81f23179fd315b7d5ff0f6d",
+    "data/raw/E0_2122.csv": "624d02593e0196c271cba9569968eb15c5ffa2214f2eb86fc0fdb7df2237e747",
+    "data/raw/E0_2223.csv": "c9a9edcf87acb65b94ccafa37b2e8e05b8da837a4e7fc10a571d382b6a29171e",
+    "data/raw/E0_2324.csv": "0b669038e94bf305603d841f02006c7d35ebd41c8722c76e479f2393079b995f",
+    "data/processed/matches.csv": "f51862c7a21ecdb16b3ad76a94c95bee6eede528bbde8c08ef933114f04a45d0"
+  }
+}

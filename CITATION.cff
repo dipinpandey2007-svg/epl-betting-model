@@ -1,0 +1,55 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "eplmodel: leakage-safe English Premier League match-probability models"
+abstract: >-
+  Research code for estimating English Premier League match-outcome
+  probabilities (Elo with multinomial logistic regression, static Poisson,
+  staged Dixon-Coles) with chronological walk-forward evaluation, proper
+  scoring rules, golden regression tests and a documented test-set access log.
+  Not betting advice.
+authors:
+  - given-names: Dipin
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/dipinpandey2007-svg/epl-betting-model"
+keywords:
+  - football
+  - Premier League
+  - Elo
+  - Poisson regression
+  - Dixon-Coles
+  - probabilistic forecasting
+  - reproducible research
+references:
+  - type: article
+    authors:
+      - family-names: Dixon
+        given-names: Mark J.
+      - family-names: Coles
+        given-names: Stuart G.
+    title: "Modelling association football scores and inefficiencies in the football betting market"
+    journal: "Journal of the Royal Statistical Society: Series C (Applied Statistics)"
+    volume: 46
+    issue: 2
+    start: 265
+    end: 280
+    year: 1997
+    doi: 10.1111/1467-9876.00065
+  - type: article
+    authors:
+      - family-names: Maher
+        given-names: M. J.
+    title: "Modelling association football scores"
+    journal: "Statistica Neerlandica"
+    volume: 36
+    issue: 3
+    start: 109
+    end: 118
+    year: 1982
+    doi: 10.1111/j.1467-9574.1982.tb00782.x
+  - type: data
+    authors:
+      - name: "Football-Data.co.uk"
+    title: "English Premier League historical results (E0 season files)"
+    url: "https://www.football-data.co.uk/"

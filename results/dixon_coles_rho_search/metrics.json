@@ -1,0 +1,182 @@
+{
+  "experiment": "dixon_coles_rho_search",
+  "results": {
+    "poisson_is_home_coef": 0.21082083750290875,
+    "n_train_matches": 3040,
+    "valid_rho_range": [
+      -0.2753469681851393,
+      0.36565351649003697
+    ],
+    "log_likelihood_rho_0": -8744.497321868079,
+    "grid": [
+      {
+        "rho": -0.3,
+        "log_likelihood": -8811.67058662612,
+        "valid_for_all_fixtures": false
+      },
+      {
+        "rho": -0.28,
+        "log_likelihood": -8800.519231525439,
+        "valid_for_all_fixtures": false
+      },
+      {
+        "rho": -0.26,
+        "log_likelihood": -8790.706995472807,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.24,
+        "log_likelihood": -8782.062499343207,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.22,
+        "log_likelihood": -8774.466521407776,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.2,
+        "log_likelihood": -8767.830570863485,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.18,
+        "log_likelihood": -8762.086497639857,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.16,
+        "log_likelihood": -8757.180685418321,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.14,
+        "log_likelihood": -8753.070492149396,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.12,
+        "log_likelihood": -8749.721927591261,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.1,
+        "log_likelihood": -8747.1080727273,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.08,
+        "log_likelihood": -8745.20797540482,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.06,
+        "log_likelihood": -8744.005869829767,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.04,
+        "log_likelihood": -8743.490628308395,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": -0.02,
+        "log_likelihood": -8743.65538860928,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.0,
+        "log_likelihood": -8744.497321868079,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.02,
+        "log_likelihood": -8746.01752024105,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.04,
+        "log_likelihood": -8748.220993872628,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.06,
+        "log_likelihood": -8751.116775176079,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.08,
+        "log_likelihood": -8754.718136319028,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.1,
+        "log_likelihood": -8759.042934344903,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.12,
+        "log_likelihood": -8764.114108852578,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.14,
+        "log_likelihood": -8769.960371371366,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.16,
+        "log_likelihood": -8776.617146273125,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.18,
+        "log_likelihood": -8784.127854983055,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.2,
+        "log_likelihood": -8792.545687019616,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.22,
+        "log_likelihood": -8801.936089823153,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.24,
+        "log_likelihood": -8812.380369528379,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.26,
+        "log_likelihood": -8823.98110658657,
+        "valid_for_all_fixtures": true
+      },
+      {
+        "rho": 0.28,
+        "log_likelihood": -8836.870755408594,
+        "valid_for_all_fixtures": true
+      }
+    ],
+    "best_rho": -0.04,
+    "configured_rho": -0.04,
+    "configured_rho_matches_selection": true
+  },
+  "provenance": {
+    "git_commit": null,
+    "git_dirty": true,
+    "data_file": "data/processed/matches.csv",
+    "data_sha256": "f51862c7a21ecdb16b3ad76a94c95bee6eede528bbde8c08ef933114f04a45d0",
+    "python": "3.13.15",
+    "packages": {
+      "numpy": "2.5.2",
+      "pandas": "3.0.5",
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "scikit-learn": "1.9.0",
+      "matplotlib": "3.11.1"
+    }
+  }
+}

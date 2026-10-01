@@ -1,0 +1,11 @@
+# Environments and build artefacts
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+
+# Football data: not redistributed until football-data.co.uk terms are verified.
+# Recreate with `python -m eplmodel.data.download` and `python -m eplmodel.data.build`;
+# data/checksums.json records the exact content used for all results.
+data/raw/
+data/processed/

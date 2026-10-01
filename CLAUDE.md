@@ -1,0 +1,175 @@
+# EPL Betting Model — Claude Code Instructions
+
+## 1. Project objective
+
+Build a serious, research-grade English Premier League football betting
+probability model.
+
+The long-term objective is to investigate whether genuine betting-market
+inefficiencies can be identified, not merely to maximize match prediction
+accuracy.
+
+The project should eventually progress through:
+
+1. Historical data pipeline
+2. Elo baseline
+3. Poisson / Dixon-Coles
+4. xG and team-performance features
+5. Squad / injury / lineup information
+6. Tactical / contextual features
+7. Market odds benchmark
+8. Machine-learning models
+9. Probability calibration
+10. Walk-forward / backtesting
+11. Closing-line value
+12. ROI and proper scoring metrics
+13. Structured football knowledge
+
+Do not pretend future stages are complete when they are not. Status per stage:
+`docs/ROADMAP.md`.
+
+---
+
+## 2. Research principles
+
+- Prevent look-ahead bias and data leakage at all costs.
+- Every prediction must use only information available before kickoff.
+- Preserve chronological train / validation / test separation.
+- Never tune on a test period.
+- Use walk-forward evaluation where appropriate.
+- Focus on probabilistic quality rather than accuracy alone.
+- Important metrics include log loss, Brier score and calibration.
+- Later stages will incorporate market-implied probabilities, CLV and ROI.
+- Be skeptical of small improvements.
+- Distinguish training fit from genuine out-of-sample improvement.
+- Never fabricate data, results or sources.
+- Do not recommend real-money betting during model development.
+
+---
+
+## 3. Development philosophy
+
+The exploratory script has been refactored (2026-10-01) into a tested package.
+The original lives in `archive/exploratory/` for reference only.
+
+- Preserve validated methodology and results unless a deliberate change is
+  justified, documented and tested.
+- Do not silently change model definitions.
+- Keep data, models, evaluation, experiments and reporting separate.
+- Add tests for important mathematical and statistical functions.
+- Make experiments reproducible.
+- Keep future/incomplete stages clearly marked. Do not add fake or placeholder
+  implementations merely to make the project look complete.
+
+I am learning Python and statistics through this project. Explain important
+mathematical and methodological decisions, but do not force every tiny coding
+step to be manually copied by me. When working on the repository, prefer
+making coherent changes directly to the codebase.
+
+---
+
+## 4. Commands
+
+```bash
+pip install -e ".[dev]"                 # inside a virtual environment (Python >= 3.11)
+python -m eplmodel.data.download        # raw CSVs -> data/raw/ (git-ignored)
+python -m eplmodel.data.build           # -> data/processed/matches.csv, validated + checksum-checked
+python -m experiments.run_all           # reproduce all results -> results/<experiment>/metrics.json
+python -m experiments.elo_k_selection   # or any single experiment
+python -m pytest                        # all tests (~5 s)
+python -m pytest -m "not golden"        # skip golden regression tests
+python -m pytest tests/test_elo.py::test_run_elo_has_no_lookahead
+```
+
+Use the virtual environment's interpreter for `python`. CI
+(`.github/workflows/tests.yml`) runs the non-golden tests on Linux and Windows,
+Python 3.11-3.13, plus a minimum-dependency job; golden tests run manually.
+
+---
+
+## 5. Architecture
+
+- `src/eplmodel/`: library code. `data/` (download, build, load, validate,
+  checksums), `models/` (elo, poisson, scoreline, dixon_coles), `evaluation/`
+  (metrics, calibration, baselines, alignment, walk_forward), `analysis/`
+  (promoted-team folds), `reporting/` (metrics.json with provenance, figures),
+  `splits.py` (season splits and dev-test guards), `constants.py`.
+- `experiments/`: one module per recorded experiment, each with
+  `run(write=True)`. The golden tests call these same functions.
+- `configs/baselines_v1.toml`: the frozen specifications (spec ids, K, rho,
+  grids). Changing a value there is a methodological change.
+- `tests/golden/golden_values.json`: full-precision values captured from the
+  original script; `tests/test_golden_results.py` must keep passing.
+- `docs/`: METHODOLOGY, RESULTS_LOG, PROJECT_STATE, TEST_SET_ACCESS_LOG,
+  ROADMAP, PROJECT_OVERVIEW.
+
+---
+
+## 6. Current validated state
+
+Data: EPL 2014-15 to 2023-24, 3,800 matches. Train = 2014-15 to 2021-22.
+
+**2022-23 and 2023-24 are an exposed development test benchmark**, not a
+final holdout. Never use them to tune, select or compare any new choice. Only
+specs in `REGISTERED_DEV_TEST_SPECS` (`splits.py`) may be scored on them, and
+any new access must be logged in `docs/TEST_SET_ACCESS_LOG.md` *first*. An
+untouched final holdout is still to be defined from additional data.
+
+| Spec | Dev-test log loss / Brier |
+|---|---|
+| `elo_k25_logreg_v1` (760 matches) | 0.9527 / 0.5642 |
+| `frequency_baseline_v1` (760) | 1.0525 / 0.6355 |
+| `poisson_static_v1` (648) | 1.0058 / 0.5989 |
+| `dixon_coles_staged_v1`, rho = -0.04 (648) | 1.0072 / 0.5994 |
+| Elo on the same 648 | 0.9547 / 0.5661 |
+
+Elo as actually implemented: ratings updated **without** a home-advantage
+term (home_adv=0), then a multinomial logistic regression on the pre-match
+rating difference. The 43.08 shift added to that feature is redundant (the
+intercept absorbs it; fits differ by only ~2e-6 from solver tolerance).
+Applying home advantage inside the updates would be a new model needing its own
+training-fold experiment.
+
+Do not describe the Elo vs Poisson gap as Elo being intrinsically better: Elo
+updates through the test seasons while the Poisson model is static, so the
+comparison mixes model family with update dynamics.
+
+---
+
+## 7. Known methodological issues and conventions
+
+- **Promoted/unseen teams.** The static goal models cannot predict Nott'm
+  Forest or Luton (112 of 760 matches excluded → 648 common subset). Inside
+  training folds about 17% of validation matches are affected. Elo hides the
+  same problem by starting new teams at 1500. Handling methods must be compared
+  on training folds, never on 2022-24.
+- **Staged Dixon-Coles.** The Poisson coefficients are fixed and rho is chosen
+  on training likelihood. This is not joint MLE. Grid values outside
+  `rho_bounds` are flagged and never selected.
+- **Class ordering.** All probability arrays use (H, D, A) columns
+  (`constants.OUTCOMES`). sklearn sorts labels to (A, D, H); use
+  `eplmodel.evaluation.metrics`, never `sklearn.metrics.log_loss` directly.
+- **Brier** = squared error summed over the 3 outcomes, averaged over matches.
+- **Scoreline grid** truncated at 10 goals per side, then H/D/A renormalised.
+- **Alignment.** Compare models on subsets by `match_id`, not row position.
+
+---
+
+## 8. Data handling
+
+Raw and processed match CSVs are git-ignored: football-data.co.uk
+redistribution terms are unverified. `data/checksums.json` (LF-normalised
+SHA-256) identifies the dataset behind all results. Never commit match CSVs.
+The public repository is a fresh export of the private development history,
+which contained the CSVs and is never pushed. The project's MIT licence does
+not cover third-party football data.
+
+---
+
+## 9. Reproducibility requirements
+
+Every meaningful experiment should record: data period, train / validation /
+test definition, features, model specification, hyperparameters, evaluation
+metrics, important assumptions, limitations, and decision / conclusion. Add it
+as a script in `experiments/`, an entry in `docs/RESULTS_LOG.md` (template at
+the bottom) and, once frozen, a spec in `configs/` and golden values in the tests.

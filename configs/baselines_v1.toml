@@ -1,0 +1,34 @@
+# Frozen specifications of the validated baseline models (v1).
+# Season splits are defined in src/eplmodel/splits.py (single source of truth).
+# Changing any value here is a methodological change: it needs its own
+# validation experiment on training-season folds, never on the development test benchmark.
+
+[elo]
+spec_id = "elo_k25_logreg_v1"
+initial_rating = 1500.0
+candidate_k = [10, 15, 20, 25, 30, 40, 50]
+min_train_seasons = 3          # K-selection folds validate on 1718..2122
+selected_k = 25                # chosen by walk-forward validation (lowest mean fold log loss)
+update_home_advantage = 0.0    # ratings are updated WITHOUT a home-advantage term
+apply_home_shift = true        # adds ~43.08 to the regression feature; redundant (absorbed by the intercept)
+logistic_C = 1.0               # sklearn default L2 penalty strength
+
+[poisson]
+spec_id = "poisson_static_v1"
+formula = "Goals ~ Team + Opponent + IsHome"
+max_goals = 10                 # scoreline grid truncation; H/D/A renormalised afterwards
+
+[dixon_coles]
+spec_id = "dixon_coles_staged_v1"
+fit = "staged"                 # Poisson coefficients fixed; rho chosen by training log-likelihood grid
+rho_grid_start = -0.30
+rho_grid_stop = 0.30           # exclusive; last grid value is 0.28
+rho_grid_step = 0.02
+selected_rho = -0.04
+
+[baseline]
+spec_id = "frequency_baseline_v1"
+
+[promoted_teams]
+yoyo_threshold = 2             # seasons out of the PL at or below which a returning team is a "recent yo-yo"
+min_train_seasons = 1          # fold analysis validates on 1516..2122

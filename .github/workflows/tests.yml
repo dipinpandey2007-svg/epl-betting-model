@@ -1,0 +1,66 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      golden:
+        description: "Also download the football-data.co.uk files and run the golden regression tests"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: unit (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest -m "not golden"
+
+  minimum-versions:
+    name: unit (minimum dependency versions)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: >-
+          python -m pip install pytest
+          numpy==2.1.0 pandas==2.2.3 scipy==1.14.1 statsmodels==0.14.4
+          scikit-learn==1.5.2 matplotlib==3.9.2
+      - run: python -m pip install -e . --no-deps
+      - run: python -m pytest -m "not golden"
+
+  golden:
+    # Manual only: downloads ten files from football-data.co.uk, so it is not run on every push.
+    if: github.event_name == 'workflow_dispatch' && inputs.golden
+    name: golden regression tests (pinned environment)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: football-data-raw-${{ hashFiles('data/checksums.json') }}
+      - run: python -m pip install -r requirements-lock.txt
+      - run: python -m pip install -e . --no-deps
+      - run: python -m eplmodel.data.download
+      - run: python -m eplmodel.data.build
+      - run: python -m pytest

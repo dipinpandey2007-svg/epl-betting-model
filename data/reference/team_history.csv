@@ -1,0 +1,24 @@
+# Premier League history of teams that (re)appear in the dataset window, known before their return season.
+# seasons_out_of_pl_before_return: number of seasons spent outside the Premier League immediately before return_season;
+#   empty = the team had never played in the Premier League (era since 1992-93; earlier top-flight history is not counted).
+# Sources (accessed 2026-10-01):
+#   source_pl_spells: Wikipedia "List of Premier League clubs", Premier League spells per club;
+#   source_return_season: Wikipedia season article for return_season, which names the three promoted clubs.
+# Every value below agrees with both sources.
+# Correction (refactor, 2026-10-01): Watford was recorded as 15 in the exploratory script; the correct value is 8
+#   (last Premier League season 2006-07, returned 2015-16). The categorisation (long absence) is unchanged.
+team,return_season,last_pl_season_before_return,seasons_out_of_pl_before_return,notes,source_pl_spells,source_return_season,accessed
+Bournemouth,1516,,,first Premier League season,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2015%E2%80%9316_Premier_League,2026-10-01
+Norwich,1516,1314,1,,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2015%E2%80%9316_Premier_League,2026-10-01
+Watford,1516,0607,8,exploratory script recorded 15,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2015%E2%80%9316_Premier_League,2026-10-01
+Middlesbrough,1617,0809,7,,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2016%E2%80%9317_Premier_League,2026-10-01
+Brighton,1718,,,first Premier League season,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2017%E2%80%9318_Premier_League,2026-10-01
+Huddersfield,1718,,,first Premier League season,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2017%E2%80%9318_Premier_League,2026-10-01
+Cardiff,1819,1314,4,,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2018%E2%80%9319_Premier_League,2026-10-01
+Fulham,1819,1314,4,,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2018%E2%80%9319_Premier_League,2026-10-01
+Wolves,1819,1112,6,,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2018%E2%80%9319_Premier_League,2026-10-01
+Sheffield United,1920,0607,12,,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2019%E2%80%9320_Premier_League,2026-10-01
+Leeds,2021,0304,16,,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2020%E2%80%9321_Premier_League,2026-10-01
+Brentford,2122,,,first Premier League season (top flight last in 1946-47; 74-year absence),https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2021%E2%80%9322_Premier_League,2026-10-01
+Nott'm Forest,2223,9899,23,development-test period team,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2022%E2%80%9323_Premier_League,2026-10-01
+Luton,2324,,,first Premier League season (31-year top-flight absence); development-test period team,https://en.wikipedia.org/wiki/List_of_Premier_League_clubs,https://en.wikipedia.org/wiki/2023%E2%80%9324_Premier_League,2026-10-01

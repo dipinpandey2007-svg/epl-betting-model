@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eplmodel"
+version = "0.1.0"
+description = "Research-grade English Premier League match-probability models (Elo, Poisson, staged Dixon-Coles) with leakage-safe evaluation."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Dipin" }]
+keywords = ["football", "premier-league", "elo", "poisson", "dixon-coles", "forecasting", "reproducible-research"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+requires-python = ">=3.11"
+# Lower bounds are the oldest versions on which the full test suite (including the
+# golden regression tests) has been run; see the minimum-versions CI job.
+dependencies = [
+    "numpy>=2.1",
+    "pandas>=2.2.3",
+    "scipy>=1.14.1",
+    "statsmodels>=0.14.4",
+    "scikit-learn>=1.5.2",
+    "matplotlib>=3.9.2",
+]
+
+[project.urls]
+Repository = "https://github.com/dipinpandey2007-svg/epl-betting-model"
+Issues = "https://github.com/dipinpandey2007-svg/epl-betting-model/issues"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+markers = [
+    "golden: regression tests that reproduce established results from the processed dataset (slow)",
+]
