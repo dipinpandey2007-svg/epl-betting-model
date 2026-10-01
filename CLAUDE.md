@@ -70,8 +70,25 @@ making coherent changes directly to the codebase.
 
 ## 4. Commands
 
+**Interpreter.** Always use this repository's own virtual environment,
+`.venv` in the repository root (`.venv\Scripts\python.exe` on Windows,
+`.venv/bin/python` elsewhere), never one belonging to another project.
+A shell may inherit another project's activated environment; then `python`
+silently runs *that* project's `eplmodel`, without this repository's guards.
+Before downloading data or running experiments, check that both of these
+point inside this repository:
+
 ```bash
-pip install -e ".[dev]"                 # inside a virtual environment (Python >= 3.11)
+python -c "import sys; print(sys.executable)"
+python -c "import eplmodel; print(eplmodel.__file__)"
+```
+
+In a non-interactive shell, call `.venv/Scripts/python.exe` explicitly (or
+activate `.venv` in the same command), since activation does not persist.
+`.vscode/settings.json` selects this interpreter in VS Code.
+
+```bash
+pip install -e ".[dev]"                 # inside this repository's .venv (Python >= 3.11)
 python -m eplmodel.data.download        # raw CSVs -> data/raw/ (git-ignored)
 python -m eplmodel.data.build           # -> data/processed/matches.csv, validated + checksum-checked
 python -m experiments.run_all           # reproduce all results -> results/<experiment>/metrics.json

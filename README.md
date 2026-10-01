@@ -58,6 +58,9 @@ python -m venv .venv
 # Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
 pip install -e ".[dev]"                     # or: pip install -r requirements-lock.txt && pip install -e . --no-deps
 
+# Check that both paths are inside this repository (not another project's environment):
+python -c "import sys, eplmodel; print(sys.executable); print(eplmodel.__file__)"
+
 python -m eplmodel.data.download            # fetch season CSVs from football-data.co.uk into data/raw/
 python -m eplmodel.data.build               # build + validate data/processed/matches.csv, verify checksum
 

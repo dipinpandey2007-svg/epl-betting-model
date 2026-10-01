@@ -1,0 +1,13 @@
+{
+    // Use this repository's own virtual environment, never another project's.
+    // On macOS/Linux the interpreter is .venv/bin/python; select it with "Python: Select Interpreter".
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": ["tests"],
+    // Code Runner otherwise runs whichever `python` is first on PATH.
+    "code-runner.executorMap": {
+        "python": "\"$workspaceRoot\.venv\Scripts\python.exe\" -u"
+    }
+}
