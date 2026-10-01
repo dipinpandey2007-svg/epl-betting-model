@@ -1,0 +1,215 @@
+# Pre-registered protocol online_tw_poisson_diagnostic_v1: does the time-weighted Poisson model also
+# benefit from in-season updating when its recency weighting is already fixed? (RESULTS_LOG
+# Experiment 13, when recorded.)
+#
+# Registered BEFORE any online weighted Poisson model was fitted on real data (access-log entry V4,
+# docs/TEST_SET_ACCESS_LOG.md). Changing anything here after the first historical-stage run is a
+# protocol change that must be logged. The only section written after registration is
+# [historical_locked], and only with the output of the historical stage.
+#
+# This is a DIAGNOSTIC. Nothing is selected, tuned or changed because of its results. The online arm
+# is not a deployment candidate and is not registered for 2022-24 or holdout scoring. There are no
+# hyperparameters to choose: H, the formula, the scoreline grid and the refit cadence are fixed below.
+#
+# Established specifications and the locked candidate poisson_time_weighted_v1 (H* = 730 days,
+# configs/time_weighted_poisson_v1.toml [locked]) are used unchanged and reproduced from their
+# recorded predictions before anything is scored.
+
+[protocol]
+protocol_id = "online_tw_poisson_diagnostic_v1"
+registered = "2026-10-01"
+diagnostic_only = true
+dataset = "dev_v2"
+data_file = "data/processed/matches_dev_v2.csv"
+data_sha256 = "c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807"
+# Historical stage: the selection folds' historical targets (eplmodel.splits.selection_folds).
+historical_targets = ["1718", "1819", "1920", "2021", "2122"]
+# 2024-25: diagnostic/descriptive only, scored once after [historical_locked] is committed. It cannot
+# select, tune or confirm anything (fourth exposure of 2024-25, after Experiments 10, 11 and 12).
+validation_target = "2425"
+validation_evidence_class = "diagnostic_descriptive_cannot_confirm"
+# 2025-26 (sealed holdout) and 2026-27 are never accessed; 2022-23 and 2023-24 are history only.
+# No 2024-25 result is ever pooled with the historical folds for any criterion.
+pool_validation_with_historical = false
+
+[arms]
+# Prediction-column prefixes and the spec behind each arm.
+poisson_tw = "poisson_time_weighted_v1"                 # frozen: fitted once on the fold history (Experiment 12)
+poisson_tw_online = "poisson_tw_online_h730_v1_diag"   # the only new arm
+poisson = "poisson_static_v1"
+elo = "elo_k25_logreg_v1"
+elo_f1 = "elo_k25_frozen_ratings_online_layer_v1_diag"
+elo_f2 = "elo_k25_season_start_v1_diag"
+dixon_coles = "dixon_coles_staged_v1"
+frequency_baseline = "frequency_baseline_v1"
+
+[online]
+# The weighted likelihood of poisson_time_weighted_v1, unchanged, refitted before every target date.
+half_life_days = 730.0                          # must equal time_weighted_poisson_v1 [locked]; never changed
+formula = "Goals ~ Team + Opponent + IsHome"
+max_goals = 10                                  # scoreline grid; H/D/A renormalised by captured mass
+weighting = "exponential_half_life_days"        # w_i = 2 ** (-age_i / H); no other form, no second parameter
+age_unit = "days"
+glm_weights = "var_weights"                     # both goal rows of a match get the match weight
+truncation = "none"
+# Fitting set for target date d:  S(d) = fold history  U  {common-group target matches with Date < d}.
+fit_set = "history_plus_common_target_matches_strictly_before_date"
+# Reference date: the latest match date in S(d). Point estimates do not depend on it (a common factor on
+# every weight); this choice makes the fit on the first target date identical to the frozen fit.
+reference_date = "latest_date_in_fit_set"
+# One refit per distinct target date that has at least one common-group match. Every match on a date
+# has exactly the same information set, so this equals a refit per match.
+refit_cadence = "once_per_target_date"
+information_policy = "strictly_earlier_dates"   # no outcome dated d enters any prediction on d
+refit_parameters = "all"                        # intercept, attack, defence and IsHome are all refitted
+warm_start = false                              # default IRLS start on every fit
+# Unseen teams (absent from the fold history, from fixtures): their target matches are not scored and
+# are NOT used in any online fit, all season. The team parameter space is fixed at the history's teams,
+# identical to the frozen model's (decision approved 2026-10-01).
+unseen_team_rule = "exclude_match"
+unseen_team_matches_in_online_fit = false
+team_parameter_space = "fixed_history_teams"
+
+[fitting]
+# statsmodels GLM IRLS defaults: maxiter 100, tol 1e-8 (as every earlier Poisson fit).
+method = "IRLS"
+maxiter = 100
+tol = 1e-8
+# A fit is valid only if: statsmodels reports converged, every parameter is finite, and every predicted
+# goal rate for that date's matches is finite and positive.
+# Failure rule: one retry of the SAME IRLS with maxiter = retry_maxiter (recorded). If still invalid, the
+# stage aborts: no predictions and no scores are written. No fallback to the frozen fit or any other model.
+retry_maxiter = 1000
+on_failure = "abort_stage_no_fallback"
+# Every fit and every pre-scoring check of a stage runs before any loss is computed.
+checks_before_scoring = true
+
+[groups]
+# Defined from fixtures only. Identical to Experiments 11 and 12.
+expected_common = { "1718" = 306, "1819" = 272, "1920" = 342, "2021" = 342, "2122" = 342, "2425" = 342 }
+expected_full = { "1718" = 380, "1819" = 380, "1920" = 380, "2021" = 380, "2122" = 380, "2425" = 380 }
+expected_unseen_teams = { "1718" = ["Brighton", "Huddersfield"], "1819" = ["Cardiff", "Fulham", "Wolves"], "1920" = ["Sheffield United"], "2021" = ["Leeds"], "2122" = ["Brentford"], "2425" = ["Ipswich"] }
+# Online fits per fold = distinct dates with a common-group match (counted from fixtures before registration).
+expected_online_fits = { "1718" = 98, "1819" = 98, "1920" = 110, "2021" = 128, "2122" = 119, "2425" = 109 }
+# No team plays twice on one date (checked on the real fixtures before registration and again at run time).
+# The online arm does not rely on this for leakage; segments and online Elo do.
+no_team_twice_per_date = true
+
+[primary]
+# Delta = mean per-match (online - frozen) loss on identical common-group matches. Negative = updating helps.
+difference = "poisson_tw_online_minus_poisson_tw"
+metric = "log_loss"
+secondary_metric = "brier"
+# Pooled over the historical folds per match; the equal-fold-weight mean is reported as descriptive.
+historical_pooling = "per_match"
+
+[criterion_u]
+# Historical stage only (targets 1718..2122). U holds if ALL of:
+#   pooled Delta log loss < -practical_floor,
+#   |pooled Delta| > clustered_se_multiple x date-clustered SE (clusters = (target, date)),
+#   Delta < 0 in at least min_folds_same_sign of the 5 folds (decision approved 2026-10-01),
+#   pooled Delta Brier < 0.
+practical_floor_log_loss = 0.002
+clustered_se_multiple = 2.0
+min_folds_same_sign = 4
+# The mirror ("harm") condition uses the same thresholds with every sign reversed.
+# Readings:
+#   U holds        -> "historical_evidence_online_refitting_helps" (diagnostic; no spec adopted)
+#   mirror holds   -> "historical_evidence_online_refitting_hurts"
+#   neither        -> "no_distinguishable_updating_benefit" (not evidence of zero effect)
+# H* = 730 was selected on these folds for the FROZEN arm; the online arm inherits it, so any selection
+# bias favours the frozen arm.
+
+[validation]
+# 2024-25 labels (diagnostic observation only; none alters the historical reading, none selects anything).
+# "distinguishable" = |Delta| > clustered_se_multiple x date-clustered SE.
+clustered_se_multiple = 2.0
+labels = ["same_sign_as_historical_distinguishable", "not_distinguishable", "opposite_sign_distinguishable"]
+
+[segments]
+# Experiment 11 segments: mean, over the two teams, of target-season matches each played on dates
+# strictly before this match (fixtures only).
+lower_edges = [0, 10, 19, 29]
+labels = ["0-9", "10-18", "19-28", "29+"]
+# Invariant checked at run time: online = frozen on the first target date.
+first_date_invariant_tolerance = 1e-12
+# Pre-registered hypothesis (descriptive; cannot change any reading). "Consistent with accumulation" if:
+#   |Delta(0-9)| <= 2 x clustered SE, AND Delta(19-28) < Delta(0-9), AND Delta(29+) < Delta(0-9)
+# (pooled historical). Unlike Elo's F1, Delta is not zero for teams that have not yet played: shared
+# parameters move after any target match. Expected size (not a criterion): smaller than Elo's pooled
+# updating component (F1 - Online, +0.0139), because at H = 730 the current season carries only about
+# 17-23% of the total weight by mid-season and about 30-39% by the end (idealised calendar, 10 down to
+# 3 history seasons; arithmetic only, no data), whereas Elo's K = 25 adapts per match.
+
+[decomposition]
+# Per match on the common group, every fold, checked to identity_tolerance before anything is written:
+identity = "poisson - elo = (poisson - poisson_tw) + (poisson_tw - poisson_tw_online) + (poisson_tw_online - elo)"
+components = ["poisson_minus_poisson_tw", "poisson_tw_minus_poisson_tw_online", "poisson_tw_online_minus_elo"]
+total = "poisson_minus_elo"
+identity_tolerance = 1e-12
+# Every difference here is (left - right); positive = right-hand arm better.
+# Parallel table (descriptive): each family's updating gain within its own family. Their difference
+# is NOT a model-family effect.
+updating_parallel = ["poisson_tw_minus_poisson_tw_online", "elo_f1_minus_elo"]
+
+[context]
+# Cross-family and baseline comparisons: context only, never effects. They differ in goals vs results,
+# global refit vs per-team sequential updates, recency in days vs per match (K), refitted home
+# advantage vs a layer fitted once, Elo's use of unseen-team results, and hyperparameters tuned for
+# different arms.
+pairs = [["poisson_tw_online", "elo"], ["poisson_tw", "elo_f2"], ["poisson_tw_online", "poisson"],
+         ["poisson_tw_online", "frequency_baseline"], ["poisson_tw", "frequency_baseline"]]
+
+[uncertainty]
+naive_se = "sd(ddof=1) / sqrt(n)"
+clustered_se = "match_date"                     # pooled clusters are (fold target, date)
+# Limitation stated in advance: the online fits share one trajectory within a season, so date clusters
+# do not capture serial correlation; the per-fold sign count is reported alongside every SE.
+
+[diagnostics]
+# Descriptive only.
+calibration_in_the_large = true
+sharpness = "mean_entropy_nats"
+returning_vs_continuous = true
+mean_abs_prob_change_vs_frozen_by_segment = true   # outcome-free
+per_fit = ["date", "n_fit_matches", "n_target_matches_in_fit", "converged", "iterations", "retried",
+           "max_abs_coef", "is_home_coef", "target_season_weight_share", "kish_ess"]
+runtime_seconds = true
+
+[reproduction]
+# Recorded predictions, checksum-verified; arms recomputed and compared to tolerance before scoring.
+experiment_11_predictions = "results/update_policy_diagnostic/predictions.csv"
+experiment_11_sha256 = "73251375050967fd00c81f66c1c0d5c640e975aa43a2d1042fa234304eacf5e8"
+experiment_11_models = ["elo", "elo_f1", "elo_f2", "poisson", "dixon_coles", "frequency_baseline"]
+experiment_12_development_predictions = "results/time_weighted_poisson_development/predictions.csv"
+experiment_12_development_sha256 = "96831b967d1841a71bbd95f141147446691891e55e8a939477036ea521c1c3ba"
+experiment_12_development_column = "poisson_tw_h730"
+experiment_12_validation_predictions = "results/time_weighted_poisson_validation/predictions.csv"
+experiment_12_validation_sha256 = "3dcc77393ae57a9752f172920a31bb107fe9af16d55d6789990b5d8713c4e37b"
+experiment_12_validation_column = "poisson_tw"
+tolerance = 1e-12
+
+[historical_stage]
+# python -m experiments.online_tw_poisson_diagnostic --stage historical
+# The match table is cut to seasons <= max_season straight after reading; the stage refuses any later season.
+max_season = "2122"
+results_name = "online_tw_poisson_historical"
+
+[validation_stage]
+# python -m experiments.online_tw_poisson_diagnostic --stage validation
+# Refuses to run (before loading any data) unless ALL of:
+#  - [historical_locked] status = "locked",
+#  - the historical metrics file matches [historical_locked] historical_metrics_sha256 and was produced
+#    from the clean commit recorded there, which HEAD descends from,
+#  - the working tree is clean outside results/.
+results_name = "online_tw_poisson_validation"
+
+[historical_locked]
+# Written ONLY from the historical stage output, in a separate commit, before the validation stage.
+status = "unlocked"
+historical_metrics_sha256 = ""
+historical_commit = ""
+
+[outputs]
+in_run_all = false
+not_registered_for = ["dev_test", "holdout"]
