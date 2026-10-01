@@ -35,11 +35,40 @@ def to_long_format(matches: pd.DataFrame) -> pd.DataFrame:
 
 
 class PoissonGoalModel:
-    def fit(self, matches: pd.DataFrame) -> "PoissonGoalModel":
+    def fit(self, matches: pd.DataFrame, weights=None) -> "PoissonGoalModel":
+        """Fit the GLM; `weights` (one per match, optional) weight both of a match's goal rows equally.
+
+        weights=None is the unweighted poisson_static_v1 fit, unchanged. With
+        weights, the weighted log-likelihood sum_i w_i * loglik_i is maximised
+        (statsmodels var_weights; freq_weights give the same point estimates).
+        Only point estimates are meaningful: the GLM's standard errors are not
+        used anywhere.
+        """
         long = to_long_format(matches)
-        self.result_ = smf.glm(formula=FORMULA, data=long, family=sm.families.Poisson()).fit()
+        if weights is None:
+            self.result_ = smf.glm(formula=FORMULA, data=long, family=sm.families.Poisson()).fit()
+        else:
+            w = np.asarray(weights, dtype=float)
+            if w.shape != (len(matches),):
+                raise ValueError(f"need one weight per match ({len(matches)}), got shape {w.shape}")
+            if not np.all(np.isfinite(w)) or np.any(w <= 0):
+                raise ValueError("weights must be finite and strictly positive")
+            row_weights = np.concatenate([w, w])  # home rows, then away rows, as in to_long_format
+            self.result_ = smf.glm(formula=FORMULA, data=long, family=sm.families.Poisson(),
+                                   var_weights=row_weights).fit()
         self.teams_ = frozenset(long["Team"]) | frozenset(long["Opponent"])
         return self
+
+    def team_effects(self) -> pd.DataFrame:
+        """Attack ('Team') and defence ('Opponent') effects per team; the reference team's are 0.
+
+        A higher defence effect means the team concedes more.
+        """
+        params = self.result_.params
+        teams = sorted(self.teams_)
+        attack = [float(params.get(f"Team[T.{t}]", 0.0)) for t in teams]
+        defence = [float(params.get(f"Opponent[T.{t}]", 0.0)) for t in teams]
+        return pd.DataFrame({"attack": attack, "defence": defence}, index=pd.Index(teams, name="team"))
 
     @property
     def is_home_coef(self) -> float:
