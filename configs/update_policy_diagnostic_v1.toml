@@ -1,0 +1,153 @@
+# Pre-registered protocol update_policy_diagnostic_v1: separate Elo's in-season updating from its
+# calibration layer and from the static goal models, on the six selection folds.
+#
+# Registered BEFORE any diagnostic prediction was generated (access-log entry V2,
+# docs/TEST_SET_ACCESS_LOG.md). Changing anything here after the first run is a protocol change
+# that must be logged. This is a DIAGNOSTIC: no model is selected, tuned or changed because of its
+# results, and the two season-start Elo arms are never candidates for deployment or for scoring
+# on the exposed 2022-24 benchmark or the holdout.
+#
+# Established specifications are used exactly as in protocol validation_2425_v1
+# (configs/validation_2425_v1.toml), which the experiment checks before running.
+
+[protocol]
+protocol_id = "update_policy_diagnostic_v1"
+registered = "2026-10-01"
+diagnostic_only = true
+dataset = "dev_v2"
+data_file = "data/processed/matches_dev_v2.csv"
+data_sha256 = "c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807"
+# eplmodel.splits.selection_folds(): each target is predicted from every development season before it.
+targets = ["1718", "1819", "1920", "2021", "2122", "2425"]
+primary_target = "2425"
+previously_used_targets = ["1718", "1819", "1920", "2021", "2122"]   # historical context
+pooled_is_unbiased = false          # K = 25 was selected on folds 1-5
+established_protocol = "validation_2425_v1"
+
+[arms]
+# Prediction-column prefixes and the spec behind each arm.
+elo = "elo_k25_logreg_v1"                                   # online Elo, unchanged
+elo_f1 = "elo_k25_frozen_ratings_online_layer_v1_diag"     # update-isolation arm
+elo_f2 = "elo_k25_season_start_v1_diag"                    # primary season-start comparator
+poisson = "poisson_static_v1"
+dixon_coles = "dixon_coles_staged_v1"
+frequency_baseline = "frequency_baseline_v1"
+
+[season_start_elo]
+# Shared by F1 and F2. Ratings use the elo_k25_logreg_v1 update rule unchanged.
+k = 25
+initial_rating = 1500.0
+update_home_advantage = 0.0
+between_season_regression = "none"
+# Ratings are computed from the fold history ONLY (never by running through the target season)
+# and held fixed for every target match. A team absent from the history enters at the initial
+# rating and stays there all season; a returning team resumes its last history rating.
+target_ratings = "end_of_history_frozen_all_season"
+prediction_time = "before_first_target_match"
+
+[elo_f1]
+# Frozen season-start ratings fed into the SAME fitted calibration layer as online Elo in this
+# fold: the same LogisticRegression object and the same home shift (fitted once on the history
+# with online pre-match ratings, as in validation_2425_v1).
+layer = "identical_to_online_fold_layer"
+
+[elo_f2]
+# Its own calibration layer, fitted on history rows whose feature is the rating difference at the
+# START OF THAT ROW'S SEASON (season-start features for the same information policy it predicts with).
+layer = "fit_on_season_start_features"
+# The first history season is excluded from the layer fit: every season-start rating in it is the
+# initial rating, so its feature is identically zero. Decided by construction, not from outcomes.
+exclude_first_history_season = true
+apply_home_shift = true             # home shift from the F2 fitting rows (redundant, as in the spec)
+logistic_C = 1.0
+logistic_tol = 1e-4
+
+[groups]
+# Defined from fixtures only (teams absent from the fold history); models compared only within a group.
+full_models = ["elo", "elo_f1", "elo_f2", "frequency_baseline"]
+common_models = ["elo", "elo_f1", "elo_f2", "poisson", "dixon_coles", "frequency_baseline"]
+unseen_models = ["elo", "elo_f1", "elo_f2", "frequency_baseline"]   # full minus common; descriptive only
+expected_full = { "1718" = 380, "1819" = 380, "1920" = 380, "2021" = 380, "2122" = 380, "2425" = 380 }
+expected_common = { "1718" = 306, "1819" = 272, "1920" = 342, "2021" = 342, "2122" = 342, "2425" = 342 }
+expected_unseen_teams = { "1718" = ["Brighton", "Huddersfield"], "1819" = ["Cardiff", "Fulham", "Wolves"], "1920" = ["Sheffield United"], "2021" = ["Leeds"], "2122" = ["Brentford"], "2425" = ["Ipswich"] }
+
+[decomposition]
+# Per-match losses on the common group of each fold (and pooled, and per segment):
+#   poisson - elo = (poisson - elo_f2) + (elo_f2 - elo_f1) + (elo_f1 - elo)
+identity = "poisson - elo = (poisson - elo_f2) + (elo_f2 - elo_f1) + (elo_f1 - elo)"
+components = ["poisson_minus_elo_f2", "elo_f2_minus_elo_f1", "elo_f1_minus_elo"]
+total = "poisson_minus_elo"
+# Names used in every report. Online - F2 is NOT an effect; it is reported only as a derived subtotal.
+label_elo_f1_minus_elo = "updating_effect"                  # primary update-policy isolation
+label_elo_f2_minus_elo_f1 = "calibration_layer_effect"
+label_poisson_minus_elo_f2 = "history_weighting_or_model_family"
+derived_subtotal = "elo_f2_minus_elo"
+derived_subtotal_label = "season_start_vs_online_each_with_own_layer_not_an_effect"
+# Sign: every difference is (left arm loss - right arm loss); positive = the right-hand arm has the lower loss.
+sign = "positive_means_right_hand_arm_better"
+# Full group (Poisson undefined on unseen-team matches): elo_f2 - elo = (elo_f2 - elo_f1) + (elo_f1 - elo).
+full_group_components = ["elo_f2_minus_elo_f1", "elo_f1_minus_elo"]
+identity_tolerance = 1e-12          # max absolute per-match residual; checked before anything is written
+metrics = ["log_loss", "brier"]     # log loss primary
+
+[side_comparisons]
+# Outside the decomposition.
+pairs = [["dixon_coles", "poisson"], ["elo", "frequency_baseline"], ["elo_f1", "frequency_baseline"],
+         ["elo_f2", "frequency_baseline"], ["poisson", "frequency_baseline"], ["dixon_coles", "frequency_baseline"]]
+
+[segments]
+# Within-season position from fixtures only: the mean, over the two teams, of the target-season matches
+# each has played on dates strictly before this match. A match belongs to the segment whose lower edge is
+# the largest edge <= that mean (so 9.5 is in "0-9").
+lower_edges = [0, 10, 19, 29]
+labels = ["0-9", "10-18", "19-28", "29+"]
+# Invariant checked at run time: if neither team has played a target-season match yet, F1 = online Elo.
+first_match_invariant_tolerance = 1e-12
+# Expected direction (stated before the run): updating_effect ~ 0 in "0-9" and growing later.
+# calibration_layer_effect may change sign across segments (F2's layer is fitted on season-average
+# staleness) and is not interpreted by segment. poisson_minus_elo_f2 by segment reflects in-season
+# strength drift, not updating. All segment results are descriptive.
+
+[uncertainty]
+naive_se = "sd(ddof=1) / sqrt(n)"
+# Date-clustered SE of a mean paired difference d with clusters g = match date (G clusters):
+#   SE^2 = G / (G - 1) * sum_g (sum_{i in g} (d_i - mean(d)))^2 / n^2
+# Equals the naive SE when every date has one match. Pooled clusters are (fold target, date).
+clustered_se = "match_date"
+# Component SEs do not add (components are correlated); the total's SE is computed from its own differences.
+
+[interpretation]
+# A component is "distinguishable" only if |mean| > 2 x date-clustered SE AND its sign in 2024-25
+# agrees with its sign in at least 3 of the 5 historical folds.
+distinguishable_clustered_se_multiple = 2.0
+min_historical_folds_same_sign = 3
+# Readings (common group):
+# - updating_effect clearly positive, other two ~0      -> gap is mainly in-season updating.
+# - updating_effect ~0, history_weighting_or_model_family clearly positive
+#                                                        -> not updating; history weighting and/or family
+#                                                           (follow-up: time-weighted Poisson, separate experiment).
+# - calibration_layer_effect large relative to updating_effect
+#                                                        -> update-policy reading depends on the layer; no
+#                                                           conclusion from either component alone.
+# - several distinguishable                              -> report shares of the total; no shares when the
+#                                                           total itself is not distinguishable.
+# - 2024-25 differs from folds 1-5                       -> 2024-25-specific observation only.
+# History weighting and model family are NOT separated by this design.
+
+[calibration]
+# Descriptive only.
+mean_prediction_vs_observed = true  # calibration in the large, per outcome
+sharpness = "mean_entropy_nats"
+home_win_bins = 10
+
+[reproduction]
+# Before scoring, online Elo, frequency baseline, Poisson and Dixon-Coles must reproduce the
+# recorded validation_2425_v1 predictions row for row (no new exposure for those specs).
+predictions_file = "results/validation_2425/predictions.csv"
+predictions_sha256 = "4e1db61efe28c9961cc5dc46c4ffe5cee6e5ac67c5672a6d8fec63507029c80f"
+models = ["elo", "frequency_baseline", "poisson", "dixon_coles"]
+tolerance = 1e-12
+
+[outputs]
+predictions_file = "results/update_policy_diagnostic/predictions.csv"   # git-ignored; SHA-256 in metrics.json
+in_run_all = false
