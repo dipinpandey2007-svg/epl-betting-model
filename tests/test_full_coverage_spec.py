@@ -59,9 +59,19 @@ def test_no_season_after_the_selection_folds_appears_in_any_config_value():
         assert season not in values
 
 
-def test_protocol_is_not_yet_run():
-    assert CFG["historical_locked"]["status"] == "not_run"
-    assert not (PROJECT_ROOT / "results" / CFG["outputs"]["results_name"]).exists()
+def test_historical_results_are_locked_to_the_recorded_run():
+    """The historical stage was run once (Experiment 15) and locked; the lock matches the committed metrics."""
+    from eplmodel.data.checksums import content_sha256
+    lock = CFG["historical_locked"]
+    metrics_path = PROJECT_ROOT / "results" / CFG["outputs"]["results_name"] / "metrics.json"
+    assert lock["status"] == "locked"
+    assert content_sha256(metrics_path) == lock["historical_metrics_sha256"]
+    payload = json.loads(metrics_path.read_text(encoding="utf-8"))
+    assert payload["provenance"]["git_commit"] == lock["historical_commit"]
+    assert payload["provenance"]["git_dirty"] is False
+    assert payload["results"]["predictions"]["sha256"] == lock["historical_predictions_sha256"]
+    assert payload["results"]["reading"] == lock["reading"]
+    assert payload["results"]["stage"] == "historical" and payload["results"]["targets"] == list(SELECTION_TARGET_SEASONS)
 
 
 def test_registered_groups_hold_on_the_real_fixture_lists():

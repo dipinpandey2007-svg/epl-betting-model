@@ -190,9 +190,10 @@ in two ways:
 The recorded scripts keep their own private helpers (for example `date_clusters` and the lock checks); a test checks
 that these agree with the harness versions.
 
-### Pre-registered next model: full-coverage dynamic Poisson (`full_coverage_poisson_v1`, planned Experiment 15)
+### Full-coverage dynamic Poisson (`full_coverage_poisson_v1`, Experiment 15)
 
-Registered 2026-10-02; design only, nothing implemented or scored. See `docs/preregistration/full_coverage_poisson_v1.md`
+Registered 2026-10-02 (amendment PA1), implemented in `eplmodel.models.full_coverage`, run once on the historical
+folds and locked (RESULTS_LOG Experiment 15). See `docs/preregistration/full_coverage_poisson_v1.md`
 and `configs/full_coverage_poisson_v1.toml`. It links the earlier stages as follows:
 
 - **Experiments 12-13:** it inherits H = 730 days, exponential weights and the once-per-date online refits. It adds

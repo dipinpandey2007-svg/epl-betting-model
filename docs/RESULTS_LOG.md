@@ -6,7 +6,8 @@ conversations. Every model result in Experiments 2–7 is reproduced by `python 
 `python -m experiments.validation_2425`, Experiment 11 by `python -m experiments.update_policy_diagnostic`, and
 Experiment 12 by `python -m experiments.time_weighted_poisson --stage development` then `--stage validation`,
 Experiment 13 by `python -m experiments.online_tw_poisson_diagnostic --stage historical` then `--stage validation`,
-and Experiment 14 by `python -m experiments.market_benchmark`. None of them is in `run_all`. The recorded predictions
+Experiment 14 by `python -m experiments.market_benchmark`, and Experiment 15 by
+`python -m experiments.full_coverage_poisson`. None of them is in `run_all`. The recorded predictions
 of Experiments 10-13 are regenerated row by row by `tests/test_reproduction_recorded.py`, and Experiment 14's
 metrics by `tests/test_market.py` (both golden). Data-acquisition records are not
 produced by `run_all`. Their checksums and coverage are locked by `tests/test_data.py` against
@@ -1589,6 +1590,163 @@ model is refitted.
 | Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1 |
 
 Reproduced by `tests/test_market.py::test_recorded_market_benchmark_reproduces` (golden). Not in `experiments.run_all`.
+
+## Experiment 15 — Full-coverage dynamic Poisson with empirical-Bayes season-start priors (2026-10-02)
+
+Protocol `full_coverage_poisson_v1`. Pre-registration: `docs/preregistration/full_coverage_poisson_v1.md` and
+`configs/full_coverage_poisson_v1.toml`. Code: `eplmodel.models.full_coverage`, `experiments/full_coverage_poisson.py`.
+Results: `results/full_coverage_poisson_historical/metrics.json`. Historical stage only; locked in `[historical_locked]`.
+
+### Pre-registration and run sequence
+
+| Step | Commit | What |
+|---|---|---|
+| Pre-registration | `5034f56` | Design, config, typed spec; nothing implemented |
+| Amendment PA1 | `10e99d1` | Identifiability parameterisation and rationale of the inherited 0.002 margin; no frozen value changed |
+| Implementation | `f555637` | Model, experiment, the pre-registered test plan; no real-data prediction |
+| First run | at `f555637` | Stopped while loading the Experiment 14 comparator (its file has no `fold_target` column). This was after stage 1 (all checks and forecasts) and **before any outcome was joined**; nothing was scored or written |
+| Fix | `d609b95` | The comparator is loaded by season; nothing else changed |
+| **Recorded run** | at `d609b95`, `git_dirty: false` | Stage 1 checks, then scoring; metrics reproduce exactly on a rerun |
+
+Two notes from the implementation, recorded in `f555637`:
+
+- **A slip in the test plan.** The pre-registered test plan said "doubling every weight equals halving tau²". The
+  registered objective implies the opposite: doubling the weights is equivalent to **doubling** tau² (halving the prior
+  precision). The test checks that identity. The model is unaffected.
+- **Numerical conventions, not model choices.** Damped-Newton steps are accepted within a 64·ε·(1 + |f|) round-off
+  allowance, and M1's unpenalised continuing teams start at 0. The optimum is unique, and the registered gradient
+  tolerance (1e-9) certifies every fit.
+
+### Objective
+
+Forecast every match of each target season, including promoted, returning and never-seen teams, with the online
+time-weighted Poisson model (H = 730, Experiments 12-13). Empirical-Bayes season-start priors make this possible. The
+question is whether this degrades the matches the Experiment 13 model could already score.
+
+### Data and evidence roles
+
+- **Targets.** 2017-18 … 2021-22 only (amendment A1), via `selection_folds()` and `build_fold`. dev_v2 is cut to
+  seasons ≤ 2021-22 straight after reading.
+- **No other season.** Nothing from 2022-23 onward is read; no 2024-25, 2025-26 or 2026-27 information is used.
+- **No other inputs.** No market, shots or squad input.
+- **Nothing selected.** No value was tuned, and M2 was fixed as primary in advance.
+
+### Checks before scoring (all passed, all five folds)
+
+- The config equals the pre-registration, apart from the later `[historical_locked]`, and the document is unchanged.
+- The registered group sizes and team lists hold: promoted teams, recent yo-yo teams, full / common / unseen /
+  promoted / returning / continuing-only.
+- The EB team-season counts hold: 6/34 … 18/102.
+- **M0 anchor.** The implementation without priors and with unseen-team matches excluded reproduces the recorded
+  Experiment 13 online predictions to at most **7.0e-14** (registered tolerance 1e-7).
+- **Coverage.** M1, M2 and S1 each give 380 valid forecasts per target, with exactly the registered 105 / 108 / 115 /
+  135 / 123 refits.
+- **Convergence.** Every fit converged: at most 6 Newton iterations, max |gradient| ≤ 9.9e-10 (M1) and ≤ 1.9e-13 (M2,
+  S1). **No fit failed or aborted.**
+
+### Empirical-Bayes priors (per target, from seasons 2015-16 … S − 1 only)
+
+| Target | Promoted / continuing team-seasons | a_P (attack) | b_P (defence) | tau_att | tau_def | Floor binds | corr(att, def) |
+|---|---|---|---|---|---|---|---|
+| 2017-18 | 6 / 34 | −0.280 | +0.178 | 0.237 | 0.211 | no | −0.62 |
+| 2018-19 | 9 / 51 | −0.303 | +0.136 | 0.260 | 0.212 | no | −0.61 |
+| 2019-20 | 12 / 68 | −0.298 | +0.154 | 0.262 | 0.231 | no | −0.65 |
+| 2020-21 | 15 / 85 | −0.306 | +0.148 | 0.260 | 0.219 | no | −0.65 |
+| 2021-22 | 18 / 102 | −0.289 | +0.152 | 0.269 | 0.206 | no | −0.63 |
+
+Promoted teams start with about 25% fewer goals scored (e^−0.29) and 16% more conceded than an average team.
+
+### Coverage and scores (log loss / Brier, pooled over the five targets)
+
+| Group (matches) | M1 `fc_promoted` | **M2 `fc_hier`** | S1 `fc_hier_break` | M0 (Exp 13) | online Elo | frequency baseline | market (Exp 14) |
+|---|---|---|---|---|---|---|---|
+| full (1,900) | 0.9592 / 0.5680 | **0.9622 / 0.5701** | 0.9631 / 0.5705 | — | 0.9717 / 0.5745 | 1.0672 / 0.6460 | 0.9475 / 0.5597 |
+| common (1,604) | 0.9573 / 0.5667 | 0.9609 / 0.5692 | 0.9618 / 0.5695 | 0.9572 / 0.5667 | 0.9703 / 0.5734 | 1.0698 / 0.6479 | 0.9451 / 0.5580 |
+| unseen (296) | 0.9692 | 0.9695 | 0.9699 | — | 0.9793 | 1.0527 | 0.9608 |
+| promoted (540) | 0.9419 | 0.9420 | 0.9450 | — | 0.9550 | 1.0627 | 0.9366 |
+| returning (260) | 0.9070 | 0.9066 | 0.9130 | — | 0.9207 | 1.0707 | 0.9071 |
+| continuing-only (1,360) | 0.9660 | 0.9703 | 0.9703 | — | 0.9783 | 1.0690 | 0.9519 |
+| recent yo-yo (186) | 0.9215 | 0.9214 | 0.9276 | — | 0.9368 | 1.0860 | 0.9269 |
+| long absence or newcomer (366) | 0.9507 | 0.9507 | 0.9521 | — | 0.9619 | 1.0487 | 0.9416 |
+
+Coverage: M2 gives valid forecasts for **1,900 / 1,900** matches (380 per target). M2's full-group log loss by target:
+0.9658, 0.9052, 0.9718, 1.0178, 0.9505.
+
+### Primary criterion: common-group non-inferiority, M2 − M0
+
+| Pooled (1,604 matches) | Value |
+|---|---|
+| Mean log-loss difference | **+0.0037** (date-clustered SE 0.0014); Brier +0.0024 |
+| Upper bound (mean + 2 SE) | +0.0065, **not** below the 0.002 margin |
+| Lower bound (mean − 2 SE) | +0.0009, **not** above the margin |
+| Per target | +0.0051, +0.0150, +0.0008, −0.0033, +0.0035 |
+| **Registered reading** | `inconclusive_on_common_group` → **`full_coverage_inconclusive`** |
+
+### Key secondary and decomposition (pooled; left − right; descriptive except the U readings)
+
+| Comparison (group, matches) | Log loss (clustered SE) | Brier | Per target | Reading |
+|---|---|---|---|---|
+| M2 − Elo (unseen, 296) | −0.0097 (0.0107) | −0.0049 | −0.0104, −0.0211, +0.0309, −0.0139, −0.0126 | U: **not distinguishable** (4 of 5 folds negative) |
+| M2 − baseline (unseen, 296) | −0.0832 (0.0226) | −0.0604 | all negative | U: **helps** |
+| M1 − M0 (common, 1,604) | +0.0001 (0.0007) | +0.0000 | mixed, all within ±0.0014 | — |
+| M2 − M1 (full, 1,900) | +0.0031 (0.0011) | +0.0021 | +0.0049, +0.0097, −0.0000, −0.0020, +0.0028 | — |
+| M2 − M1 (common, 1,604) | +0.0036 (0.0013) | +0.0024 | | — |
+| M2 − M1 (promoted, 540) | +0.0001 (0.0017) | +0.0002 | | — |
+| M2 − M1 (continuing-only, 1,360) | +0.0043 (0.0014) | +0.0028 | | — |
+| S1 − M2 (returning, 260) | +0.0064 (0.0054) | +0.0028 | +0.0019, —, +0.0069, +0.0055, +0.0091 | — |
+| M2 − Elo (full, 1,900; context) | −0.0095 (0.0045) | −0.0043 | all negative | — |
+| M2 − market (full, 1,900; context) | +0.0147 (0.0047) | +0.0104 | 4 of 5 positive | — |
+
+Segments of the primary difference (M2 − M0, common): +0.0049 (0-9, n 422), +0.0048 (10-18), +0.0003 (19-28),
++0.0051 (29+). Each has a clustered SE of about 0.003.
+
+Calibration in the large of M2 (full group, observed − predicted): H −0.0073, D −0.0088, A +0.0162. Each has a
+clustered SE of about 0.01.
+
+### Interpretation (pre-registered reading)
+
+- **Full coverage works.** Every match of every target season gets a valid forecast, including the 296 unseen-team
+  matches that Experiment 13 could not score. No fit failed.
+- **The primary criterion is inconclusive, and the point estimate is against M2.** On the matches M0 can score, M2 is
+  +0.0037 worse. The 2-SE interval [+0.0009, +0.0065] excludes zero but straddles the 0.002 margin, so neither
+  non-inferiority nor inferiority is established.
+- **The decomposition locates the cost.** Admitting the promoted teams' matches and priors leaves the common group
+  unchanged (M1 − M0 = +0.0001). The cost comes entirely from the continuing-team prior that M2 adds (M2 − M1 on
+  continuing-only matches +0.0043, 3.1 SEs), while M2 and M1 are equal on promoted-team matches.
+- **On the unseen-team matches**, M2 beats the frequency baseline clearly. It is ahead of online Elo by 0.0097, which
+  is not distinguishable (one SE).
+- **The identity break (S1) is not better** for returning teams: +0.0064, not distinguishable. This matches the primary
+  rule of keeping their decayed history.
+- **Context only.** Every arm remains well behind the closing market (+0.0147).
+
+### Limitations
+
+- **One promoted-prior form.** The EB reference sets are small early on (6 promoted team-seasons for 2017-18).
+- **The continuing-team prior's effect is a historical observation.** It is measured on the same five folds that
+  produced it. It does not license replacing the primary arm.
+- **Clustered SEs.** These ignore serial correlation within a season.
+
+### Decision
+
+- **Recorded as is and locked** (`[historical_locked]`: reading `full_coverage_inconclusive`).
+- **M2 stays the registered primary arm of this protocol.** M1's descriptively better common-group score must not be
+  used to swap the primary arm after the fact. Dropping or changing the continuing-team prior would be a new
+  specification, needing its own pre-registration and evidence from a season not used here.
+- **No 2024-25 stage was run.** A descriptive 2024-25 stage would need its own access-log entry first. 2025-26 remains
+  sealed.
+
+### Provenance
+
+| Item | Value |
+|---|---|
+| Run | commit `d609b952ff6dc4dc3a63717f54ab7bd4fa9a7bfe`, `git_dirty: false` |
+| Metrics | `results/full_coverage_poisson_historical/metrics.json`, content SHA-256 `c50267ce7ab911f36703e0291ab772a9265fb9ba89197ae10883deeedc82a3ca` |
+| Predictions | `results/full_coverage_poisson_historical/predictions.csv`, 1,900 rows, git-ignored, content SHA-256 `69963f996c08f5c88353247ce715c9a2a2e829c12bb6c937be1e04b9449f5600` |
+| Data | `data/processed/matches_dev_v2.csv`, SHA-256 `c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807`, cut to ≤ 2021-22 |
+| Comparators | recorded predictions of Experiments 13 (historical), 10 and 14, checksum-verified |
+| Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0, scikit-learn 1.9.0 |
+
+Reproduced by `tests/test_full_coverage.py::test_recorded_experiment_15_reproduces` (golden). Not in `experiments.run_all`.
 
 ## Future experiment template
 

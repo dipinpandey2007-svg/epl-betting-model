@@ -23,10 +23,17 @@ Since then:
   Brier on 1,900 matches (100% coverage). It is a reference, not a model: nothing was selected or ranked, and CLV is
   not implemented. On the same matches, every established arm scores worse than the closing market. For example,
   market − online Elo is −0.0242 (clustered SE 0.0051). See `RESULTS_LOG.md` Experiment 14.
-- **Experiment 15 is pre-registered, not implemented** (`full_coverage_poisson_v1`, 2026-10-02). It is a
-  full-coverage online time-weighted Poisson model (H = 730) with empirical-Bayes season-start priors for promoted,
-  returning and continuing teams, scored on the selection targets only. See
-  `docs/preregistration/full_coverage_poisson_v1.md`. No prediction or result exists yet.
+- **Experiment 15** (`full_coverage_poisson_v1`, pre-registered with amendment PA1, run and locked 2026-10-02) is a
+  full-coverage online time-weighted Poisson model (H = 730) with empirical-Bayes season-start priors, on the
+  selection targets only.
+  - **Coverage:** valid forecasts for **1,900 / 1,900** matches, including the 296 unseen-team matches. No fit failed.
+  - **Primary criterion (common-group non-inferiority vs the Experiment 13 online arm):** **inconclusive**. M2 − M0 is
+    +0.0037 (clustered SE 0.0014); the 2-SE interval [+0.0009, +0.0065] straddles the 0.002 margin.
+  - **Where the cost comes from:** the continuing-team prior (M2 − M1 on continuing-only matches +0.0043). Admitting
+    promoted teams costs nothing on the common group (M1 − M0 +0.0001).
+  - **Unseen-team matches:** M2 − online Elo is −0.0097 (SE 0.0107), not distinguishable.
+  - M2 stays the registered primary arm; nothing is adopted or swapped. No 2024-25 stage has been run. See
+    `RESULTS_LOG.md` Experiment 15.
 
 No established model or specification has been changed. `poisson_time_weighted_v1` is a new candidate, not a
 replacement for `poisson_static_v1`.

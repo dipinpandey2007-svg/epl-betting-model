@@ -171,7 +171,11 @@ existence_checks = ["unpenalised_teams_scored_and_conceded", "positive_total_goa
 
 [historical_locked]
 # Written only from the scored historical run, in a separate commit.
-status = "not_run"
+status = "locked"
+historical_commit = "d609b952ff6dc4dc3a63717f54ab7bd4fa9a7bfe"
+historical_metrics_sha256 = "c50267ce7ab911f36703e0291ab772a9265fb9ba89197ae10883deeedc82a3ca"
+historical_predictions_sha256 = "69963f996c08f5c88353247ce715c9a2a2e829c12bb6c937be1e04b9449f5600"
+reading = "full_coverage_inconclusive"
 
 [amendments]
 # PA1 (2026-10-02), before any implementation, fit, prediction or result of this protocol existed:

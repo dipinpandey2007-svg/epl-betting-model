@@ -394,3 +394,29 @@ def test_evidence_rules():
 def test_experiment_is_not_in_run_all():
     from experiments import run_all
     assert fcp not in run_all.EXPERIMENTS
+
+
+# --- Recorded Experiment 15 (needs the data) ---------------------------------------------------------------
+
+@pytest.mark.golden
+def test_recorded_experiment_15_reproduces():
+    """Rerunning the locked historical stage (without writing) gives the recorded predictions and metrics."""
+    import json
+
+    from eplmodel.data.checksums import content_sha256
+    from eplmodel.paths import PROCESSED_DEV_V2, RESULTS_DIR
+    from eplmodel.reporting.results import _jsonable
+
+    out_dir = RESULTS_DIR / load_config(fcp.FULL_COVERAGE_CONFIG)["outputs"]["results_name"]
+    if not PROCESSED_DEV_V2.exists() or not (out_dir / "predictions.csv").exists():
+        pytest.skip("dev_v2 or the recorded Experiment 15 predictions missing")
+    lock = load_config(fcp.FULL_COVERAGE_CONFIG)["historical_locked"]
+    assert content_sha256(out_dir / "predictions.csv") == lock["historical_predictions_sha256"]
+    recorded = json.loads((out_dir / "metrics.json").read_text(encoding="utf-8"))["results"]
+    recorded.pop("predictions")
+    again = json.loads(json.dumps(_jsonable(fcp.run(write=False))))
+    # The config hash changes only because [historical_locked] was written after the run; check_frozen (run
+    # inside fcp.run) has already verified that every other section equals the pre-registration.
+    for result in (recorded, again):
+        result["frozen_state"].pop("config_sha256")
+    assert again == recorded
