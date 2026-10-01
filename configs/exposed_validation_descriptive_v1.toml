@@ -42,7 +42,9 @@ expected_unseen = 38
 expected_promoted_teams = ["Ipswich", "Leicester", "Southampton"]
 expected_unseen_teams = ["Ipswich"]
 expected_returning_teams = ["Leicester", "Southampton"]
-expected_eb_team_seasons = [24, 136]          # promoted, continuing team-seasons in 2015-16 .. 2023-24
+expected_eb_team_seasons = [27, 153]          # promoted, continuing team-seasons in 2015-16 .. 2023-24 (9 seasons x 3 / 17)
+# Correction before scoring: first registered as [24, 136], an arithmetic slip (8 instead of 9 seasons). The
+# pre-scoring check aborted the first run before any outcome was joined; corrected from the fixture lists only.
 online_fits = "one_per_distinct_target_date"
 anchor_tolerance = 1e-7                       # M0 reproduction check against the recorded Experiment 13 predictions
 # Same comparisons as the Experiment 15 protocol, reported descriptively (no reading, no label).
