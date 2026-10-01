@@ -170,7 +170,8 @@ def comparators(targets) -> pd.DataFrame:
     """Recorded, checksum-verified comparators: M0 (Exp 13, common), Elo and baseline (Exp 10), market (Exp 14)."""
     rec13 = load_recorded_predictions(RECORDED["13-historical"], targets)
     rec10 = load_recorded_predictions(RECORDED["10"], targets)
-    rec14 = load_recorded_predictions(MARKET, targets)
+    rec14 = load_recorded_predictions(MARKET)                 # Experiment 14 has no folds: filter by season
+    rec14 = rec14[rec14["Season"].isin(list(targets))]
     out = rec10[[*prob_columns("elo"), *prob_columns("frequency_baseline")]]
     out = out.join(rec13[prob_columns(M0_ONLINE)], how="left").join(rec14[prob_columns("market_close_shin")],
                                                                      how="left")
