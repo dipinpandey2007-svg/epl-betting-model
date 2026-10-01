@@ -35,18 +35,19 @@ def to_long_format(matches: pd.DataFrame) -> pd.DataFrame:
 
 
 class PoissonGoalModel:
-    def fit(self, matches: pd.DataFrame, weights=None) -> "PoissonGoalModel":
+    def fit(self, matches: pd.DataFrame, weights=None, maxiter: int = 100) -> "PoissonGoalModel":
         """Fit the GLM; `weights` (one per match, optional) weight both of a match's goal rows equally.
 
         weights=None is the unweighted poisson_static_v1 fit, unchanged. With
         weights, the weighted log-likelihood sum_i w_i * loglik_i is maximised
         (statsmodels var_weights; freq_weights give the same point estimates).
         Only point estimates are meaningful: the GLM's standard errors are not
-        used anywhere.
+        used anywhere. `maxiter` is the IRLS iteration limit; the default 100 is
+        statsmodels' own, so every established fit is unchanged.
         """
         long = to_long_format(matches)
         if weights is None:
-            self.result_ = smf.glm(formula=FORMULA, data=long, family=sm.families.Poisson()).fit()
+            self.result_ = smf.glm(formula=FORMULA, data=long, family=sm.families.Poisson()).fit(maxiter=maxiter)
         else:
             w = np.asarray(weights, dtype=float)
             if w.shape != (len(matches),):
@@ -55,7 +56,7 @@ class PoissonGoalModel:
                 raise ValueError("weights must be finite and strictly positive")
             row_weights = np.concatenate([w, w])  # home rows, then away rows, as in to_long_format
             self.result_ = smf.glm(formula=FORMULA, data=long, family=sm.families.Poisson(),
-                                   var_weights=row_weights).fit()
+                                   var_weights=row_weights).fit(maxiter=maxiter)
         self.teams_ = frozenset(long["Team"]) | frozenset(long["Opponent"])
         return self
 
