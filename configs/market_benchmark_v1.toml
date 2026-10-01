@@ -1,0 +1,121 @@
+# Pre-registered protocol market_benchmark_v1: a market-implied probability benchmark from Pinnacle 1X2 odds.
+#
+# Registered BEFORE any market probability was computed or scored (2026-10-02). Changing anything here after the
+# first run is a protocol change that must be logged in RESULTS_LOG.md.
+#
+# This is a BENCHMARK, not a model and not a selection candidate: nothing is fitted, tuned or selected, and no
+# result of this protocol may be used to choose a market specification. All arms below are reported separately;
+# no "best" market probability is formed and no ranking is claimed.
+#
+# Seasons: only the historical selection targets are scored. 2014-15 is burn-in for the models the benchmark will
+# be compared with; 2015-16 and 2016-17 are reported for coverage only. The exposed development seasons
+# (2022-23, 2023-24), the retired exposed validation season (2024-25, amendment A1), the sealed holdout (2025-26)
+# and the declared next holdout (2026-27) are NOT read for odds values and NOT scored. The specification was fixed
+# without any 2024-25 information.
+
+[protocol]
+protocol_id = "market_benchmark_v1"
+registered = "2026-10-02"
+benchmark_only = true
+selection_candidate = false
+# Scored seasons = eplmodel.splits.SELECTION_TARGET_SEASONS (each checked with assert_selection_target).
+scored_seasons = ["1718", "1819", "1920", "2021", "2122"]
+# Odds values are read for these seasons only (coverage and validity are reported; nothing outcome-based).
+coverage_seasons = ["1415", "1516", "1617", "1718", "1819", "1920", "2021", "2122"]
+# Outcomes are taken from dataset dev_v2 cut to seasons <= 2021-22 straight after reading.
+outcomes_dataset = "dev_v2"
+outcomes_max_season = "2122"
+# Raw odds files must match their content checksums in data/checksums.json before use.
+require_raw_checksums = true
+
+[source]
+provider = "football-data.co.uk"
+notes_url = "https://www.football-data.co.uk/notes.txt"
+notes_accessed = "2026-10-02"
+notes_sha256 = "6ecd41a98ad2751372817e7e6f1709bfeb433c53dd9aeda330fd926a5471452d"
+record = "data/reference/football_data_odds_columns.md"
+
+[snapshots.closing]
+role = "primary"
+bookmaker = "Pinnacle"
+columns = ["PSCH", "PSCD", "PSCA"]    # (H, D, A); "C" suffix = closing (source record)
+timestamp = "closing, exact time not documented"
+
+[snapshots.pre_closing]
+role = "secondary"
+bookmaker = "Pinnacle"
+columns = ["PSH", "PSD", "PSA"]       # (H, D, A); pre-closing (source record), not "opening"
+timestamp = "pre-closing, collection time not documented per match"
+
+[snapshot_rules]
+# The two snapshots are never mixed: no fallback from one to the other, no averaging, no "best" price.
+mix_snapshots = false
+other_bookmakers = "not used"         # no fallback to another bookmaker or to market averages/maxima
+
+[margin]
+# pi_k = 1 / odds_k (k = H, D, A); booksum B = sum_k pi_k.
+primary = "shin"
+sensitivity = ["proportional", "power"]
+# proportional: p_k = pi_k / B
+# power:        p_k = pi_k ** c, with c >= 1 solving sum_k pi_k ** c = 1
+# shin:         p_k = (sqrt(z**2 + 4 * (1 - z) * pi_k**2 / B) - z) / (2 * (1 - z)), z in [0, 1) solving sum_k p_k = 1
+# If B == 1 exactly, every method returns p = pi (z = 0, c = 1).
+# Roots: scipy.optimize.brentq, xtol = 1e-15, maxiter = 500; then p is divided by its sum (a correction of
+# order 1e-15) so every row sums to 1 to machine precision.
+solver = "brentq"
+solver_xtol = 1e-15
+solver_maxiter = 500
+power_c_upper = 100.0
+selection_by_score = false            # the methods are never chosen by any historical score
+
+[validity]
+# A snapshot price set for a match is valid only if all three odds are present, numeric, finite and > 1.0, and
+# its booksum lies in [min_booksum, max_booksum]. Otherwise the match has no probability for that snapshot
+# (it is counted, by reason, and excluded from that snapshot's scored group). No imputation, no forward fill.
+min_booksum = 1.0
+max_booksum = 1.10                    # plausibility bound for a single-bookmaker 1X2 book
+reasons = ["missing", "non_numeric", "odds_not_above_1", "booksum_below_min", "booksum_above_max"]
+impute = false
+
+[arms]
+# Prediction-column prefix -> spec id. "market_close_shin" is the primary benchmark.
+market_close_shin = "market_pinnacle_close_shin_v1"
+market_close_proportional = "market_pinnacle_close_proportional_v1"
+market_close_power = "market_pinnacle_close_power_v1"
+market_pre_shin = "market_pinnacle_preclose_shin_v1"
+market_pre_proportional = "market_pinnacle_preclose_proportional_v1"
+market_pre_power = "market_pinnacle_preclose_power_v1"
+
+[evaluation]
+# Through the common harness (eplmodel.evaluation): forecast frames checked, outcomes joined by match_id.
+metrics = ["log_loss", "brier"]
+calibration = "calibration_in_the_large_per_outcome_with_clustered_se"
+clusters = "season_date"               # "<season>_<YYYY-MM-DD>", as in Experiments 11-13
+report = ["per_season", "pooled"]
+# Each arm is scored on the matches where its snapshot is valid. Paired comparisons use the matches valid for
+# both arms, aligned by match_id. Differences are (left - right); descriptive only, no ranking claim.
+paired = [
+  ["market_close_proportional", "market_close_shin"],
+  ["market_close_power", "market_close_shin"],
+  ["market_pre_proportional", "market_pre_shin"],
+  ["market_pre_power", "market_pre_shin"],
+  ["market_pre_shin", "market_close_shin"],
+]
+# Context only: the primary benchmark against recorded predictions of the established arms on the same matches
+# (checksum-verified recorded files of Experiments 10 and 13, historical folds only; no model is refitted).
+# Full group: Experiment 10 (elo, frequency_baseline). Common group: Experiment 13 historical
+# (poisson, poisson_tw, poisson_tw_online, elo).
+context_full = ["elo", "frequency_baseline"]
+context_common = ["poisson", "poisson_tw", "poisson_tw_online", "elo"]
+ranking_claims = false
+
+[clv]
+status = "not_implemented"
+# CLV needs a separately defined pre-match snapshot and an explicit information cutoff for each prediction. The
+# source record does not establish per-match collection times, so no cutoff is inferred here.
+
+[outputs]
+results_name = "market_benchmark"
+predictions_file = "results/market_benchmark/predictions.csv"   # git-ignored; SHA-256 recorded in metrics.json
+in_run_all = false
+not_registered_for = ["dev_test", "exposed_validation", "holdout"]
