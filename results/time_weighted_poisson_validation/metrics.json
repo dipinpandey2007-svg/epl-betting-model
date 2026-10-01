@@ -1,0 +1,612 @@
+{
+  "experiment": "time_weighted_poisson_validation",
+  "results": {
+    "protocol_id": "time_weighted_poisson_v1",
+    "stage": "validation",
+    "target": "2425",
+    "h_star": "730",
+    "n_common": 342,
+    "reproduction_max_abs_diff": {
+      "experiment_10": 9.71445146547012e-17,
+      "experiment_11": 9.71445146547012e-17
+    },
+    "fitted": {
+      "target": "2425",
+      "history": [
+        "1415",
+        "1516",
+        "1617",
+        "1718",
+        "1819",
+        "1920",
+        "2021",
+        "2122",
+        "2223",
+        "2324"
+      ],
+      "unseen_teams": [
+        "Ipswich"
+      ],
+      "returning_teams": [
+        "Leicester",
+        "Southampton"
+      ],
+      "n_full": 380,
+      "n_common": 342,
+      "arms": {
+        "poisson_tw": {
+          "half_life_days": "730",
+          "glm_converged": true,
+          "is_home_coef": 0.20032402892067175,
+          "attack_sd": 0.3129313399106308,
+          "defence_sd": 0.20311385657427627,
+          "spearman_net_strength_vs_static": 0.9657754010695186,
+          "n_history_matches": 3800,
+          "sum_of_weights": 1113.3506934524312,
+          "kish_ess": 2068.820071187616,
+          "last_season_weight_share": 0.3014712921677416,
+          "team_kish_ess_min": 37.76360618982454,
+          "team_kish_ess_median": 140.76599802749342,
+          "team_kish_ess": {
+            "Arsenal": 206.99616612127372,
+            "Aston Villa": 166.08770660227586,
+            "Bournemouth": 134.99219718636465,
+            "Brentford": 105.07898230738815,
+            "Brighton": 184.42208016164537,
+            "Burnley": 163.26941603974404,
+            "Cardiff": 37.78428024570626,
+            "Chelsea": 206.60548219867553,
+            "Crystal Palace": 206.85204599977735,
+            "Everton": 207.0158133491567,
+            "Fulham": 114.31854431518502,
+            "Huddersfield": 73.41515059391746,
+            "Hull": 67.98465241823803,
+            "Leeds": 105.21752492738219,
+            "Leicester": 201.04498809866757,
+            "Liverpool": 206.80355133403458,
+            "Luton": 37.77283796046579,
+            "Man City": 206.75999070727573,
+            "Man United": 206.83657002235182,
+            "Middlesbrough": 37.76360618982454,
+            "Newcastle": 196.7049008460508,
+            "Norwich": 78.8212961730185,
+            "Nott'm Forest": 73.37331796372146,
+            "QPR": 37.77764442479027,
+            "Sheffield United": 82.3002052866701,
+            "Southampton": 201.2921390701161,
+            "Stoke": 132.31026040901338,
+            "Sunderland": 105.03497799540608,
+            "Swansea": 132.24593556429542,
+            "Tottenham": 206.89114228215487,
+            "Watford": 146.5397988686222,
+            "West Brom": 109.99206732143715,
+            "West Ham": 206.92063488864974,
+            "Wolves": 171.53463787576
+          }
+        }
+      }
+    },
+    "scores": {
+      "elo": {
+        "log_loss": 0.9835787785866659,
+        "brier": 0.5878612320917658
+      },
+      "elo_f1": {
+        "log_loss": 1.0162991391936758,
+        "brier": 0.6081694922165606
+      },
+      "elo_f2": {
+        "log_loss": 1.0142896629218927,
+        "brier": 0.6070410524883925
+      },
+      "poisson": {
+        "log_loss": 1.0854424331541417,
+        "brier": 0.657320875533445
+      },
+      "poisson_tw": {
+        "log_loss": 1.0416621634663767,
+        "brier": 0.627335882986214
+      },
+      "dixon_coles": {
+        "log_loss": 1.0857475749685424,
+        "brier": 0.657234898874135
+      },
+      "frequency_baseline": {
+        "log_loss": 1.0759926141518226,
+        "brier": 0.6520026469682979
+      }
+    },
+    "primary_tw_minus_static": {
+      "log_loss": {
+        "n_matches": 342,
+        "mean": -0.043780269687764786,
+        "sd": 0.140184238995541,
+        "naive_se": 0.00758029548999704,
+        "clustered_se": 0.007664986671262947,
+        "n_clusters": 109
+      },
+      "brier": {
+        "n_matches": 342,
+        "mean": -0.029984992547230964,
+        "sd": 0.09751904143666386,
+        "naive_se": 0.005273225829721777,
+        "clustered_se": 0.005339752265660756,
+        "n_clusters": 109
+      },
+      "checks": {
+        "below_floor": true,
+        "beyond_se_multiple": true,
+        "brier_same_sign": true
+      },
+      "met": true
+    },
+    "criterion_d_from_development": false,
+    "reading": "2425_specific_observation_cannot_confirm",
+    "decomposition": {
+      "identity": "poisson - elo = (poisson - poisson_tw) + (poisson_tw - elo_f2) + (elo_f2 - elo_f1) + (elo_f1 - elo)",
+      "max_identity_residual": {
+        "log_loss": 1.1102230246251565e-16,
+        "brier": 1.1102230246251565e-16
+      },
+      "components": {
+        "poisson_minus_poisson_tw": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": 0.043780269687764786,
+            "sd": 0.140184238995541,
+            "naive_se": 0.00758029548999704,
+            "clustered_se": 0.007664986671262947,
+            "n_clusters": 109
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": 0.029984992547230964,
+            "sd": 0.09751904143666386,
+            "naive_se": 0.005273225829721777,
+            "clustered_se": 0.005339752265660756,
+            "n_clusters": 109
+          }
+        },
+        "poisson_tw_minus_elo_f2": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": 0.027372500544484125,
+            "sd": 0.14746075789387278,
+            "naive_se": 0.007973764568854451,
+            "clustered_se": 0.0076365626285676245,
+            "n_clusters": 109
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": 0.020294830497821555,
+            "sd": 0.10347796570758487,
+            "naive_se": 0.00559544755093491,
+            "clustered_se": 0.005298276640560256,
+            "n_clusters": 109
+          }
+        },
+        "elo_f2_minus_elo_f1": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": -0.002009476271783137,
+            "sd": 0.032299675692770674,
+            "naive_se": 0.0017465664309813352,
+            "clustered_se": 0.0017664919421941782,
+            "n_clusters": 109
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": -0.0011284397281680933,
+            "sd": 0.0166542997030898,
+            "naive_se": 0.0009005613885909546,
+            "clustered_se": 0.0009411559634472746,
+            "n_clusters": 109
+          }
+        },
+        "elo_f1_minus_elo": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": 0.032720360607009766,
+            "sd": 0.21450217249373096,
+            "naive_se": 0.011598949085856333,
+            "clustered_se": 0.01058879117702539,
+            "n_clusters": 109
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": 0.020308260124794707,
+            "sd": 0.14613712447373,
+            "naive_se": 0.007902190670697208,
+            "clustered_se": 0.007151076307972734,
+            "n_clusters": 109
+          }
+        },
+        "poisson_minus_elo": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": 0.10186365456747552,
+            "sd": 0.348146295675469,
+            "naive_se": 0.018825595615295076,
+            "clustered_se": 0.01936928352412996,
+            "n_clusters": 109
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": 0.06945964344167914,
+            "sd": 0.24506034591172995,
+            "naive_se": 0.013251345858865695,
+            "clustered_se": 0.013228214512758175,
+            "n_clusters": 109
+          }
+        }
+      },
+      "experiment_11_split": {
+        "poisson_minus_elo_f2": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": 0.07115277023224892,
+            "sd": 0.24015164365991684,
+            "naive_se": 0.01298591364046673,
+            "clustered_se": 0.013206012647424614,
+            "n_clusters": 109
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": 0.05027982304505251,
+            "sd": 0.16947798220695418,
+            "naive_se": 0.009164319707995397,
+            "clustered_se": 0.009204071277311621,
+            "n_clusters": 109
+          }
+        },
+        "poisson_minus_poisson_tw": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": 0.043780269687764786,
+            "sd": 0.140184238995541,
+            "naive_se": 0.00758029548999704,
+            "clustered_se": 0.007664986671262947,
+            "n_clusters": 109
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": 0.029984992547230964,
+            "sd": 0.09751904143666386,
+            "naive_se": 0.005273225829721777,
+            "clustered_se": 0.005339752265660756,
+            "n_clusters": 109
+          }
+        },
+        "poisson_tw_minus_elo_f2": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": 0.027372500544484125,
+            "sd": 0.14746075789387278,
+            "naive_se": 0.007973764568854451,
+            "clustered_se": 0.0076365626285676245,
+            "n_clusters": 109
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": 0.020294830497821555,
+            "sd": 0.10347796570758487,
+            "naive_se": 0.00559544755093491,
+            "clustered_se": 0.005298276640560256,
+            "n_clusters": 109
+          }
+        }
+      }
+    },
+    "context_comparisons": {
+      "poisson_tw_minus_elo": {
+        "log_loss": {
+          "n_matches": 342,
+          "mean": 0.05808338487971076,
+          "sd": 0.25767533536054876,
+          "naive_se": 0.013933486364178016,
+          "clustered_se": 0.014021685043157034,
+          "n_clusters": 109
+        },
+        "brier": {
+          "n_matches": 342,
+          "mean": 0.039474650894448175,
+          "sd": 0.1822415805998633,
+          "naive_se": 0.00985449606467541,
+          "clustered_se": 0.009571742174227918,
+          "n_clusters": 109
+        }
+      },
+      "poisson_tw_minus_elo_f2": {
+        "log_loss": {
+          "n_matches": 342,
+          "mean": 0.027372500544484125,
+          "sd": 0.14746075789387278,
+          "naive_se": 0.007973764568854451,
+          "clustered_se": 0.0076365626285676245,
+          "n_clusters": 109
+        },
+        "brier": {
+          "n_matches": 342,
+          "mean": 0.020294830497821555,
+          "sd": 0.10347796570758487,
+          "naive_se": 0.00559544755093491,
+          "clustered_se": 0.005298276640560256,
+          "n_clusters": 109
+        }
+      },
+      "poisson_tw_minus_dixon_coles": {
+        "log_loss": {
+          "n_matches": 342,
+          "mean": -0.04408541150216558,
+          "sd": 0.1436982200991423,
+          "naive_se": 0.007770309826147989,
+          "clustered_se": 0.007798090382917901,
+          "n_clusters": 109
+        },
+        "brier": {
+          "n_matches": 342,
+          "mean": -0.029899015887920967,
+          "sd": 0.09903322103853937,
+          "naive_se": 0.00535510328534293,
+          "clustered_se": 0.00539920314131288,
+          "n_clusters": 109
+        }
+      },
+      "poisson_tw_minus_frequency_baseline": {
+        "log_loss": {
+          "n_matches": 342,
+          "mean": -0.034330450685445595,
+          "sd": 0.37497955904554703,
+          "naive_se": 0.02027657232111844,
+          "clustered_se": 0.018741037766452265,
+          "n_clusters": 109
+        },
+        "brier": {
+          "n_matches": 342,
+          "mean": -0.024666763982083957,
+          "sd": 0.2639270199888217,
+          "naive_se": 0.014271538752464608,
+          "clustered_se": 0.01340545694690894,
+          "n_clusters": 109
+        }
+      }
+    },
+    "segments": {
+      "0-9": {
+        "poisson_tw_minus_poisson": {
+          "log_loss": {
+            "n_matches": 90,
+            "mean": -0.04482723625644621,
+            "sd": 0.12606025657240805,
+            "naive_se": 0.013287917773134003,
+            "clustered_se": 0.015652273274834805,
+            "n_clusters": 26
+          },
+          "brier": {
+            "n_matches": 90,
+            "mean": -0.03318790580942113,
+            "sd": 0.0902219755002754,
+            "naive_se": 0.009510231252692658,
+            "clustered_se": 0.011189078896417265,
+            "n_clusters": 26
+          }
+        }
+      },
+      "10-18": {
+        "poisson_tw_minus_poisson": {
+          "log_loss": {
+            "n_matches": 82,
+            "mean": -0.033064766864170134,
+            "sd": 0.13560140808454135,
+            "naive_se": 0.014974670432673934,
+            "clustered_se": 0.015053892284673237,
+            "n_clusters": 26
+          },
+          "brier": {
+            "n_matches": 82,
+            "mean": -0.021444429140126328,
+            "sd": 0.09176348697676555,
+            "naive_se": 0.010133581904793526,
+            "clustered_se": 0.009497363553729186,
+            "n_clusters": 26
+          }
+        }
+      },
+      "19-28": {
+        "poisson_tw_minus_poisson": {
+          "log_loss": {
+            "n_matches": 90,
+            "mean": -0.05658259080706808,
+            "sd": 0.14889893051417008,
+            "naive_se": 0.015695325386264128,
+            "clustered_se": 0.015640711492557375,
+            "n_clusters": 30
+          },
+          "brier": {
+            "n_matches": 90,
+            "mean": -0.03920838981194971,
+            "sd": 0.10348212551154035,
+            "naive_se": 0.010907973791062812,
+            "clustered_se": 0.011296119861561744,
+            "n_clusters": 30
+          }
+        }
+      },
+      "29+": {
+        "poisson_tw_minus_poisson": {
+          "log_loss": {
+            "n_matches": 80,
+            "mean": -0.03918321143296651,
+            "sd": 0.1508757087634178,
+            "naive_se": 0.016868417047423145,
+            "clustered_se": 0.014965261656852604,
+            "n_clusters": 29
+          },
+          "brier": {
+            "n_matches": 80,
+            "mean": -0.02475947069674069,
+            "sd": 0.10473397541894572,
+            "naive_se": 0.011709614429527731,
+            "clustered_se": 0.0102894729668794,
+            "n_clusters": 29
+          }
+        }
+      }
+    },
+    "returning_vs_continuous": {
+      "returning": {
+        "poisson_tw_minus_poisson": {
+          "log_loss": {
+            "n_matches": 70,
+            "mean": -0.09106233897635983,
+            "sd": 0.13166380644231673,
+            "naive_se": 0.0157368348273723,
+            "clustered_se": 0.015432348267070434,
+            "n_clusters": 57
+          },
+          "brier": {
+            "n_matches": 70,
+            "mean": -0.06378433591280483,
+            "sd": 0.09645216457788396,
+            "naive_se": 0.01152823865357163,
+            "clustered_se": 0.011418703884919548,
+            "n_clusters": 57
+          }
+        }
+      },
+      "continuous": {
+        "poisson_tw_minus_poisson": {
+          "log_loss": {
+            "n_matches": 272,
+            "mean": -0.03161209009143518,
+            "sd": 0.13995647533967684,
+            "naive_se": 0.00848610780609766,
+            "clustered_se": 0.008847847324065313,
+            "n_clusters": 99
+          },
+          "brier": {
+            "n_matches": 272,
+            "mean": -0.021286632122267106,
+            "sd": 0.09605582510869413,
+            "naive_se": 0.005824239895279455,
+            "clustered_se": 0.006130114885794608,
+            "n_clusters": 99
+          }
+        }
+      }
+    },
+    "sharpness_and_calibration": {
+      "elo": {
+        "mean_predicted": {
+          "H": 0.4503689558836565,
+          "D": 0.2286956738327168,
+          "A": 0.3209353702836268
+        },
+        "observed": {
+          "H": 0.42105263157894735,
+          "D": 0.24269005847953215,
+          "A": 0.3362573099415205
+        },
+        "mean_entropy_nats": 0.9568101832259549
+      },
+      "elo_f1": {
+        "mean_predicted": {
+          "H": 0.4516860008090056,
+          "D": 0.2290178622734661,
+          "A": 0.31929613691752823
+        },
+        "observed": {
+          "H": 0.42105263157894735,
+          "D": 0.24269005847953215,
+          "A": 0.3362573099415205
+        },
+        "mean_entropy_nats": 0.9581332394375475
+      },
+      "elo_f2": {
+        "mean_predicted": {
+          "H": 0.4491710046604189,
+          "D": 0.22700936847561673,
+          "A": 0.32381962686396426
+        },
+        "observed": {
+          "H": 0.42105263157894735,
+          "D": 0.24269005847953215,
+          "A": 0.3362573099415205
+        },
+        "mean_entropy_nats": 0.9670028630611816
+      },
+      "poisson": {
+        "mean_predicted": {
+          "H": 0.4472553668614436,
+          "D": 0.23117851655344196,
+          "A": 0.32156611658511447
+        },
+        "observed": {
+          "H": 0.42105263157894735,
+          "D": 0.24269005847953215,
+          "A": 0.3362573099415205
+        },
+        "mean_entropy_nats": 0.993590760465668
+      },
+      "poisson_tw": {
+        "mean_predicted": {
+          "H": 0.44503100250732675,
+          "D": 0.22714649531121114,
+          "A": 0.3278225021814621
+        },
+        "observed": {
+          "H": 0.42105263157894735,
+          "D": 0.24269005847953215,
+          "A": 0.3362573099415205
+        },
+        "mean_entropy_nats": 0.9903024529741343
+      },
+      "dixon_coles": {
+        "mean_predicted": {
+          "H": 0.44508147919151747,
+          "D": 0.23552629189329427,
+          "A": 0.3193922289151883
+        },
+        "observed": {
+          "H": 0.42105263157894735,
+          "D": 0.24269005847953215,
+          "A": 0.3362573099415205
+        },
+        "mean_entropy_nats": 0.9952510234890407
+      },
+      "frequency_baseline": {
+        "mean_predicted": {
+          "H": 0.4494736842105263,
+          "D": 0.2331578947368421,
+          "A": 0.3173684210526316
+        },
+        "observed": {
+          "H": 0.42105263157894735,
+          "D": 0.24269005847953215,
+          "A": 0.3362573099415205
+        },
+        "mean_entropy_nats": 1.0631624718640438
+      }
+    },
+    "predictions": {
+      "file": "results/time_weighted_poisson_validation/predictions.csv",
+      "sha256": "3dcc77393ae57a9752f172920a31bb107fe9af16d55d6789990b5d8713c4e37b",
+      "n_rows": 342
+    }
+  },
+  "provenance": {
+    "git_commit": "e8bc661e4bf5abcef8d50f95f59a17d6b25ee0d3",
+    "git_dirty": false,
+    "data_file": "data/processed/matches_dev_v2.csv",
+    "data_sha256": "c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807",
+    "python": "3.13.15",
+    "packages": {
+      "numpy": "2.5.2",
+      "pandas": "3.0.5",
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "scikit-learn": "1.9.0",
+      "matplotlib": "3.11.1"
+    }
+  }
+}

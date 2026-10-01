@@ -1,6 +1,6 @@
 # EPL Betting Model — Current State
 
-_Last updated: 2026-10-01 (after Experiment 11, the update-policy diagnostic)._
+_Last updated: 2026-10-01 (after Experiment 12, the time-weighted Poisson experiment)._
 
 ## Current phase
 
@@ -10,8 +10,11 @@ Since then:
 - 2024-25 has been acquired (Experiment 9).
 - The established specs have been scored on the selection folds (Experiment 10).
 - The pre-registered update-policy diagnostic has been run and recorded (Experiment 11).
+- The pre-registered time-weighted Poisson experiment has been run and recorded (Experiment 12). Its half-life
+  H\* = 730 days is locked in `configs/time_weighted_poisson_v1.toml`.
 
-No model or specification has been changed.
+No established model or specification has been changed. `poisson_time_weighted_v1` is a new candidate, not a
+replacement for `poisson_static_v1`.
 
 Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Coles (see `RESULTS_LOG.md`).
 
@@ -30,7 +33,7 @@ Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Cole
 |---|---|---|
 | Training (fitting + walk-forward selection) | 2014-15 … 2021-22 | 3,040 |
 | **Exposed development test benchmark** | 2022-23, 2023-24 | 760 |
-| Validation (model selection, with the training folds) | 2024-25 | 380, **scored in two pre-registered runs** (2026-10-01: Experiments 10 and 11) |
+| Validation (model selection, with the training folds) | 2024-25 | 380, **scored in three pre-registered runs** (2026-10-01: Experiments 10, 11 and 12) |
 | **Sealed final holdout** ([protocol](HOLDOUT_PROTOCOL.md)) | 2025-26 (next: 2026-27) | not yet downloaded |
 
 The development test has been scored several times (`TEST_SET_ACCESS_LOG.md`). It may be re-scored only for the
@@ -64,6 +67,23 @@ common matches. It added two frozen season-start Elo arms:
 - **Poisson − F2 mixes history weighting with model family.** This design does not separate them.
 - **The pooled six-fold figures are not an unbiased estimate.**
 
+**Experiment 12** (protocol `time_weighted_poisson_v1`) tested recency weighting of the static Poisson history:
+w = 2^(−age/H), age in days, the model still static in-season.
+
+- **Development** (targets 2017-18 … 2021-22, data cut to seasons ≤ 2021-22): one-SE rule selected **H\* = 730 days**
+  (H_min = 274). The nested estimate of the selection procedure was −0.0058 log loss (clustered SE 0.0043), negative in
+  3 of 4 outer folds: **criterion D not met** (1.34 SEs, below the 2-SE requirement).
+- **2024-25 validation** (H\* only, 342 common matches): time-weighted 1.0417 / 0.6273 vs static 1.0854 / 0.6573;
+  **TW − static −0.0438 log loss** (naive SE 0.0076, clustered 0.0077), Brier −0.0300: **criterion V met**.
+- **Registered reading: 2024-25-specific observation that cannot confirm.** The hypothesis was prompted by 2024-25,
+  and the historical evidence alone does not distinguish the gain from zero. History length (3–7 seasons in the
+  development folds, 10 in 2024-25) is confounded with the fold.
+- Weighting closed 0.0438 of Experiment 11's 0.0712 Poisson − F2 gap (about 62%). The remaining TW − F2 gap (+0.0274,
+  clustered SE 0.0076) is **not** a pure model-family effect (goals vs results, Elo's implicit recency, the weighting
+  form, H\* vs any 2024-25-optimal H).
+- **The 2024-25 result must not be used to retune the candidate** (for example to choose another half-life). H\* stays
+  730 days.
+
 The 2025-26 holdout remains sealed and unacquired.
 
 ## Frozen specifications (`configs/baselines_v1.toml`)
@@ -85,8 +105,10 @@ The 2025-26 holdout remains sealed and unacquired.
    - Excluding these matches is not an acceptable final policy.
 2. **Unfair Elo vs goal-model comparison.** Elo updates dynamically through the test period; the Poisson model is
    static and assumes constant team strength over its whole history. Experiment 11 isolated the updating component
-   (about a third of the 2024-25 gap). The rest is a difference at the start of the season, in which history weighting
-   and model family are still confounded. No goal model yet updates or time-weights its history.
+   (about a third of the 2024-25 gap). The rest is a difference at the start of the season. Experiment 12 showed that
+   recency weighting closes about 62% of the 2024-25 Poisson − F2 part of it, as a 2024-25-specific observation (the
+   historical nested gain was not distinguishable from zero). The remainder still mixes model family with other
+   differences, and no goal model yet updates during the season.
 3. **Dixon-Coles is staged, not joint MLE.** It showed no development-test benefit in this static setup.
 4. **Elo design choices not yet validated.**
    - Promoted teams start at 1500.
@@ -95,7 +117,8 @@ The 2025-26 holdout remains sealed and unacquired.
      training-fold experiment).
    - The 2014-15 burn-in season is used when fitting the regression.
 5. **Limited uncertainty estimates.**
-   - Experiments 10 and 11 report paired per-match differences with naive SEs; Experiment 11 adds date-clustered SEs.
+   - Experiments 10-12 report paired per-match differences with naive SEs; Experiments 11 and 12 add date-clustered
+     SEs.
    - The development-test results (Experiments 2-6) still have none.
    - With six folds, fold-to-fold variation is the main uncertainty.
 6. **Calibration** is assessed only for P(home win), with decile bins, on the development test.
@@ -111,8 +134,8 @@ The 2025-26 holdout remains sealed and unacquired.
 
 1. ~~Define and seal a final holdout before looking at it~~: done 2026-10-01 ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md),
    tag `holdout-freeze-v1`). 2024-25 was added as dataset dev_v2 and scored as validation (Experiment 10), then used
-   by the update-policy diagnostic (Experiment 11), both on 2026-10-01. The sealed acquisition of 2025-26 has not been
-   done.
+   by the update-policy diagnostic (Experiment 11) and the time-weighted Poisson experiment (Experiment 12), all on
+   2026-10-01. The sealed acquisition of 2025-26 has not been done.
 2. Build one evaluation harness that scores every model on the same training-season walk-forward folds:
    - the same information and update policy for every model (for example, goal models refitted or time-weighted
      as each season progresses);
@@ -120,7 +143,7 @@ The 2025-26 holdout remains sealed and unacquired.
 3. Inside that harness, run the deferred experiments as separate, pre-registered comparisons:
    - promoted-team handling, for both the goal models and Elo;
    - home advantage inside the Elo updates;
-   - a dynamic or time-decayed Poisson model;
+   - a dynamic (in-season updating) Poisson model; the static time-decayed version is done (Experiment 12);
    - joint Dixon-Coles.
 
 Only after this should the project move to stage 4+ features (xG, market odds) in `ROADMAP.md`.

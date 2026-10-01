@@ -193,6 +193,24 @@ So updating explains about a third of the 2024-25 gap. The pooled six-fold
 figures are not an unbiased estimate. Do not use these results to tune
 anything. A hypothesis prompted by them cannot be confirmed on 2024-25.
 
+Experiment 12 (protocol `time_weighted_poisson_v1`, RESULTS_LOG Experiment 12)
+has been run and recorded. It tested static Poisson fitted on a
+recency-weighted history (w = 2^(−age/H), age in days; not updated in-season).
+
+- H* = 730 days, selected by the one-SE rule on the development folds
+  (2017-18 to 2021-22), is locked in the config.
+- Development criterion D was **not met**: nested estimate −0.0058 log loss
+  (clustered SE 0.0043).
+- Validation criterion V was met on 2024-25: TW − static −0.0438 (clustered
+  SE 0.0077). The pre-registered reading is **"2024-25-specific observation;
+  cannot confirm"**.
+- Weighting closed 0.0438 of the 0.0712 Poisson − F2 gap. The remaining
+  TW − F2 gap is not a pure model-family effect.
+
+2024-25 has now been exposed in three pre-registered experiments (10, 11 and
+12). It must not be used to retune the Experiment 12 candidate or to confirm
+any future candidate or hypothesis.
+
 ---
 
 ## 7. Known methodological issues and conventions

@@ -3,8 +3,9 @@
 This file records important experiments and decisions so that results do not exist only inside individual chat
 conversations. Every model result in Experiments 2–7 is reproduced by `python -m experiments.run_all` (written to
 `results/<experiment>/metrics.json`) and locked by `tests/test_golden_results.py`. Experiment 10 is reproduced by
-`python -m experiments.validation_2425`, and Experiment 11 by `python -m experiments.update_policy_diagnostic`.
-Neither is in `run_all` or locked by golden tests yet. Data-acquisition records are not
+`python -m experiments.validation_2425`, Experiment 11 by `python -m experiments.update_policy_diagnostic`, and
+Experiment 12 by `python -m experiments.time_weighted_poisson --stage development` then `--stage validation`.
+None of them is in `run_all` or locked by golden tests yet. Data-acquisition records are not
 produced by `run_all`. Their checksums and coverage are locked by `tests/test_data.py` against
 `data/checksums.json`: dataset v1 also through the golden data fixture, and dataset dev_v2 (Experiment 9) by the
 `dev_v2` tests.
@@ -769,6 +770,260 @@ Full-group segments are in `metrics.json`. 2024-25 F1 − Online by segment: +0.
 | Predictions | `results/update_policy_diagnostic/predictions.csv`, 2,280 rows, git-ignored. Content SHA-256 (CRLF normalised to LF) `73251375050967fd00c81f66c1c0d5c640e975aa43a2d1042fa234304eacf5e8` |
 | Metrics | `results/update_policy_diagnostic/metrics.json`, content SHA-256 `f97f4c698d6fa8044d3af24db95eb3a83bdd642f14378ac6fd952e4463747091` |
 | Reproduction reference | Experiment 10 predictions, content SHA-256 `4e1db61efe28c9961cc5dc46c4ffe5cee6e5ac67c5672a6d8fec63507029c80f` |
+| Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0, scikit-learn 1.9.0 |
+
+Not yet locked by golden tests. The run is not in `experiments.run_all`.
+
+## Experiment 12 — Time-weighted static Poisson: does recency weighting of the history help? (2026-10-01)
+
+`experiments/time_weighted_poisson.py`, protocol `time_weighted_poisson_v1` (`configs/time_weighted_poisson_v1.toml`),
+results in `results/time_weighted_poisson_development/metrics.json` and
+`results/time_weighted_poisson_validation/metrics.json`.
+
+### Pre-registration and run sequence
+
+| Step | Commit | What |
+|---|---|---|
+| Pre-registration | `b94bba1` | Protocol and access-log entry V3, committed and pushed **before** any time-weighted model was fitted on real data |
+| Implementation | `ae54757` | Code and tests; no weighted fit on real data |
+| Development stage | run at `ae54757` (`git_dirty: false`) | Every grid half-life on the five development folds; seasons up to 2021-22 only loaded |
+| Lock | `e8bc661` | H\* = 730 days written to `[locked]` with the development metrics checksum |
+| Validation stage | run at `e8bc661` (`git_dirty: false`) | 2024-25 scored **once, for H = 730 only** |
+
+Nothing was changed before or after either run. The grid, selection rule, 0.002 floor, nested procedure and evidence
+criteria are exactly as registered.
+
+### Objective
+
+Experiment 11 found a large 2024-25 gap between static Poisson and frozen season-start Elo (Poisson − F2 = +0.0712)
+that was absent in the historical folds. One explanation is that static Poisson weights a 10-season history equally.
+This experiment isolates **history weighting within the same model family**: the candidate is static during the
+target season, so it is not combined with online updating.
+
+### Candidate (`poisson_time_weighted_v1`)
+
+- `poisson_static_v1` unchanged (`Goals ~ Team + Opponent + IsHome`, 10-goal grid, H/D/A renormalised, unseen-team
+  matches excluded), except that each history match is weighted:
+
+  w = 2^(−age / H), with age = days from the match to the latest history date.
+
+- Both goal rows of a match get the same weight (statsmodels `var_weights`). There is no truncation, so the set of seen
+  teams and the common groups are unchanged.
+- **H is a hyperparameter.** It defines the objective; it cannot be chosen by training likelihood. The Poisson
+  coefficients are fitted parameters, estimated by weighted maximum likelihood on the history for a given H.
+- H = ∞ is `poisson_static_v1` exactly. It reproduced the Experiment 10 predictions in every fold (largest difference
+  about 1e-16).
+- Grid (days): 183, 274, 365, 548, 730, 1095, 1460, ∞.
+
+### Data and evidence roles
+
+- Dataset `dev_v2` (SHA-256 `c726bd5c…39fd807`).
+- **Development:** targets 2017-18 … 2021-22. The development stage cut the data to seasons ≤ 2021-22 straight after
+  reading the file.
+- **Validation:** 2024-25, H\* only. The grid was never scored on 2024-25.
+- 2022-23 and 2023-24 were history only (in the 2024-25 fit). 2025-26 was not accessed.
+
+### Development stage: selection of H
+
+The criterion is the mean over the five targets of each target's mean log loss on the common group. Differences are
+pooled per match, with clusters (target, date).
+
+| H (days) | Criterion | Diff vs H_min | Clustered SE | Within 1 SE |
+|---|---|---|---|---|
+| 183 | 0.96547 | +0.00130 | 0.00122 | no |
+| **274 (H_min)** | **0.96437** | 0 | — | yes |
+| 365 | 0.96440 | −0.00007 | 0.00073 | yes |
+| 548 | 0.96524 | +0.00067 | 0.00157 | yes |
+| **730 (H\*)** | 0.96615 | +0.00154 | 0.00204 | yes |
+| 1095 | 0.96753 | +0.00289 | 0.00254 | no |
+| 1460 | 0.96842 | +0.00378 | 0.00281 | no |
+| ∞ (static) | 0.97197 | +0.00734 | 0.00363 | no |
+
+**H\* = 730 days** (about two seasons): the longest half-life within one clustered SE of H_min. Leave-one-target-out
+selections: 730, 730, 548, 730, 365 (leaving out 2017-18 … 2021-22 in turn).
+
+In-sample per fold, H = 730 vs static (log loss / Brier). **Optimistically biased: H\* was selected on these folds.**
+
+| Target | History seasons | Static | H = 730 | Log-loss diff (clustered SE) |
+|---|---|---|---|---|
+| 2017-18 | 3 | 0.9836 / 0.5847 | 0.9780 / 0.5812 | −0.0057 (0.0024) |
+| 2018-19 | 4 | 0.9033 / 0.5303 | 0.8972 / 0.5255 | −0.0061 (0.0033) |
+| 2019-20 | 5 | 0.9708 / 0.5768 | 0.9659 / 0.5735 | −0.0049 (0.0036) |
+| 2020-21 | 6 | 1.0482 / 0.6263 | 1.0418 / 0.6218 | −0.0063 (0.0044) |
+| 2021-22 | 7 | 0.9539 / 0.5651 | 0.9479 / 0.5616 | −0.0061 (0.0049) |
+
+Every finite H from 548 to 1460 is better than static in all five folds, in log loss and Brier. H = 183 is worse than
+static in 2019-20 (+0.0004) and 2021-22 (+0.0055).
+
+### Development stage: nested estimate and criterion D
+
+For each outer target, H was selected by the same rule from earlier targets only (2018-19 selects from 2017-18 alone).
+Differences are time-weighted − static (negative = weighting better).
+
+| Outer target | Nested H | Log loss (clustered SE) | Brier (clustered SE) |
+|---|---|---|---|
+| 2018-19 | 274 | −0.0115 (0.0075) | −0.0087 (0.0051) |
+| 2019-20 | 183 | +0.0004 (0.0107) | −0.0004 (0.0069) |
+| 2020-21 | 365 | −0.0100 (0.0071) | −0.0074 (0.0043) |
+| 2021-22 | 365 | −0.0031 (0.0082) | −0.0011 (0.0056) |
+| **Pooled (1,298)** | | **−0.0058** (naive 0.0043 / clustered 0.0043) | −0.0042 (0.0028 / 0.0028) |
+
+| Criterion D check | Result |
+|---|---|
+| Pooled log loss < −0.002 | yes (−0.0058) |
+| \|mean\| > 2 clustered SEs | **no** (1.34 SEs) |
+| Negative in ≥ 3 of 4 outer folds | yes (3) |
+| Pooled Brier negative | yes |
+
+**Criterion D: not met.** The historical gain is consistently signed in-sample but the nested estimate of the
+selection procedure is not distinguishable from zero. H\* was not changed because of this.
+
+### Development diagnostics (descriptive)
+
+H = 730 vs static, by target (2017-18 … 2021-22):
+
+- Kish effective sample size: 1050/1140, 1323/1520, 1543/1900, 1697/2280, 1827/2660 matches. At H = 183 about 510–590
+  in every fold.
+- Weight share of the last history season: 0.45, 0.39, 0.36, 0.34, 0.32 (static 0.33 … 0.14; H = 183 about 0.75).
+- Per-team effective sample size: minimum 37.6–37.8, median 105–137. Never below 31.6 at any H.
+- All GLM fits converged.
+- Rank correlation of net team strength with the static fit: 0.95–0.99 at H = 730 (0.90–0.98 at H = 183). The spread
+  of attack and defence effects grows slightly as H shortens; mean entropy falls (sharper forecasts).
+- **Home advantage (registered COVID caveat).** In the 2021-22 fold the IsHome coefficient falls from 0.220 (static) to
+  0.173 at H = 730 and 0.075 at H = 183, because 2020-21, played largely without crowds, gets the most weight. In the
+  other folds it moves by at most 0.03. Short half-lives are therefore penalised in that fold for a reason unrelated
+  to team-strength staleness.
+- Returning vs continuously present teams, H = 730 − static log loss: 2017-18 Newcastle (34) −0.0122 vs −0.0048;
+  2019-20 Aston Villa, Norwich (70) +0.0066 vs −0.0079; 2020-21 Fulham, West Brom (70) −0.0012 vs −0.0076;
+  2021-22 Norwich, Watford (70) −0.0205 vs −0.0023; 2018-19 no returning team (−0.0061).
+
+### 2024-25 validation: primary result (H = 730)
+
+Common group: 342 matches (380 minus the 38 involving Ipswich), as registered.
+
+| Model | Log loss | Brier |
+|---|---|---|
+| Static Poisson | 1.0854 | 0.6573 |
+| **Time-weighted Poisson, H = 730** | **1.0417** | **0.6273** |
+
+Paired difference **time-weighted − static** (109 match dates as clusters):
+
+| Metric | Mean | Naive SE | Date-clustered SE |
+|---|---|---|---|
+| Log loss | **−0.0438** | 0.0076 | 0.0077 |
+| Brier | −0.0300 | 0.0053 | 0.0053 |
+
+| Criterion V check | Result |
+|---|---|
+| Log loss < −0.002 | yes (−0.0438) |
+| \|mean\| > 2 clustered SEs | yes (5.7 SEs) |
+| Brier negative | yes |
+
+**Criterion V: met.**
+
+### Context comparisons (2024-25 common group; not effects of weighting)
+
+These mix model family and/or in-season updating. Log loss, date-clustered SE:
+
+| Comparison | Log loss | Brier |
+|---|---|---|
+| Time-weighted − online Elo | +0.0581 (0.0140) | +0.0395 (0.0096) |
+| Time-weighted − F2 | +0.0274 (0.0076) | +0.0203 (0.0053) |
+| Time-weighted − Dixon-Coles | −0.0441 (0.0078) | −0.0299 (0.0054) |
+| Time-weighted − frequency baseline | −0.0343 (0.0187) | −0.0247 (0.0134) |
+
+Scores of the other arms reproduce Experiments 10 and 11: online Elo 0.9836 / 0.5879, F1 1.0163 / 0.6082,
+F2 1.0143 / 0.6070, Dixon-Coles 1.0857 / 0.6572, baseline 1.0760 / 0.6520.
+
+### Connection to Experiment 11
+
+Per match on the 342 matches, checked before reporting (largest residual 1.1e-16, tolerance 1e-12):
+
+> Poisson − Online = (Poisson − TW) + (TW − F2) + (F2 − F1) + (F1 − Online)
+
+| Component | Log loss (naive / clustered SE) | Brier (naive / clustered SE) |
+|---|---|---|
+| Poisson − TW: history weighting at H\* | +0.0438 (0.0076 / 0.0077) | +0.0300 (0.0053 / 0.0053) |
+| TW − F2: remainder | +0.0274 (0.0080 / 0.0076) | +0.0203 (0.0056 / 0.0053) |
+| F2 − F1: calibration layer | −0.0020 (0.0017 / 0.0018) | −0.0011 (0.0009 / 0.0009) |
+| F1 − Online: updating | +0.0327 (0.0116 / 0.0106) | +0.0203 (0.0079 / 0.0072) |
+| **Poisson − Online (total)** | **+0.1019** (0.0188 / 0.0194) | +0.0695 (0.0133 / 0.0132) |
+
+- Weighting at H\* closed **0.0438 of the 0.0712 Poisson − F2 gap (about 62%)**.
+- **The remaining TW − F2 gap (+0.0274) is not a pure model-family effect.** It also contains goals vs results as the
+  input, Elo's own implicit recency (K = 25 smooths over matches, not days), the weighting's functional form, and any
+  difference between H\* and a 2024-25-optimal H (which was deliberately never estimated).
+- That weighting closes part of the gap shows it is *sufficient* to close that part on these matches. It does not show
+  that staleness was the reason for F2's advantage.
+
+### 2024-25 diagnostics (descriptive)
+
+Time-weighted − static by within-season segment (Experiment 11 segments; log loss / Brier, clustered SE):
+
+| Segment | n | Log loss | Brier |
+|---|---|---|---|
+| 0–9 | 90 | −0.0448 (0.0157) | −0.0332 (0.0112) |
+| 10–18 | 82 | −0.0331 (0.0151) | −0.0214 (0.0095) |
+| 19–28 | 90 | −0.0566 (0.0156) | −0.0392 (0.0113) |
+| 29+ | 80 | −0.0392 (0.0150) | −0.0248 (0.0103) |
+
+The gain is already present in the first segment, as expected for a difference in season-start information.
+
+- **Returning teams** (Leicester, Southampton; 70 matches): −0.0911 (0.0154). Continuously present teams (272):
+  −0.0316 (0.0088). The gain is largest for returning teams but not confined to them.
+- **Calibration and sharpness.** Mean P(H/D/A): static 0.447 / 0.231 / 0.322 (entropy 0.9936), time-weighted
+  0.445 / 0.227 / 0.328 (0.9903); observed 0.421 / 0.243 / 0.336. Both over-predict home wins.
+- **Fit on 2014-15 … 2023-24 (3,800 matches):** Kish effective sample size 2,069; last-season (2023-24) weight share
+  0.30; per-team effective sample size minimum 37.8, median 140.8; IsHome 0.2003 (static 0.2175); rank correlation of
+  net strength with static 0.966; converged.
+
+### Interpretation (pre-registered reading)
+
+- **D not met, V met → "2024-25-specific observation that cannot confirm".** This is the registered reading and it is
+  not upgraded.
+- Historically, recency weighting gave a small, consistently signed in-sample gain (about 0.006 log loss at H\*), but
+  the honest nested estimate (−0.0058, 1.34 clustered SEs) is not distinguishable from zero. In 2024-25 the gain is
+  about seven times larger.
+- The hypothesis that equal weighting of a long history hurts static Poisson was prompted by 2024-25, so 2024-25
+  cannot confirm it, however clear the 2024-25 result is.
+- **History length is confounded with the fold.** The development folds had 3–7 history seasons; 2024-25 had 10.
+  A mechanism in which equal weighting hurts more as history lengthens would fit the pattern, but this design cannot
+  separate it from 2024-25 being unusual. 2022-23 and 2023-24 can never be targets, so no historical fold with a
+  similar history length exists.
+- The 2021-22 development fold is affected by the COVID-era home-advantage shift, which weighting cannot separate from
+  team-strength recency because IsHome is shared.
+
+### Limitations
+
+- Only four nested outer folds; 2018-19 selects H from a single earlier fold.
+- One weighting form (exponential in days) and one grid; no other forms were tested.
+- 2024-25 has now been used for three scored comparisons (Experiments 10, 11 and 12).
+- The pooled development figures are not an unbiased estimate of the locked candidate; only the nested figures and
+  2024-25 are honest out-of-sample estimates for their own seasons.
+- Unseen/promoted teams are still excluded from the goal-model comparisons.
+
+### Decision
+
+- **Recorded as is.** H\* = 730 days stays locked. No model, hyperparameter, protocol, eligibility rule or evidence
+  criterion is changed because of these results.
+- **The 2024-25 result must not be used to retune the candidate** (for example to choose a different half-life).
+- `poisson_time_weighted_v1` is not registered for 2022-24 or holdout scoring. Confirming the mechanism would need a
+  future pre-registered evaluation on a season not used to generate the hypothesis.
+
+### Provenance
+
+| Item | Value |
+|---|---|
+| Pre-registration | commit `b94bba1` (config and access-log entry V3) |
+| Development run | commit `ae547570c8d8368bfe30fd91f6a763237637d5f9`, `git_dirty: false` |
+| Development metrics | `results/time_weighted_poisson_development/metrics.json`, content SHA-256 `e21495a1a7695179787d319ad8954014274669582ad53634c9831de181d5a215` |
+| Development predictions | `results/time_weighted_poisson_development/predictions.csv`, 1,604 rows, git-ignored, content SHA-256 `96831b967d1841a71bbd95f141147446691891e55e8a939477036ea521c1c3ba` |
+| Lock | commit `e8bc661e4bf5abcef8d50f95f59a17d6b25ee0d3` |
+| Validation run | commit `e8bc661e4bf5abcef8d50f95f59a17d6b25ee0d3`, `git_dirty: false` |
+| Validation metrics | `results/time_weighted_poisson_validation/metrics.json`, content SHA-256 `fda8da0931609eb3b3df98c0cc7aaccd684dd5f4526fbb02d676afcbb7952086` |
+| Validation predictions | `results/time_weighted_poisson_validation/predictions.csv`, 342 rows, git-ignored, content SHA-256 `3dcc77393ae57a9752f172920a31bb107fe9af16d55d6789990b5d8713c4e37b` |
+| Data | `data/processed/matches_dev_v2.csv`, SHA-256 `c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807` |
+| Reproduction references | Experiment 10 predictions `4e1db61e…c80f`; Experiment 11 predictions `73251375…e5f8` |
 | Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0, scikit-learn 1.9.0 |
 
 Not yet locked by golden tests. The run is not in `experiments.run_all`.
