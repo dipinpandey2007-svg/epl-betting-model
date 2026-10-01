@@ -63,14 +63,29 @@ def unseen_teams(history_rows: pd.DataFrame, target_rows: pd.DataFrame) -> list[
     return sorted(teams_in(target_rows) - teams_in(history_rows))
 
 
-def elo_fold(data: pd.DataFrame, history: Sequence[str], target: str, cfg: dict) -> tuple[pd.DataFrame, dict]:
-    """elo_k25_logreg_v1 predictions for the target season: online ratings, calibration layer fitted on history."""
+def online_elo_layer(
+    data: pd.DataFrame, history: Sequence[str], cfg: dict
+) -> tuple[pd.DataFrame, EloOutcomeModel, float]:
+    """Online ratings through the fold data, and the calibration layer fitted once on the history.
+
+    Returns the rated fold data (pre-match EloHome / EloAway), the fitted
+    logistic regression and the home shift. elo_fold and the update-policy
+    diagnostic both use this, so they share one definition of the layer.
+    """
     hist = run_elo(data, k=cfg["k"], home_adv=cfg["update_home_advantage"], initial_rating=cfg["initial_rating"])
     train = hist["Season"].isin(history).to_numpy()
-    tgt = (hist["Season"] == target).to_numpy()
     shift = home_shift_from_results(hist.loc[train, "FTR"]) if cfg["apply_home_shift"] else 0.0
     diff = elo_difference(hist, shift)
     model = EloOutcomeModel(C=cfg["logistic_C"], tol=cfg["logistic_tol"]).fit(diff[train], hist.loc[train, "FTR"])
+    return hist, model, shift
+
+
+def elo_fold(data: pd.DataFrame, history: Sequence[str], target: str, cfg: dict) -> tuple[pd.DataFrame, dict]:
+    """elo_k25_logreg_v1 predictions for the target season: online ratings, calibration layer fitted on history."""
+    hist, model, shift = online_elo_layer(data, history, cfg)
+    train = hist["Season"].isin(history).to_numpy()
+    tgt = (hist["Season"] == target).to_numpy()
+    diff = elo_difference(hist, shift)
     out = pd.DataFrame(model.predict_proba(diff[tgt]), columns=prob_columns("elo"),
                        index=pd.Index(hist.loc[tgt, "match_id"], name="match_id"))
     out["elo_rating_home"] = hist.loc[tgt, "EloHome"].to_numpy()

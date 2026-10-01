@@ -85,6 +85,64 @@ def run_elo(
     return out
 
 
+def final_ratings(
+    matches: pd.DataFrame,
+    k: float,
+    home_adv: float = 0.0,
+    initial_rating: float = INITIAL_RATING,
+) -> dict[str, float]:
+    """Every team's rating after the last match in `matches` (same update rule and row order as run_elo).
+
+    Teams enter at `initial_rating` on their first appearance. A team absent
+    from `matches` has no entry; callers give it the initial rating.
+    """
+    ratings: dict[str, float] = {}
+    for home, away, hg, ag in zip(matches["HomeTeam"], matches["AwayTeam"], matches["FTHG"], matches["FTAG"]):
+        rating_home, rating_away = ratings.get(home, initial_rating), ratings.get(away, initial_rating)
+        ratings[home], ratings[away] = update_ratings(rating_home, rating_away, hg, ag, k, home_adv)
+    return ratings
+
+
+def season_start_elo(
+    matches: pd.DataFrame,
+    k: float,
+    home_adv: float = 0.0,
+    initial_rating: float = INITIAL_RATING,
+) -> pd.DataFrame:
+    """Return a copy with EloHomeStart / EloAwayStart: each team's rating before the first match of the row's season.
+
+    Ratings are run through `matches` in row order exactly as in run_elo, but a
+    row's features are the ratings frozen at the start of its season, so they
+    depend only on results from earlier seasons. Seasons must be contiguous
+    blocks of rows (chronological order). There is no regression towards the
+    mean between seasons; a team without an earlier match starts at
+    `initial_rating`.
+    """
+    seasons = matches["Season"].to_numpy()
+    blocks = [s for i, s in enumerate(seasons) if i == 0 or s != seasons[i - 1]]
+    if len(blocks) != len(set(blocks)):
+        raise ValueError("Seasons must be contiguous blocks of rows in chronological order")
+
+    ratings: dict[str, float] = {}
+    snapshot: dict[str, float] = {}
+    start_home = np.empty(len(matches))
+    start_away = np.empty(len(matches))
+    for i, (season, home, away, hg, ag) in enumerate(
+        zip(seasons, matches["HomeTeam"], matches["AwayTeam"], matches["FTHG"], matches["FTAG"])
+    ):
+        if i == 0 or season != seasons[i - 1]:
+            snapshot = dict(ratings)  # frozen before the season's first match
+        start_home[i] = snapshot.get(home, initial_rating)
+        start_away[i] = snapshot.get(away, initial_rating)
+        rating_home, rating_away = ratings.get(home, initial_rating), ratings.get(away, initial_rating)
+        ratings[home], ratings[away] = update_ratings(rating_home, rating_away, hg, ag, k, home_adv)
+
+    out = matches.copy()
+    out["EloHomeStart"] = start_home
+    out["EloAwayStart"] = start_away
+    return out
+
+
 def home_shift_from_results(results: pd.Series) -> float:
     """Rating gap whose Elo expected score equals the mean home 'actual score' (draw = 0.5)."""
     mean_home = results.map(RESULT_TO_SCORE).mean()
