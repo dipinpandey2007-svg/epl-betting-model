@@ -226,9 +226,16 @@ scored nor fitted.
 - Caveats: 2020-21 includes home-advantage re-learning; the registered
   accumulation pattern was not met; H = 730 was selected on these folds for
   the frozen arm.
-- The result is locked in `[historical_locked]`. The only next step is the
-  pre-registered 2024-25 stage (`--stage validation`): diagnostic only, the
-  fourth exposure of 2024-25, and it cannot select, tune or confirm.
+- The historical result is locked in `[historical_locked]`.
+- 2024-25 stage (H = 730 only, 342 matches): online − frozen −0.0230
+  (clustered SE 0.0046). The registered label is
+  `same_sign_as_historical_distinguishable`: a diagnostic observation only
+  that cannot select, tune or confirm.
+- 2024-25 decomposition: static Poisson − online Elo (+0.1019) = weighting
+  (+0.0438) + Poisson updating (+0.0230) + online TW − online Elo (+0.0351).
+  The remainder is not attributed to a single cause.
+
+2024-25 has now been scored in four pre-registered experiments (10-13).
 
 ---
 

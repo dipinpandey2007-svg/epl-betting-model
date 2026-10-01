@@ -7,7 +7,7 @@ deliberately *not* stubbed out: each will be added when real data and a validati
 |---|---|---|---|
 | 1 | Historical data pipeline | **done** (results only, 2014-24) | `eplmodel.data` |
 | 2 | Elo baseline | **done** (`elo_k25_logreg_v1`) | `eplmodel.models.elo` |
-| 3 | Poisson / Dixon-Coles | **done**: static Poisson and staged DC; time-weighted static Poisson candidate `poisson_time_weighted_v1` (Experiment 12, H* = 730 days locked; 2024-25-specific observation that cannot confirm); online refitted diagnostic arm (Experiment 13, historical stage: in-season refitting helps, diagnostic only; 2024-25 stage pending). Not yet: an adopted dynamic Poisson spec, joint DC MLE | `eplmodel.models.poisson`, `.dixon_coles`, `.scoreline` |
+| 3 | Poisson / Dixon-Coles | **done**: static Poisson and staged DC; time-weighted static Poisson candidate `poisson_time_weighted_v1` (Experiment 12, H* = 730 days locked; 2024-25-specific observation that cannot confirm); online refitted diagnostic arm (Experiment 13: in-season refitting helps historically, same sign in 2024-25; diagnostic only, no spec adopted). Not yet: an adopted dynamic Poisson spec, joint DC MLE | `eplmodel.models.poisson`, `.dixon_coles`, `.scoreline` |
 | 4 | xG and team-performance features | not started | new data source → `eplmodel.data`; features → a future `eplmodel.features` package |
 | 5 | Squad / injury / lineup information | not started | needs a timestamped data source (must be known before kickoff) |
 | 6 | Tactical / contextual features | not started | `eplmodel.features` |
@@ -26,8 +26,8 @@ deliberately *not* stubbed out: each will be added when real data and a validati
 - **Same interface for every model.** A model produces an (n, 3) array of (H, D, A) probabilities for a set of
   fixtures, keyed by `match_id`, so it can be scored by `eplmodel.evaluation.metrics` and compared on the same matches.
 - **Selection on the selection folds only.** New selection work must use `eplmodel.splits.selection_folds`
-  (training folds plus 2024-25). 2024-25 has been scored in three pre-registered runs (Experiments 10, 11 and 12);
-  Experiment 13's pre-registered 2024-25 stage (diagnostic only) is pending. Its results must not be used to tune the
+  (training folds plus 2024-25). 2024-25 has been scored in four pre-registered runs (Experiments 10, 11, 12 and 13);
+  its results must not be used to tune the
   established specifications or to retune the Experiment 12 candidate (its half-life stays 730 days). The development test benchmark may only be re-scored for registered specifications; the
   2025-26 holdout is sealed ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md)).
 - **Each experiment** gets a script in `experiments/`, a results folder, a `RESULTS_LOG.md` entry and, once frozen, a
