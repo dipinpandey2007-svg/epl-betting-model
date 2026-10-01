@@ -67,6 +67,59 @@ def normalise(obj):
     return _jsonable(obj)
 
 
+# Floats are compared with math.isclose at the registered reproduction tolerance (1e-12). The fits behind the
+# snapshot go through BLAS, whose CPU-specific code paths and library versions change results in the last bits
+# (observed: up to ~1e-13); everything that is not a float must match exactly.
+FLOAT_REL_TOL = 1e-12
+FLOAT_ABS_TOL = 1e-12
+
+
+def snapshot_mismatches(actual, expected, rel_tol: float = FLOAT_REL_TOL, abs_tol: float = FLOAT_ABS_TOL,
+                        path: str = "") -> list[str]:
+    """Every difference between two snapshot structures, as 'path: description' strings.
+
+    Structure (dict keys, list lengths), types and every non-float value must be identical; floats must agree
+    within math.isclose(rel_tol, abs_tol). No type is coerced: an int never equals a float, a bool never an int.
+    """
+    where = path or "<root>"
+    if type(actual) is not type(expected):
+        return [f"{where}: type {type(actual).__name__} != {type(expected).__name__} "
+                f"({actual!r:.80} vs {expected!r:.80})"]
+    if isinstance(actual, dict):
+        out = []
+        missing, extra = sorted(set(expected) - set(actual)), sorted(set(actual) - set(expected))
+        if missing:
+            out.append(f"{where}: missing keys {missing}")
+        if extra:
+            out.append(f"{where}: unexpected keys {extra}")
+        for key in expected:
+            if key in actual:
+                out += snapshot_mismatches(actual[key], expected[key], rel_tol, abs_tol, f"{path}/{key}")
+        return out
+    if isinstance(actual, list):
+        if len(actual) != len(expected):
+            return [f"{where}: length {len(actual)} != {len(expected)}"]
+        out = []
+        for i, (a, e) in enumerate(zip(actual, expected)):
+            out += snapshot_mismatches(a, e, rel_tol, abs_tol, f"{path}[{i}]")
+        return out
+    if isinstance(actual, float):
+        if math.isclose(actual, expected, rel_tol=rel_tol, abs_tol=abs_tol):
+            return []
+        return [f"{where}: {actual!r} != {expected!r} (|diff| {abs(actual - expected):.3e})"]
+    return [] if actual == expected else [f"{where}: {actual!r:.80} != {expected!r:.80}"]
+
+
+def assert_snapshot_close(actual, expected, max_reported: int = 5) -> None:
+    """Raise AssertionError listing the number of mismatches and only the first `max_reported` of them."""
+    mismatches = snapshot_mismatches(actual, expected)
+    if mismatches:
+        shown = "\n  ".join(mismatches[:max_reported])
+        more = len(mismatches) - max_reported
+        raise AssertionError(f"{len(mismatches)} snapshot mismatch(es):\n  {shown}"
+                             + (f"\n  ... and {more} more" if more > 0 else ""))
+
+
 def compute_snapshot() -> dict:
     from test_validation import synthetic_league
 

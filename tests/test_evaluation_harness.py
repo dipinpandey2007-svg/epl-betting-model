@@ -24,7 +24,14 @@ from eplmodel.splits import (
     SplitAccessError,
 )
 from experiments import online_tw_poisson_diagnostic, time_weighted_poisson, update_policy_diagnostic
-from recorded_snapshot import SNAPSHOT_FILE, compute_snapshot
+from recorded_snapshot import (
+    FLOAT_ABS_TOL,
+    FLOAT_REL_TOL,
+    SNAPSHOT_FILE,
+    assert_snapshot_close,
+    compute_snapshot,
+    snapshot_mismatches,
+)
 from test_validation import HISTORY, TARGET, _reverse_scores, synthetic_league
 
 
@@ -48,9 +55,97 @@ def _frame(probs, ids=("m1", "m2"), arm="x"):
 # --- Reproduction of the recorded library code (CI gate) -----------------------------------------
 
 def test_recorded_library_outputs_reproduce_the_pre_harness_snapshot():
-    """Experiments 10-13's prediction and scoring functions give exactly the outputs captured before the harness."""
+    """Experiments 10-13's prediction and scoring functions give the outputs captured before the harness.
+
+    Structure and every non-float value must match exactly; floats within the registered tolerance 1e-12,
+    because BLAS code paths differ between CPUs and library versions in the last bits.
+    """
     expected = json.loads(SNAPSHOT_FILE.read_text(encoding="utf-8"))
-    assert compute_snapshot() == expected
+    assert_snapshot_close(compute_snapshot(), expected)
+
+
+# --- The snapshot comparison itself ------------------------------------------------------------------
+
+SAMPLE = {"scores": {"log_loss": 0.9475, "brier": 0.5597, "n": 380}, "labels": ["H", "D", "A"],
+          "converged": True, "rho": -0.04, "unseen": ["Ipswich"], "z": None, "big": 1500.25}
+
+
+def _copy(obj):
+    return json.loads(json.dumps(obj))
+
+
+def test_snapshot_tolerance_is_the_registered_one():
+    assert FLOAT_REL_TOL == FLOAT_ABS_TOL == 1e-12 == reproduction.REGISTERED_TOLERANCE
+
+
+def test_identical_structures_pass_deterministically():
+    for _ in range(3):
+        assert snapshot_mismatches(_copy(SAMPLE), _copy(SAMPLE)) == []
+        assert_snapshot_close(_copy(SAMPLE), SAMPLE)
+
+
+@pytest.mark.parametrize("delta", [1e-13, 5e-13, 9e-13])
+def test_float_differences_below_1e_12_are_accepted(delta):
+    changed = _copy(SAMPLE)
+    changed["scores"]["log_loss"] += delta
+    changed["rho"] -= delta
+    assert snapshot_mismatches(changed, SAMPLE) == []
+
+
+@pytest.mark.parametrize("delta", [2e-12, 1e-9, 1e-4])
+def test_float_differences_above_1e_12_are_rejected(delta):
+    changed = _copy(SAMPLE)
+    changed["scores"]["log_loss"] += delta
+    found = snapshot_mismatches(changed, SAMPLE)
+    assert len(found) == 1 and found[0].startswith("/scores/log_loss:")
+
+
+def test_relative_tolerance_scales_with_large_values_only_up_to_1e_12():
+    changed = _copy(SAMPLE)
+    changed["big"] = 1500.25 * (1 + 5e-13)               # inside rel_tol
+    assert snapshot_mismatches(changed, SAMPLE) == []
+    changed["big"] = 1500.25 * (1 + 1e-10)               # outside
+    assert snapshot_mismatches(changed, SAMPLE)
+
+
+@pytest.mark.parametrize("path,value", [
+    (("scores", "n"), 381),            # integer count
+    (("converged",), False),           # bool
+    (("labels",), ["H", "A", "D"]),    # string order
+    (("unseen",), ["Luton"]),          # team list
+    (("z",), 0.0),                     # None vs float
+    (("scores", "n"), 380.0),          # int vs float: no coercion
+    (("converged",), 1),               # bool vs int: no coercion
+])
+def test_non_float_changes_are_rejected(path, value):
+    changed = _copy(SAMPLE)
+    target = changed
+    for key in path[:-1]:
+        target = target[key]
+    target[path[-1]] = value
+    assert snapshot_mismatches(changed, SAMPLE)
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda s: s.pop("rho"),                               # missing key
+    lambda s: s.update(extra=1),                          # unexpected key
+    lambda s: s["labels"].append("X"),                    # list length
+    lambda s: s.update(scores=[0.9475, 0.5597, 380]),     # dict replaced by list
+])
+def test_structural_changes_are_rejected(mutate):
+    changed = _copy(SAMPLE)
+    mutate(changed)
+    assert snapshot_mismatches(changed, SAMPLE)
+
+
+def test_failure_message_reports_only_the_first_few_mismatches():
+    expected = {"values": [float(i) for i in range(50)]}
+    actual = {"values": [float(i) + 1.0 for i in range(50)]}
+    with pytest.raises(AssertionError) as err:
+        assert_snapshot_close(actual, expected, max_reported=5)
+    message = str(err.value)
+    assert message.startswith("50 snapshot mismatch(es):")
+    assert message.count("/values[") == 5 and "... and 45 more" in message
 
 
 def test_reproduction_is_deterministic(league):
