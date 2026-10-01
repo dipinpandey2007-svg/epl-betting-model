@@ -1,0 +1,4566 @@
+{
+  "experiment": "time_weighted_poisson_development",
+  "results": {
+    "protocol_id": "time_weighted_poisson_v1",
+    "stage": "development",
+    "seasons_loaded": [
+      "1415",
+      "1516",
+      "1617",
+      "1718",
+      "1819",
+      "1920",
+      "2021",
+      "2122"
+    ],
+    "grid": [
+      "183",
+      "274",
+      "365",
+      "548",
+      "730",
+      "1095",
+      "1460",
+      "inf"
+    ],
+    "selection": {
+      "targets": [
+        "1718",
+        "1819",
+        "1920",
+        "2021",
+        "2122"
+      ],
+      "h_min": "274",
+      "h_selected": "730",
+      "h_selected_days": 730.0,
+      "table": [
+        {
+          "half_life_days": "183",
+          "criterion_mean_log_loss": 0.965469244898886,
+          "diff_vs_h_min": 0.001298781909180794,
+          "diff_vs_h_min_clustered_se": 0.0012222230112002598,
+          "within_one_se": false
+        },
+        {
+          "half_life_days": "274",
+          "criterion_mean_log_loss": 0.9643654156593724,
+          "diff_vs_h_min": 0.0,
+          "diff_vs_h_min_clustered_se": 0.0,
+          "within_one_se": true
+        },
+        {
+          "half_life_days": "365",
+          "criterion_mean_log_loss": 0.9644005328207431,
+          "diff_vs_h_min": -7.090780891827616e-05,
+          "diff_vs_h_min_clustered_se": 0.0007261335417787328,
+          "within_one_se": true
+        },
+        {
+          "half_life_days": "548",
+          "criterion_mean_log_loss": 0.965240316593287,
+          "diff_vs_h_min": 0.0006675925736510639,
+          "diff_vs_h_min_clustered_se": 0.0015672983574698107,
+          "within_one_se": true
+        },
+        {
+          "half_life_days": "730",
+          "criterion_mean_log_loss": 0.9661501945279245,
+          "diff_vs_h_min": 0.0015378188270738563,
+          "diff_vs_h_min_clustered_se": 0.0020362054359235574,
+          "within_one_se": true
+        },
+        {
+          "half_life_days": "1095",
+          "criterion_mean_log_loss": 0.9675274586352721,
+          "diff_vs_h_min": 0.0028900197559283583,
+          "diff_vs_h_min_clustered_se": 0.0025424188081556768,
+          "within_one_se": false
+        },
+        {
+          "half_life_days": "1460",
+          "criterion_mean_log_loss": 0.9684199545753976,
+          "diff_vs_h_min": 0.0037774170803447013,
+          "diff_vs_h_min_clustered_se": 0.002807585704223436,
+          "within_one_se": false
+        },
+        {
+          "half_life_days": "inf",
+          "criterion_mean_log_loss": 0.9719677664647947,
+          "diff_vs_h_min": 0.007344558158415169,
+          "diff_vs_h_min_clustered_se": 0.003632041186373166,
+          "within_one_se": false
+        }
+      ],
+      "h_star": "730",
+      "note": "In-sample: H* is selected on the same five targets, so its scores here are optimistically biased."
+    },
+    "nested": {
+      "selected": {
+        "1819": "274",
+        "1920": "183",
+        "2021": "365",
+        "2122": "365"
+      },
+      "selection_tables": {
+        "1819": {
+          "targets": [
+            "1718"
+          ],
+          "h_min": "183",
+          "h_selected": "274",
+          "h_selected_days": 274.0,
+          "table": [
+            {
+              "half_life_days": "183",
+              "criterion_mean_log_loss": 0.9699070567992548,
+              "diff_vs_h_min": 0.0,
+              "diff_vs_h_min_clustered_se": 0.0,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "274",
+              "criterion_mean_log_loss": 0.9720579403888626,
+              "diff_vs_h_min": 0.002150883589607665,
+              "diff_vs_h_min_clustered_se": 0.0024701498580275657,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "365",
+              "criterion_mean_log_loss": 0.973903033815068,
+              "diff_vs_h_min": 0.003995977015813255,
+              "diff_vs_h_min_clustered_se": 0.003881295414983046,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "548",
+              "criterion_mean_log_loss": 0.9764407905465867,
+              "diff_vs_h_min": 0.006533733747331716,
+              "diff_vs_h_min_clustered_se": 0.005391359856721467,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "730",
+              "criterion_mean_log_loss": 0.9779773739117986,
+              "diff_vs_h_min": 0.008070317112543883,
+              "diff_vs_h_min_clustered_se": 0.006164494065220382,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "1095",
+              "criterion_mean_log_loss": 0.9797004692208205,
+              "diff_vs_h_min": 0.009793412421565652,
+              "diff_vs_h_min_clustered_se": 0.006947100440567488,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "1460",
+              "criterion_mean_log_loss": 0.9806265456674825,
+              "diff_vs_h_min": 0.010719488868227756,
+              "diff_vs_h_min_clustered_se": 0.007338725806234272,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "inf",
+              "criterion_mean_log_loss": 0.9836341823879322,
+              "diff_vs_h_min": 0.013727125588677261,
+              "diff_vs_h_min_clustered_se": 0.008503895592747146,
+              "within_one_se": false
+            }
+          ]
+        },
+        "1920": {
+          "targets": [
+            "1718",
+            "1819"
+          ],
+          "h_min": "183",
+          "h_selected": "183",
+          "h_selected_days": 183.0,
+          "table": [
+            {
+              "half_life_days": "183",
+              "criterion_mean_log_loss": 0.9300408907479775,
+              "diff_vs_h_min": 0.0,
+              "diff_vs_h_min_clustered_se": 0.0,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "274",
+              "criterion_mean_log_loss": 0.9319610923537256,
+              "diff_vs_h_min": 0.0019337711342104042,
+              "diff_vs_h_min_clustered_se": 0.0016925539902767422,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "365",
+              "criterion_mean_log_loss": 0.9336505184104384,
+              "diff_vs_h_min": 0.0036323540950111716,
+              "diff_vs_h_min_clustered_se": 0.002698881406377992,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "548",
+              "criterion_mean_log_loss": 0.936063085312441,
+              "diff_vs_h_min": 0.006052285104632112,
+              "diff_vs_h_min_clustered_se": 0.0038226902910173353,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "730",
+              "criterion_mean_log_loss": 0.9375794581135644,
+              "diff_vs_h_min": 0.007569846762466765,
+              "diff_vs_h_min_clustered_se": 0.004418137226545408,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "1095",
+              "criterion_mean_log_loss": 0.9393278622149096,
+              "diff_vs_h_min": 0.009316762111322199,
+              "diff_vs_h_min_clustered_se": 0.005034011839038561,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "1460",
+              "criterion_mean_log_loss": 0.9402869289894635,
+              "diff_vs_h_min": 0.010273888278353223,
+              "diff_vs_h_min_clustered_se": 0.0053467253721792,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "inf",
+              "criterion_mean_log_loss": 0.94348209820474,
+              "diff_vs_h_min": 0.013458026170404615,
+              "diff_vs_h_min_clustered_se": 0.006291806252559416,
+              "within_one_se": false
+            }
+          ]
+        },
+        "2021": {
+          "targets": [
+            "1718",
+            "1819",
+            "1920"
+          ],
+          "h_min": "274",
+          "h_selected": "365",
+          "h_selected_days": 365.0,
+          "table": [
+            {
+              "half_life_days": "183",
+              "criterion_mean_log_loss": 0.943759474602055,
+              "diff_vs_h_min": 0.00030657481740607246,
+              "diff_vs_h_min_clustered_se": 0.0015209145117848625,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "274",
+              "criterion_mean_log_loss": 0.9436753121758801,
+              "diff_vs_h_min": 0.0,
+              "diff_vs_h_min_clustered_se": 0.0,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "365",
+              "criterion_mean_log_loss": 0.9443500998202449,
+              "diff_vs_h_min": 0.0005636365779016476,
+              "diff_vs_h_min_clustered_se": 0.0009104674820321114,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "548",
+              "criterion_mean_log_loss": 0.9458537726716779,
+              "diff_vs_h_min": 0.0019672156085120567,
+              "diff_vs_h_min_clustered_se": 0.0019367339189251306,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "730",
+              "criterion_mean_log_loss": 0.9470163119852248,
+              "diff_vs_h_min": 0.0030897340628154445,
+              "diff_vs_h_min_clustered_se": 0.0024856347289418895,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "1095",
+              "criterion_mean_log_loss": 0.9485145240403791,
+              "diff_vs_h_min": 0.004558184318148627,
+              "diff_vs_h_min_clustered_se": 0.003057607774337822,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "1460",
+              "criterion_mean_log_loss": 0.9493970917407256,
+              "diff_vs_h_min": 0.005430718786957981,
+              "diff_vs_h_min_clustered_se": 0.003349757890464599,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "inf",
+              "criterion_mean_log_loss": 0.9525888550732268,
+              "diff_vs_h_min": 0.008615159153808633,
+              "diff_vs_h_min_clustered_se": 0.004239922401334599,
+              "within_one_se": false
+            }
+          ]
+        },
+        "2122": {
+          "targets": [
+            "1718",
+            "1819",
+            "1920",
+            "2021"
+          ],
+          "h_min": "274",
+          "h_selected": "365",
+          "h_selected_days": 365.0,
+          "table": [
+            {
+              "half_life_days": "183",
+              "criterion_mean_log_loss": 0.9669895435221678,
+              "diff_vs_h_min": 0.00015794271351099982,
+              "diff_vs_h_min_clustered_se": 0.0013185308007776046,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "274",
+              "criterion_mean_log_loss": 0.9669868932870123,
+              "diff_vs_h_min": 0.0,
+              "diff_vs_h_min_clustered_se": 0.0,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "365",
+              "criterion_mean_log_loss": 0.9678008678701656,
+              "diff_vs_h_min": 0.0007446361000831779,
+              "diff_vs_h_min_clustered_se": 0.0007618600366800651,
+              "within_one_se": true
+            },
+            {
+              "half_life_days": "548",
+              "criterion_mean_log_loss": 0.969469748926894,
+              "diff_vs_h_min": 0.0023544250447707364,
+              "diff_vs_h_min_clustered_se": 0.001637940896231523,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "730",
+              "criterion_mean_log_loss": 0.97072131357966,
+              "diff_vs_h_min": 0.003584291991873633,
+              "diff_vs_h_min_clustered_se": 0.0021265652723482863,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "1095",
+              "criterion_mean_log_loss": 0.9723079253707558,
+              "diff_vs_h_min": 0.005156632401174181,
+              "diff_vs_h_min_clustered_se": 0.0026535211436646733,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "1460",
+              "criterion_mean_log_loss": 0.9732295394123822,
+              "diff_vs_h_min": 0.006074211846256606,
+              "diff_vs_h_min_clustered_se": 0.0029287432083231345,
+              "within_one_se": false
+            },
+            {
+              "half_life_days": "inf",
+              "criterion_mean_log_loss": 0.9764798708674848,
+              "diff_vs_h_min": 0.009324124198821416,
+              "diff_vs_h_min_clustered_se": 0.003781196876556163,
+              "within_one_se": false
+            }
+          ]
+        }
+      },
+      "outer_differences": {
+        "1819": {
+          "log_loss": {
+            "n_matches": 272,
+            "mean": -0.011465769702959405,
+            "sd": 0.12105330758514808,
+            "naive_se": 0.0073399349044698395,
+            "clustered_se": 0.007469165869312942,
+            "n_clusters": 98
+          },
+          "brier": {
+            "n_matches": 272,
+            "mean": -0.008712699665662973,
+            "sd": 0.08387601108108064,
+            "naive_se": 0.005085730193276071,
+            "clustered_se": 0.005141418334145431,
+            "n_clusters": 98
+          }
+        },
+        "1920": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": 0.0003942735000102654,
+            "sd": 0.19622798525958113,
+            "naive_se": 0.010610794211478525,
+            "clustered_se": 0.010676965410836304,
+            "n_clusters": 110
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": -0.00035542408544122676,
+            "sd": 0.12595926968419047,
+            "naive_se": 0.006811097244254117,
+            "clustered_se": 0.00686847273770176,
+            "n_clusters": 110
+          }
+        },
+        "2021": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": -0.009999746230331076,
+            "sd": 0.12687925410797138,
+            "naive_se": 0.006860844304468753,
+            "clustered_se": 0.007114044756367863,
+            "n_clusters": 128
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": -0.007443742560706061,
+            "sd": 0.07810912125548543,
+            "naive_se": 0.0042236575511132995,
+            "clustered_se": 0.004271918162709657,
+            "n_clusters": 128
+          }
+        },
+        "2122": {
+          "log_loss": {
+            "n_matches": 342,
+            "mean": -0.003120156230980084,
+            "sd": 0.15265520465306795,
+            "naive_se": 0.00825464808060936,
+            "clustered_se": 0.008184531963393783,
+            "n_clusters": 119
+          },
+          "brier": {
+            "n_matches": 342,
+            "mean": -0.0010544942460840921,
+            "sd": 0.10533515564787514,
+            "naive_se": 0.005695872881409458,
+            "clustered_se": 0.005619499575606865,
+            "n_clusters": 119
+          }
+        }
+      }
+    },
+    "leave_one_target_out": {
+      "1718": "730",
+      "1819": "730",
+      "1920": "548",
+      "2021": "730",
+      "2122": "365"
+    },
+    "criterion_d": {
+      "pooled": {
+        "log_loss": {
+          "n_matches": 1298,
+          "mean": -0.005755665996895118,
+          "sd": 0.15351939978956808,
+          "naive_se": 0.004261141121908984,
+          "clustered_se": 0.004288368659788148,
+          "n_clusters": 455
+        },
+        "brier": {
+          "n_matches": 1298,
+          "mean": -0.004158556497845501,
+          "sd": 0.10087643159381561,
+          "naive_se": 0.002799963467060502,
+          "clustered_se": 0.0027990118714499674,
+          "n_clusters": 455
+        }
+      },
+      "n_negative_folds": 3,
+      "n_folds": 4,
+      "checks": {
+        "below_floor": true,
+        "beyond_se_multiple": false,
+        "enough_negative_folds": true,
+        "brier_same_sign": true
+      },
+      "met": false
+    },
+    "reading": "validation_not_yet_scored",
+    "folds": [
+      {
+        "target": "1718",
+        "history": "1415..1617",
+        "n_history_seasons": 3,
+        "fitted": {
+          "target": "1718",
+          "history": [
+            "1415",
+            "1516",
+            "1617"
+          ],
+          "unseen_teams": [
+            "Brighton",
+            "Huddersfield"
+          ],
+          "returning_teams": [
+            "Newcastle"
+          ],
+          "n_full": 380,
+          "n_common": 306,
+          "arms": {
+            "poisson_tw_h183": {
+              "half_life_days": "183",
+              "glm_converged": true,
+              "is_home_coef": 0.2755484318345479,
+              "attack_sd": 0.31570118050111873,
+              "defence_sd": 0.2602067056094485,
+              "spearman_net_strength_vs_static": 0.9765217391304346,
+              "n_history_matches": 1140,
+              "sum_of_weights": 313.6649799658427,
+              "kish_ess": 555.9890777768361,
+              "last_season_weight_share": 0.7654792856030012,
+              "team_kish_ess_min": 34.6521643744992,
+              "team_kish_ess_median": 55.28200378588773,
+              "team_kish_ess": {
+                "Arsenal": 55.06149602491803,
+                "Aston Villa": 51.56077416628404,
+                "Bournemouth": 50.78686265421126,
+                "Burnley": 39.10740675039607,
+                "Chelsea": 55.52511518137242,
+                "Crystal Palace": 55.601778602718845,
+                "Everton": 56.0231278905943,
+                "Hull": 39.10436155863086,
+                "Leicester": 55.394760465436,
+                "Liverpool": 56.00818077775221,
+                "Man City": 55.41845866707605,
+                "Man United": 55.18692770264913,
+                "Middlesbrough": 34.6521643744992,
+                "Newcastle": 51.352390273445415,
+                "Norwich": 34.72788630717141,
+                "QPR": 34.79165901194737,
+                "Southampton": 54.98678366911685,
+                "Stoke": 55.85272240015477,
+                "Sunderland": 55.51329828451502,
+                "Swansea": 55.83303545425684,
+                "Tottenham": 55.377079869126334,
+                "Watford": 50.54356240977599,
+                "West Brom": 55.71462140603554,
+                "West Ham": 55.93389163464865
+              }
+            },
+            "poisson_tw_h274": {
+              "half_life_days": "274",
+              "glm_converged": true,
+              "is_home_coef": 0.2733821171825903,
+              "attack_sd": 0.30038672787479404,
+              "defence_sd": 0.24168678693714868,
+              "spearman_net_strength_vs_static": 0.9765217391304346,
+              "n_history_matches": 1140,
+              "sum_of_weights": 427.906110992345,
+              "kish_ess": 740.2970947114436,
+              "last_season_weight_share": 0.6465112191351204,
+              "team_kish_ess_min": 36.40554498484337,
+              "team_kish_ess_median": 73.78850690893498,
+              "team_kish_ess": {
+                "Arsenal": 73.63862698168388,
+                "Aston Villa": 61.788745153981075,
+                "Bournemouth": 61.153887323322465,
+                "Burnley": 47.66312982724347,
+                "Chelsea": 73.99855788777933,
+                "Crystal Palace": 74.02506788952704,
+                "Everton": 74.33024056868334,
+                "Hull": 47.66966554069378,
+                "Leicester": 73.91111840561751,
+                "Liverpool": 74.32320490003958,
+                "Man City": 73.89215110976632,
+                "Man United": 73.70276991021721,
+                "Middlesbrough": 36.40554498484337,
+                "Newcastle": 61.655474099949835,
+                "Norwich": 36.44776285673539,
+                "QPR": 36.48612462595537,
+                "Southampton": 73.5640766597465,
+                "Stoke": 74.2107173641807,
+                "Sunderland": 73.97954043425959,
+                "Swansea": 74.19822524207687,
+                "Tottenham": 73.87424390765273,
+                "Watford": 61.014605393987566,
+                "West Brom": 74.12493978000151,
+                "West Ham": 74.2615734295144
+              }
+            },
+            "poisson_tw_h365": {
+              "half_life_days": "365",
+              "glm_converged": true,
+              "is_home_coef": 0.2714712129507704,
+              "attack_sd": 0.2930074100618151,
+              "defence_sd": 0.23123412814096259,
+              "spearman_net_strength_vs_static": 0.9843478260869565,
+              "n_history_matches": 1140,
+              "sum_of_weights": 519.5066855073098,
+              "kish_ess": 862.3341089137504,
+              "last_season_weight_share": 0.5740031992927322,
+              "team_kish_ess_min": 37.07885625586417,
+              "team_kish_ess_median": 86.06079308613712,
+              "team_kish_ess": {
+                "Arsenal": 85.96011945899876,
+                "Aston Villa": 67.02693195860274,
+                "Bournemouth": 66.56314499925766,
+                "Burnley": 54.55308674097633,
+                "Chelsea": 86.2209281813366,
+                "Crystal Palace": 86.22862014434524,
+                "Everton": 86.43414332954215,
+                "Hull": 54.562466455089194,
+                "Leicester": 86.16813640427816,
+                "Liverpool": 86.42888883496884,
+                "Man City": 86.132811378038,
+                "Man United": 85.9918851265176,
+                "Middlesbrough": 37.07885625586417,
+                "Newcastle": 66.94054341310178,
+                "Norwich": 37.104420184448436,
+                "QPR": 37.129003606761984,
+                "Southampton": 85.90361448580855,
+                "Stoke": 86.36319245985882,
+                "Sunderland": 86.2001811145922,
+                "Swansea": 86.3546975140011,
+                "Tottenham": 86.12970104575666,
+                "Watford": 66.47614533206604,
+                "West Brom": 86.30256621582758,
+                "West Ham": 86.38904338627503
+              }
+            },
+            "poisson_tw_h548": {
+              "half_life_days": "548",
+              "glm_converged": true,
+              "is_home_coef": 0.26919390089680884,
+              "attack_sd": 0.2862440000245201,
+              "defence_sd": 0.2204203833347794,
+              "spearman_net_strength_vs_static": 0.988695652173913,
+              "n_history_matches": 1140,
+              "sum_of_weights": 651.5646742643945,
+              "kish_ess": 992.1254075216075,
+              "last_season_weight_share": 0.49487826355049835,
+              "team_kish_ess_min": 37.583493228492074,
+              "team_kish_ess_median": 99.11865858153871,
+              "team_kish_ess": {
+                "Arsenal": 99.07156394605332,
+                "Aston Villa": 71.64106731868786,
+                "Bournemouth": 71.38768782994973,
+                "Burnley": 63.3791165408597,
+                "Chelsea": 99.21126594512448,
+                "Crystal Palace": 99.209545914753,
+                "Everton": 99.30741004901684,
+                "Hull": 63.38752849059099,
+                "Leicester": 99.19146094803628,
+                "Liverpool": 99.30351818264725,
+                "Man City": 99.15727716275559,
+                "Man United": 99.08004000032183,
+                "Middlesbrough": 37.583493228492074,
+                "Newcastle": 71.59892170818016,
+                "Norwich": 37.59538232949902,
+                "QPR": 37.60760054637631,
+                "Southampton": 99.04246861341701,
+                "Stoke": 99.28348981064849,
+                "Sunderland": 99.19492111372966,
+                "Swansea": 99.27883854366782,
+                "Tottenham": 99.16346682799487,
+                "Watford": 71.34603206970722,
+                "West Brom": 99.24897074377623,
+                "West Ham": 99.28814618150813
+              }
+            },
+            "poisson_tw_h730": {
+              "half_life_days": "730",
+              "glm_converged": true,
+              "is_home_coef": 0.26799773922785475,
+              "attack_sd": 0.28324611914123055,
+              "defence_sd": 0.2151229902944879,
+              "spearman_net_strength_vs_static": 0.9895652173913043,
+              "n_history_matches": 1140,
+              "sum_of_weights": 738.7286869165401,
+              "kish_ess": 1050.4582291188954,
+              "last_season_weight_share": 0.4542573257503326,
+              "team_kish_ess_min": 37.76360618982456,
+              "team_kish_ess_median": 104.98923526872738,
+              "team_kish_ess": {
+                "Arsenal": 104.96358580239388,
+                "Aston Villa": 73.45956131585162,
+                "Bournemouth": 73.30514396991981,
+                "Burnley": 67.9784599116722,
+                "Chelsea": 105.04656878934006,
+                "Crystal Palace": 105.04398877957914,
+                "Everton": 105.09752165506907,
+                "Hull": 67.98465241823797,
+                "Leicester": 105.03802199041291,
+                "Liverpool": 105.09460782072571,
+                "Man City": 105.01237015163171,
+                "Man United": 104.96610038582307,
+                "Middlesbrough": 37.76360618982456,
+                "Newcastle": 73.43519879386486,
+                "Norwich": 37.770402926332956,
+                "QPR": 37.77764442479025,
+                "Southampton": 104.94744663669586,
+                "Stoke": 105.08896932635538,
+                "Sunderland": 105.03497799540607,
+                "Swansea": 105.08603398486989,
+                "Tottenham": 105.01904870671378,
+                "Watford": 73.28108887219649,
+                "West Brom": 105.06713094579905,
+                "West Ham": 105.08817053950307
+              }
+            },
+            "poisson_tw_h1095": {
+              "half_life_days": "1095",
+              "glm_converged": true,
+              "is_home_coef": 0.266795310797351,
+              "attack_sd": 0.28053975700556244,
+              "defence_sd": 0.20998790589711003,
+              "spearman_net_strength_vs_static": 0.994782608695652,
+              "n_history_matches": 1140,
+              "sum_of_weights": 845.6285564718121,
+              "kish_ess": 1097.9799515418983,
+              "last_season_weight_share": 0.41333582236967653,
+              "team_kish_ess_min": 37.89435063241021,
+              "team_kish_ess_median": 109.77204631468973,
+              "team_kish_ess": {
+                "Arsenal": 109.76149767504693,
+                "Aston Villa": 74.84252518530873,
+                "Bournemouth": 74.76971618325746,
+                "Burnley": 72.07560919254601,
+                "Chelsea": 109.798945736667,
+                "Crystal Palace": 109.79716422573192,
+                "Everton": 109.8189111815538,
+                "Hull": 72.0789636563335,
+                "Leicester": 109.79678207041667,
+                "Liverpool": 109.81721934878547,
+                "Man City": 109.78254530773826,
+                "Man United": 109.7615473216412,
+                "Middlesbrough": 37.89435063241021,
+                "Newcastle": 74.83160227404026,
+                "Norwich": 37.89739697679901,
+                "QPR": 37.90076858260689,
+                "Southampton": 109.75504479883334,
+                "Stoke": 109.81812316656055,
+                "Sunderland": 109.79276810231123,
+                "Swansea": 109.81665931627226,
+                "Tottenham": 109.78715079974243,
+                "Watford": 74.75887547677809,
+                "West Brom": 109.80741982282638,
+                "West Ham": 109.81586207042075
+              }
+            },
+            "poisson_tw_h1460": {
+              "half_life_days": "1460",
+              "glm_converged": true,
+              "is_home_coef": 0.2662027532451309,
+              "attack_sd": 0.27931121042517526,
+              "defence_sd": 0.20752112568184197,
+              "spearman_net_strength_vs_static": 0.997391304347826,
+              "n_history_matches": 1140,
+              "sum_of_weights": 907.9357630194584,
+              "kish_ess": 1115.9000108829657,
+              "last_season_weight_share": 0.39299676306660447,
+              "team_kish_ess_min": 37.94044326317416,
+              "team_kish_ess_median": 111.57553556228986,
+              "team_kish_ess": {
+                "Arsenal": 111.56979882354024,
+                "Aston Villa": 75.34314989822303,
+                "Bournemouth": 75.3012943760038,
+                "Burnley": 73.71195031599383,
+                "Chelsea": 111.5906811217402,
+                "Crystal Palace": 111.58954163637814,
+                "Everton": 111.60092392060571,
+                "Hull": 73.71396918343605,
+                "Leicester": 111.589998576473,
+                "Liverpool": 111.59985078173888,
+                "Man City": 111.58127230103948,
+                "Man United": 111.56954576694532,
+                "Middlesbrough": 37.94044326317416,
+                "Newcastle": 75.33702015574146,
+                "Norwich": 37.942160243164984,
+                "QPR": 37.944098333448714,
+                "Southampton": 111.56650852611362,
+                "Stoke": 111.60145530549728,
+                "Sunderland": 111.58695456268063,
+                "Swansea": 111.60058437117232,
+                "Tottenham": 111.58433609966714,
+                "Watford": 75.29518034921632,
+                "West Brom": 111.59519580495275,
+                "West Ham": 111.5996006684875
+              }
+            },
+            "poisson": {
+              "half_life_days": "inf",
+              "glm_converged": true,
+              "is_home_coef": 0.2645003389453753,
+              "attack_sd": 0.27615941168527286,
+              "defence_sd": 0.2006769232740328,
+              "spearman_net_strength_vs_static": 0.9999999999999999,
+              "n_history_matches": 1140,
+              "sum_of_weights": 1140.0,
+              "kish_ess": 1140.0,
+              "last_season_weight_share": 0.3333333333333333,
+              "team_kish_ess_min": 38.0,
+              "team_kish_ess_median": 114.0,
+              "team_kish_ess": {
+                "Arsenal": 114.0,
+                "Aston Villa": 76.0,
+                "Bournemouth": 76.0,
+                "Burnley": 76.0,
+                "Chelsea": 114.0,
+                "Crystal Palace": 114.0,
+                "Everton": 114.0,
+                "Hull": 76.0,
+                "Leicester": 114.0,
+                "Liverpool": 114.0,
+                "Man City": 114.0,
+                "Man United": 114.0,
+                "Middlesbrough": 38.0,
+                "Newcastle": 76.0,
+                "Norwich": 38.0,
+                "QPR": 38.0,
+                "Southampton": 114.0,
+                "Stoke": 114.0,
+                "Sunderland": 114.0,
+                "Swansea": 114.0,
+                "Tottenham": 114.0,
+                "Watford": 76.0,
+                "West Brom": 114.0,
+                "West Ham": 114.0
+              }
+            }
+          },
+          "reproduction_max_abs_diff": 9.71445146547012e-17
+        },
+        "scores": {
+          "183": {
+            "log_loss": 0.9699070567992548,
+            "brier": 0.5761169668027613
+          },
+          "274": {
+            "log_loss": 0.9720579403888626,
+            "brier": 0.5775525632985787
+          },
+          "365": {
+            "log_loss": 0.973903033815068,
+            "brier": 0.5787028087849831
+          },
+          "548": {
+            "log_loss": 0.9764407905465867,
+            "brier": 0.5802631930561787
+          },
+          "730": {
+            "log_loss": 0.9779773739117986,
+            "brier": 0.5812075733485967
+          },
+          "1095": {
+            "log_loss": 0.9797004692208205,
+            "brier": 0.5822695888478547
+          },
+          "1460": {
+            "log_loss": 0.9806265456674825,
+            "brier": 0.5828420577630667
+          },
+          "inf": {
+            "log_loss": 0.9836341823879322,
+            "brier": 0.5847100418563154
+          }
+        },
+        "paired_vs_static": {
+          "183": {
+            "log_loss": {
+              "n_matches": 306,
+              "mean": -0.013727125588677261,
+              "sd": 0.1490014761265207,
+              "naive_se": 0.008517847446614537,
+              "clustered_se": 0.008503895592747146,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 306,
+              "mean": -0.00859307505355408,
+              "sd": 0.10288147477620176,
+              "naive_se": 0.005881342453831104,
+              "clustered_se": 0.005789380005865968,
+              "n_clusters": 98
+            }
+          },
+          "274": {
+            "log_loss": {
+              "n_matches": 306,
+              "mean": -0.011576241999069599,
+              "sd": 0.1071570764505203,
+              "naive_se": 0.006125762333090629,
+              "clustered_se": 0.006127146473041514,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 306,
+              "mean": -0.00715747855773667,
+              "sd": 0.07519420092745162,
+              "naive_se": 0.004298566356659826,
+              "clustered_se": 0.00423709369817584,
+              "n_clusters": 98
+            }
+          },
+          "365": {
+            "log_loss": {
+              "n_matches": 306,
+              "mean": -0.009731148572864008,
+              "sd": 0.08273449863101708,
+              "naive_se": 0.004729616485898088,
+              "clustered_se": 0.004736728204597426,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 306,
+              "mean": -0.006007233071332258,
+              "sd": 0.05850985870493218,
+              "naive_se": 0.0033447859949279914,
+              "clustered_se": 0.003299008907228158,
+              "n_clusters": 98
+            }
+          },
+          "548": {
+            "log_loss": {
+              "n_matches": 306,
+              "mean": -0.0071933918413455466,
+              "sd": 0.056230855500024005,
+              "naive_se": 0.003214504053202326,
+              "clustered_se": 0.003222079461398485,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 306,
+              "mean": -0.004446848800136655,
+              "sd": 0.040032332852287314,
+              "naive_se": 0.002288496148040417,
+              "clustered_se": 0.00225724744808381,
+              "n_clusters": 98
+            }
+          },
+          "730": {
+            "log_loss": {
+              "n_matches": 306,
+              "mean": -0.005656808476133381,
+              "sd": 0.04249298662198602,
+              "naive_se": 0.0024291623613833862,
+              "clustered_se": 0.0024350727383881166,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 306,
+              "mean": -0.003502468507718729,
+              "sd": 0.03033213376801229,
+              "naive_se": 0.0017339726751891412,
+              "clustered_se": 0.0017097187537552813,
+              "n_clusters": 98
+            }
+          },
+          "1095": {
+            "log_loss": {
+              "n_matches": 306,
+              "mean": -0.003933713167111612,
+              "sd": 0.028448408701861053,
+              "naive_se": 0.001626287280641669,
+              "clustered_se": 0.0016298415034209836,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 306,
+              "mean": -0.0024404530084606575,
+              "sd": 0.02034983455036435,
+              "naive_se": 0.0011633226110905428,
+              "clustered_se": 0.0011463263535661482,
+              "n_clusters": 98
+            }
+          },
+          "1460": {
+            "log_loss": {
+              "n_matches": 306,
+              "mean": -0.003007636720449508,
+              "sd": 0.021361016276220432,
+              "naive_se": 0.0012211280228593023,
+              "clustered_se": 0.0012234758314643801,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 306,
+              "mean": -0.0018679840932486127,
+              "sd": 0.015292833877984503,
+              "naive_se": 0.0008742331242979231,
+              "clustered_se": 0.000861085761729147,
+              "n_clusters": 98
+            }
+          },
+          "inf": {
+            "log_loss": {
+              "n_matches": 306,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 306,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 98
+            }
+          }
+        },
+        "sharpness_and_calibration": {
+          "183": {
+            "mean_predicted": {
+              "H": 0.4614929901932827,
+              "D": 0.22755376819084894,
+              "A": 0.3109532416158683
+            },
+            "observed": {
+              "H": 0.45098039215686275,
+              "D": 0.25163398692810457,
+              "A": 0.2973856209150327
+            },
+            "mean_entropy_nats": 0.9588804394933433
+          },
+          "274": {
+            "mean_predicted": {
+              "H": 0.4603098317978077,
+              "D": 0.2305224708510987,
+              "A": 0.30916769735109373
+            },
+            "observed": {
+              "H": 0.45098039215686275,
+              "D": 0.25163398692810457,
+              "A": 0.2973856209150327
+            },
+            "mean_entropy_nats": 0.9703796254284492
+          },
+          "365": {
+            "mean_predicted": {
+              "H": 0.4592748331041584,
+              "D": 0.23236583167646338,
+              "A": 0.3083593352193782
+            },
+            "observed": {
+              "H": 0.45098039215686275,
+              "D": 0.25163398692810457,
+              "A": 0.2973856209150327
+            },
+            "mean_entropy_nats": 0.9767077229476732
+          },
+          "548": {
+            "mean_predicted": {
+              "H": 0.4580060754690682,
+              "D": 0.2343461599266631,
+              "A": 0.3076477646042688
+            },
+            "observed": {
+              "H": 0.45098039215686275,
+              "D": 0.25163398692810457,
+              "A": 0.2973856209150327
+            },
+            "mean_entropy_nats": 0.9829808789364733
+          },
+          "730": {
+            "mean_predicted": {
+              "H": 0.4573209074870278,
+              "D": 0.23533608574477785,
+              "A": 0.30734300676819437
+            },
+            "observed": {
+              "H": 0.45098039215686275,
+              "D": 0.25163398692810457,
+              "A": 0.2973856209150327
+            },
+            "mean_entropy_nats": 0.9859219282901376
+          },
+          "1095": {
+            "mean_predicted": {
+              "H": 0.45661761024791025,
+              "D": 0.23630687533570782,
+              "A": 0.3070755144163819
+            },
+            "observed": {
+              "H": 0.45098039215686275,
+              "D": 0.25163398692810457,
+              "A": 0.2973856209150327
+            },
+            "mean_entropy_nats": 0.9886752000565079
+          },
+          "1460": {
+            "mean_predicted": {
+              "H": 0.4562652942759746,
+              "D": 0.23677741839801708,
+              "A": 0.3069572873260082
+            },
+            "observed": {
+              "H": 0.45098039215686275,
+              "D": 0.25163398692810457,
+              "A": 0.2973856209150327
+            },
+            "mean_entropy_nats": 0.9899601210121991
+          },
+          "inf": {
+            "mean_predicted": {
+              "H": 0.4552302984059334,
+              "D": 0.2381011172420663,
+              "A": 0.3066685843520003
+            },
+            "observed": {
+              "H": 0.45098039215686275,
+              "D": 0.25163398692810457,
+              "A": 0.2973856209150327
+            },
+            "mean_entropy_nats": 0.9933793829536868
+          }
+        },
+        "returning_vs_continuous_log_loss_vs_static": {
+          "183": {
+            "returning": {
+              "n_matches": 34,
+              "mean": -0.037552218103576736,
+              "sd": 0.12898376260632763,
+              "naive_se": 0.022120532793342425,
+              "clustered_se": 0.022120532793342428,
+              "n_clusters": 34
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.010748989024314828,
+              "sd": 0.15126419743372443,
+              "naive_se": 0.009171739167551908,
+              "clustered_se": 0.008881952644814506,
+              "n_clusters": 94
+            }
+          },
+          "274": {
+            "returning": {
+              "n_matches": 34,
+              "mean": -0.02875928693892588,
+              "sd": 0.08500581120141822,
+              "naive_se": 0.014578376349934453,
+              "clustered_se": 0.014578376349934455,
+              "n_clusters": 34
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.009428361381587565,
+              "sd": 0.10955215310462418,
+              "naive_se": 0.006642574981826518,
+              "clustered_se": 0.006485571242780002,
+              "n_clusters": 94
+            }
+          },
+          "365": {
+            "returning": {
+              "n_matches": 34,
+              "mean": -0.022862815624458716,
+              "sd": 0.06279662056829442,
+              "naive_se": 0.010769531579193463,
+              "clustered_se": 0.010769531579193463,
+              "n_clusters": 34
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.00808969019141467,
+              "sd": 0.08484836911924619,
+              "naive_se": 0.005144688059412467,
+              "clustered_se": 0.005043026985366254,
+              "n_clusters": 94
+            }
+          },
+          "548": {
+            "returning": {
+              "n_matches": 34,
+              "mean": -0.01594627445397713,
+              "sd": 0.040875424439390906,
+              "naive_se": 0.007010077458455067,
+              "clustered_se": 0.007010077458455068,
+              "n_clusters": 34
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.006099281514766599,
+              "sd": 0.057830245999067074,
+              "naive_se": 0.0035064737148471567,
+              "clustered_se": 0.0034485757593433184,
+              "n_clusters": 94
+            }
+          },
+          "730": {
+            "returning": {
+              "n_matches": 34,
+              "mean": -0.01218334660930575,
+              "sd": 0.030265906825673494,
+              "naive_se": 0.005190560198658004,
+              "clustered_se": 0.005190560198658004,
+              "n_clusters": 34
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.004840991209486835,
+              "sd": 0.04375655264896943,
+              "naive_se": 0.002653130711538253,
+              "clustered_se": 0.002612547081668783,
+              "n_clusters": 94
+            }
+          },
+          "1095": {
+            "returning": {
+              "n_matches": 34,
+              "mean": -0.00823379563357055,
+              "sd": 0.019876330419340688,
+              "naive_se": 0.0034087625447419374,
+              "clustered_se": 0.0034087625447419374,
+              "n_clusters": 34
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.0033962028588042457,
+              "sd": 0.02932799731602869,
+              "naive_se": 0.0017782710400267286,
+              "clustered_se": 0.0017526240050214136,
+              "n_clusters": 94
+            }
+          },
+          "1460": {
+            "returning": {
+              "n_matches": 34,
+              "mean": -0.00620758266924454,
+              "sd": 0.014790182321978674,
+              "naive_se": 0.0025364953422190883,
+              "clustered_se": 0.0025364953422190887,
+              "n_clusters": 34
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.0026076434768501295,
+              "sd": 0.02203309904840344,
+              "naive_se": 0.0013359528622979904,
+              "clustered_se": 0.0013170758074607701,
+              "n_clusters": 94
+            }
+          },
+          "inf": {
+            "returning": {
+              "n_matches": 34,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 34
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 94
+            }
+          }
+        }
+      },
+      {
+        "target": "1819",
+        "history": "1415..1718",
+        "n_history_seasons": 4,
+        "fitted": {
+          "target": "1819",
+          "history": [
+            "1415",
+            "1516",
+            "1617",
+            "1718"
+          ],
+          "unseen_teams": [
+            "Cardiff",
+            "Fulham",
+            "Wolves"
+          ],
+          "returning_teams": [],
+          "n_full": 380,
+          "n_common": 272,
+          "arms": {
+            "poisson_tw_h183": {
+              "half_life_days": "183",
+              "glm_converged": true,
+              "is_home_coef": 0.29908845118241517,
+              "attack_sd": 0.3487162368858199,
+              "defence_sd": 0.2515767843351727,
+              "spearman_net_strength_vs_static": 0.8974358974358974,
+              "n_history_matches": 1520,
+              "sum_of_weights": 319.5327278503536,
+              "kish_ess": 584.0918835034871,
+              "last_season_weight_share": 0.7460808539154731,
+              "team_kish_ess_min": 34.65216437449921,
+              "team_kish_ess_median": 58.13531796932104,
+              "team_kish_ess": {
+                "Arsenal": 58.37591376180293,
+                "Aston Villa": 51.56077416628406,
+                "Bournemouth": 57.1648498857363,
+                "Brighton": 34.82865476606437,
+                "Burnley": 53.13755986622734,
+                "Chelsea": 58.30581964044836,
+                "Crystal Palace": 58.64368845664455,
+                "Everton": 58.61866064885099,
+                "Huddersfield": 34.895293420485935,
+                "Hull": 39.10436155863085,
+                "Leicester": 58.29701376680792,
+                "Liverpool": 58.647839313217034,
+                "Man City": 58.27193734809925,
+                "Man United": 58.42056409907749,
+                "Middlesbrough": 34.65216437449921,
+                "Newcastle": 40.40168653520021,
+                "Norwich": 34.72788630717143,
+                "QPR": 34.79165901194735,
+                "Southampton": 58.42484469460479,
+                "Stoke": 58.5081239188023,
+                "Sunderland": 55.51329828451501,
+                "Swansea": 58.14386645109003,
+                "Tottenham": 58.28592783848356,
+                "Watford": 57.28038379018635,
+                "West Brom": 58.61181831962854,
+                "West Ham": 58.12676948755205
+              }
+            },
+            "poisson_tw_h274": {
+              "half_life_days": "274",
+              "glm_converged": true,
+              "is_home_coef": 0.2902948582308773,
+              "attack_sd": 0.33377634416094437,
+              "defence_sd": 0.23774166252101908,
+              "spearman_net_strength_vs_static": 0.9302564102564103,
+              "n_history_matches": 1520,
+              "sum_of_weights": 449.0362995037945,
+              "kish_ess": 811.341668647192,
+              "last_season_weight_share": 0.6137672249613811,
+              "team_kish_ess_min": 36.40554498484337,
+              "team_kish_ess_median": 80.9371595240441,
+              "team_kish_ess": {
+                "Arsenal": 81.09391843820845,
+                "Aston Villa": 61.78874515398106,
+                "Bournemouth": 75.2401458461833,
+                "Brighton": 36.515980425223326,
+                "Burnley": 67.4813915925854,
+                "Chelsea": 81.08001531873032,
+                "Crystal Palace": 81.2960752177311,
+                "Everton": 81.31918213169662,
+                "Huddersfield": 36.54982708336731,
+                "Hull": 47.669665540693785,
+                "Leicester": 81.05071440958007,
+                "Liverpool": 81.35908234165407,
+                "Man City": 81.0253864408033,
+                "Man United": 81.13637892008049,
+                "Middlesbrough": 36.40554498484337,
+                "Newcastle": 52.97996895920922,
+                "Norwich": 36.447762856735395,
+                "QPR": 36.4861246259554,
+                "Southampton": 81.10525020637047,
+                "Stoke": 81.19569104784387,
+                "Sunderland": 73.97954043425956,
+                "Swansea": 80.93232184789476,
+                "Tottenham": 81.020265784022,
+                "Watford": 75.34431773514983,
+                "West Brom": 81.27906417100004,
+                "West Ham": 80.94199720019346
+              }
+            },
+            "poisson_tw_h365": {
+              "half_life_days": "365",
+              "glm_converged": true,
+              "is_home_coef": 0.2854686184851956,
+              "attack_sd": 0.32506128794955685,
+              "defence_sd": 0.22827481744571843,
+              "spearman_net_strength_vs_static": 0.9514529914529914,
+              "n_history_matches": 1520,
+              "sum_of_weights": 561.2040145444508,
+              "kish_ess": 987.9889412526043,
+              "last_season_weight_share": 0.5300644567558007,
+              "team_kish_ess_min": 37.078856255864146,
+              "team_kish_ess_median": 98.66417782808031,
+              "team_kish_ess": {
+                "Arsenal": 98.74641685872317,
+                "Aston Villa": 67.02693195860273,
+                "Bournemouth": 87.067770305091,
+                "Brighton": 37.14976357871367,
+                "Burnley": 77.90390074338349,
+                "Chelsea": 98.77104856877737,
+                "Crystal Palace": 98.91311347277079,
+                "Everton": 98.95754702636344,
+                "Huddersfield": 37.169665831940364,
+                "Hull": 54.562466455089165,
+                "Leicester": 98.73838710838558,
+                "Liverpool": 98.99524946830027,
+                "Man City": 98.70851402877231,
+                "Man United": 98.78009383293623,
+                "Middlesbrough": 37.078856255864146,
+                "Newcastle": 65.3021401362384,
+                "Norwich": 37.10442018444844,
+                "QPR": 37.12900360676198,
+                "Southampton": 98.73942573896527,
+                "Stoke": 98.8484885777982,
+                "Sunderland": 86.20018111459218,
+                "Swansea": 98.6562632016772,
+                "Tottenham": 98.70012930851705,
+                "Watford": 87.14412706115496,
+                "West Brom": 98.90829318740526,
+                "West Ham": 98.67209245448342
+              }
+            },
+            "poisson_tw_h548": {
+              "half_life_days": "548",
+              "glm_converged": true,
+              "is_home_coef": 0.2803974975454546,
+              "attack_sd": 0.31572427935215497,
+              "defence_sd": 0.21722802605516248,
+              "spearman_net_strength_vs_static": 0.9637606837606837,
+              "n_history_matches": 1520,
+              "sum_of_weights": 736.8233859800146,
+              "kish_ess": 1209.0530380884402,
+              "last_season_weight_share": 0.43703010458442887,
+              "team_kish_ess_min": 37.583493228492074,
+              "team_kish_ess_median": 120.83720762803173,
+              "team_kish_ess": {
+                "Arsenal": 120.85373414431768,
+                "Aston Villa": 71.64106731868786,
+                "Bournemouth": 99.61281560335325,
+                "Brighton": 37.618526950435026,
+                "Burnley": 91.37984780562358,
+                "Chelsea": 120.8987252855288,
+                "Crystal Palace": 120.96576631830494,
+                "Everton": 121.00964233508583,
+                "Huddersfield": 37.6276034719336,
+                "Hull": 63.38752849059097,
+                "Leicester": 120.87526154810982,
+                "Liverpool": 121.03516354488302,
+                "Man City": 120.84429177249386,
+                "Man United": 120.8719841821987,
+                "Middlesbrough": 37.583493228492074,
+                "Newcastle": 83.81998580210477,
+                "Norwich": 37.59538232949901,
+                "QPR": 37.60760054637631,
+                "Southampton": 120.83926561986404,
+                "Stoke": 120.94162730339919,
+                "Sunderland": 99.19492111372966,
+                "Swansea": 120.83514963619942,
+                "Tottenham": 120.83990670346842,
+                "Watford": 99.651709745361,
+                "West Brom": 120.97017773283066,
+                "West Ham": 120.84664548392308
+              }
+            },
+            "poisson_tw_h730": {
+              "half_life_days": "730",
+              "glm_converged": true,
+              "is_home_coef": 0.27785109357234866,
+              "attack_sd": 0.31102249225702266,
+              "defence_sd": 0.21140244686400206,
+              "spearman_net_strength_vs_static": 0.9788034188034187,
+              "n_history_matches": 1520,
+              "sum_of_weights": 861.6153379345112,
+              "kish_ess": 1322.8362080884594,
+              "last_season_weight_share": 0.38912056666116135,
+              "team_kish_ess_min": 37.76360618982456,
+              "team_kish_ess_median": 132.23600132458955,
+              "team_kish_ess": {
+                "Arsenal": 132.24315337898227,
+                "Aston Villa": 73.45956131585162,
+                "Bournemouth": 105.26289501482348,
+                "Brighton": 37.784262074874974,
+                "Burnley": 98.90017873181613,
+                "Chelsea": 132.28292064971555,
+                "Crystal Palace": 132.31913128541825,
+                "Everton": 132.35163438306435,
+                "Huddersfield": 37.78941864324884,
+                "Hull": 67.98465241823803,
+                "Leicester": 132.26800752121056,
+                "Liverpool": 132.36814440572678,
+                "Man City": 132.24206351243828,
+                "Man United": 132.25333335954005,
+                "Middlesbrough": 37.76360618982456,
+                "Newcastle": 94.53164845308662,
+                "Norwich": 37.77040292633295,
+                "QPR": 37.777644424790246,
+                "Southampton": 132.23116126978806,
+                "Stoke": 132.31026040901335,
+                "Sunderland": 105.03497799540611,
+                "Swansea": 132.24593556429545,
+                "Tottenham": 132.24084137939107,
+                "Watford": 105.2846497706357,
+                "West Brom": 132.32461067450163,
+                "West Ham": 132.25249775417993
+              }
+            },
+            "poisson_tw_h1095": {
+              "half_life_days": "1095",
+              "glm_converged": true,
+              "is_home_coef": 0.27532728617084806,
+              "attack_sd": 0.3063853334505476,
+              "defence_sd": 0.20554113135965918,
+              "spearman_net_strength_vs_static": 0.9856410256410256,
+              "n_history_matches": 1520,
+              "sum_of_weights": 1023.9288314185627,
+              "kish_ess": 1423.6827972544038,
+              "last_season_weight_share": 0.3411814139924939,
+              "team_kish_ess_min": 37.89435063241021,
+              "team_kish_ess_median": 142.3414510733698,
+              "team_kish_ess": {
+                "Arsenal": 142.3448179298686,
+                "Aston Villa": 74.8425251853087,
+                "Bournemouth": 109.88399326067021,
+                "Brighton": 37.90390599610792,
+                "Burnley": 106.15750967873825,
+                "Chelsea": 142.36963102397482,
+                "Crystal Palace": 142.38388768201781,
+                "Everton": 142.40113974134985,
+                "Huddersfield": 37.906207999302936,
+                "Hull": 72.07896365633343,
+                "Leicester": 142.3630360305316,
+                "Liverpool": 142.4089411634267,
+                "Man City": 142.34676368198924,
+                "Man United": 142.34878277685755,
+                "Middlesbrough": 37.89435063241021,
+                "Newcastle": 104.48689874045417,
+                "Norwich": 37.897396976799016,
+                "QPR": 37.9007685826069,
+                "Southampton": 142.33808421687098,
+                "Stoke": 142.38332350779243,
+                "Sunderland": 109.79276810231123,
+                "Swansea": 142.35409262756443,
+                "Tottenham": 142.34751504423087,
+                "Watford": 109.89289561435174,
+                "West Brom": 142.38785172124008,
+                "West Ham": 142.35628534824747
+              }
+            },
+            "poisson_tw_h1460": {
+              "half_life_days": "1460",
+              "glm_converged": true,
+              "is_home_coef": 0.27409130090916556,
+              "attack_sd": 0.3041308638072517,
+              "defence_sd": 0.2026644146177714,
+              "spearman_net_strength_vs_static": 0.9856410256410256,
+              "n_history_matches": 1520,
+              "sum_of_weights": 1123.07078943161,
+              "kish_ess": 1463.8643749055523,
+              "last_season_weight_share": 0.3175985013265371,
+              "team_kish_ess_min": 37.94044326317415,
+              "team_kish_ess_median": 146.3698081865507,
+              "team_kish_ess": {
+                "Arsenal": 146.37181447720252,
+                "Aston Villa": 75.34314989822303,
+                "Bournemouth": 111.63400074218221,
+                "Brighton": 37.945916023892764,
+                "Burnley": 109.27733867298389,
+                "Chelsea": 146.38768062068536,
+                "Crystal Palace": 146.39495073754298,
+                "Everton": 146.4051177070779,
+                "Huddersfield": 37.947211985887456,
+                "Hull": 73.71396918343602,
+                "Leicester": 146.38421556891103,
+                "Liverpool": 146.40947635623598,
+                "Man City": 146.37364116880312,
+                "Man United": 146.37377608619283,
+                "Middlesbrough": 37.94044326317415,
+                "Newcastle": 108.50049266277033,
+                "Norwich": 37.94216024316498,
+                "QPR": 37.94409833344872,
+                "Southampton": 146.36780189589885,
+                "Stoke": 146.3958064666611,
+                "Sunderland": 111.58695456268063,
+                "Swansea": 146.37955756433533,
+                "Tottenham": 146.3745976942272,
+                "Watford": 111.63863232902149,
+                "West Brom": 146.39759707218323,
+                "West Ham": 146.3803898078714
+              }
+            },
+            "poisson": {
+              "half_life_days": "inf",
+              "glm_converged": true,
+              "is_home_coef": 0.27055836637319175,
+              "attack_sd": 0.2977899511949998,
+              "defence_sd": 0.19454949201041635,
+              "spearman_net_strength_vs_static": 0.9999999999999999,
+              "n_history_matches": 1520,
+              "sum_of_weights": 1520.0,
+              "kish_ess": 1520.0,
+              "last_season_weight_share": 0.25,
+              "team_kish_ess_min": 38.0,
+              "team_kish_ess_median": 152.0,
+              "team_kish_ess": {
+                "Arsenal": 152.0,
+                "Aston Villa": 76.0,
+                "Bournemouth": 114.0,
+                "Brighton": 38.0,
+                "Burnley": 114.0,
+                "Chelsea": 152.0,
+                "Crystal Palace": 152.0,
+                "Everton": 152.0,
+                "Huddersfield": 38.0,
+                "Hull": 76.0,
+                "Leicester": 152.0,
+                "Liverpool": 152.0,
+                "Man City": 152.0,
+                "Man United": 152.0,
+                "Middlesbrough": 38.0,
+                "Newcastle": 114.0,
+                "Norwich": 38.0,
+                "QPR": 38.0,
+                "Southampton": 152.0,
+                "Stoke": 152.0,
+                "Sunderland": 114.0,
+                "Swansea": 152.0,
+                "Tottenham": 152.0,
+                "Watford": 114.0,
+                "West Brom": 152.0,
+                "West Ham": 152.0
+              }
+            }
+          },
+          "reproduction_max_abs_diff": 9.71445146547012e-17
+        },
+        "scores": {
+          "183": {
+            "log_loss": 0.8901747246967001,
+            "brier": 0.5207115442679529
+          },
+          "274": {
+            "log_loss": 0.8918642443185886,
+            "brier": 0.5216170066107663
+          },
+          "365": {
+            "log_loss": 0.893398003005809,
+            "brier": 0.5226407335449076
+          },
+          "548": {
+            "log_loss": 0.8956853800782953,
+            "brier": 0.5243164219355343
+          },
+          "730": {
+            "log_loss": 0.8971815423153302,
+            "brier": 0.5254625053414013
+          },
+          "1095": {
+            "log_loss": 0.8989552552089987,
+            "brier": 0.5268488856187311
+          },
+          "1460": {
+            "log_loss": 0.8999473123114444,
+            "brier": 0.5276327210300406
+          },
+          "inf": {
+            "log_loss": 0.903330014021548,
+            "brier": 0.5303297062764292
+          }
+        },
+        "paired_vs_static": {
+          "183": {
+            "log_loss": {
+              "n_matches": 272,
+              "mean": -0.01315528932484789,
+              "sd": 0.1528157793600269,
+              "naive_se": 0.00926581764062462,
+              "clustered_se": 0.009381920620377031,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 272,
+              "mean": -0.009618162008476335,
+              "sd": 0.1057167857241443,
+              "naive_se": 0.006410021675609355,
+              "clustered_se": 0.006417240582463876,
+              "n_clusters": 98
+            }
+          },
+          "274": {
+            "log_loss": {
+              "n_matches": 272,
+              "mean": -0.011465769702959405,
+              "sd": 0.12105330758514808,
+              "naive_se": 0.0073399349044698395,
+              "clustered_se": 0.007469165869312942,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 272,
+              "mean": -0.008712699665662973,
+              "sd": 0.08387601108108064,
+              "naive_se": 0.005085730193276071,
+              "clustered_se": 0.005141418334145431,
+              "n_clusters": 98
+            }
+          },
+          "365": {
+            "log_loss": {
+              "n_matches": 272,
+              "mean": -0.009932011015739059,
+              "sd": 0.09843613359495444,
+              "naive_se": 0.005968567296903062,
+              "clustered_se": 0.006082813270697505,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 272,
+              "mean": -0.007688972731521644,
+              "sd": 0.06836751450268469,
+              "naive_se": 0.004145389465522298,
+              "clustered_se": 0.004210630457616088,
+              "n_clusters": 98
+            }
+          },
+          "548": {
+            "log_loss": {
+              "n_matches": 272,
+              "mean": -0.007644633943252832,
+              "sd": 0.07021541428892226,
+              "naive_se": 0.004257434847937207,
+              "clustered_se": 0.004341362752328012,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 272,
+              "mean": -0.006013284340894939,
+              "sd": 0.048948452776726104,
+              "naive_se": 0.0029679358971911735,
+              "clustered_se": 0.003026522613957374,
+              "n_clusters": 98
+            }
+          },
+          "730": {
+            "log_loss": {
+              "n_matches": 272,
+              "mean": -0.006148471706217886,
+              "sd": 0.05418696306224901,
+              "naive_se": 0.0032855672387808125,
+              "clustered_se": 0.0033497847774852643,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 272,
+              "mean": -0.004867200935027877,
+              "sd": 0.037861650433210214,
+              "naive_se": 0.0022956997631814464,
+              "clustered_se": 0.0023443690740213574,
+              "n_clusters": 98
+            }
+          },
+          "1095": {
+            "log_loss": {
+              "n_matches": 272,
+              "mean": -0.004374758812549578,
+              "sd": 0.03694662640810169,
+              "naive_se": 0.002240218282218207,
+              "clustered_se": 0.0022828180496078433,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 272,
+              "mean": -0.0034808206576981138,
+              "sd": 0.025881013631381664,
+              "naive_se": 0.0015692669544152514,
+              "clustered_se": 0.0016040818366650574,
+              "n_clusters": 98
+            }
+          },
+          "1460": {
+            "log_loss": {
+              "n_matches": 272,
+              "mean": -0.003382701710103516,
+              "sd": 0.02796337439943291,
+              "naive_se": 0.0016955286220228633,
+              "clustered_se": 0.0017270659788607013,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 272,
+              "mean": -0.002696985246388645,
+              "sd": 0.01961428259101367,
+              "naive_se": 0.0011892905719626912,
+              "clustered_se": 0.0012160132778453,
+              "n_clusters": 98
+            }
+          },
+          "inf": {
+            "log_loss": {
+              "n_matches": 272,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 98
+            },
+            "brier": {
+              "n_matches": 272,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 98
+            }
+          }
+        },
+        "sharpness_and_calibration": {
+          "183": {
+            "mean_predicted": {
+              "H": 0.46461294858299496,
+              "D": 0.22839576726946642,
+              "A": 0.3069912841475387
+            },
+            "observed": {
+              "H": 0.46691176470588236,
+              "D": 0.19852941176470587,
+              "A": 0.33455882352941174
+            },
+            "mean_entropy_nats": 0.9430704798998903
+          },
+          "274": {
+            "mean_predicted": {
+              "H": 0.4622509147419453,
+              "D": 0.22969452220467348,
+              "A": 0.30805456305338125
+            },
+            "observed": {
+              "H": 0.46691176470588236,
+              "D": 0.19852941176470587,
+              "A": 0.33455882352941174
+            },
+            "mean_entropy_nats": 0.9499051865088742
+          },
+          "365": {
+            "mean_predicted": {
+              "H": 0.46088918772066995,
+              "D": 0.2307643372144525,
+              "A": 0.30834647506487756
+            },
+            "observed": {
+              "H": 0.46691176470588236,
+              "D": 0.19852941176470587,
+              "A": 0.33455882352941174
+            },
+            "mean_entropy_nats": 0.955058191803499
+          },
+          "548": {
+            "mean_predicted": {
+              "H": 0.45938698973702496,
+              "D": 0.23211166297951744,
+              "A": 0.3085013472834576
+            },
+            "observed": {
+              "H": 0.46691176470588236,
+              "D": 0.19852941176470587,
+              "A": 0.33455882352941174
+            },
+            "mean_entropy_nats": 0.9612160271504431
+          },
+          "730": {
+            "mean_predicted": {
+              "H": 0.4585972646463497,
+              "D": 0.23285804267750598,
+              "A": 0.3085446926761443
+            },
+            "observed": {
+              "H": 0.46691176470588236,
+              "D": 0.19852941176470587,
+              "A": 0.33455882352941174
+            },
+            "mean_entropy_nats": 0.9644765836514475
+          },
+          "1095": {
+            "mean_predicted": {
+              "H": 0.4577866073969783,
+              "D": 0.2336341661908391,
+              "A": 0.3085792264121826
+            },
+            "observed": {
+              "H": 0.46691176470588236,
+              "D": 0.19852941176470587,
+              "A": 0.33455882352941174
+            },
+            "mean_entropy_nats": 0.9677476817025633
+          },
+          "1460": {
+            "mean_predicted": {
+              "H": 0.4573784249929268,
+              "D": 0.23402496540634787,
+              "A": 0.3085966096007253
+            },
+            "observed": {
+              "H": 0.46691176470588236,
+              "D": 0.19852941176470587,
+              "A": 0.33455882352941174
+            },
+            "mean_entropy_nats": 0.9693460271685594
+          },
+          "inf": {
+            "mean_predicted": {
+              "H": 0.4561669162807873,
+              "D": 0.23516795211653196,
+              "A": 0.3086651316026806
+            },
+            "observed": {
+              "H": 0.46691176470588236,
+              "D": 0.19852941176470587,
+              "A": 0.33455882352941174
+            },
+            "mean_entropy_nats": 0.9738138584436961
+          }
+        },
+        "returning_vs_continuous_log_loss_vs_static": {
+          "183": {
+            "returning": {
+              "n_matches": 0,
+              "mean": NaN,
+              "sd": NaN,
+              "naive_se": NaN,
+              "clustered_se": NaN,
+              "n_clusters": 0
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.01315528932484789,
+              "sd": 0.1528157793600269,
+              "naive_se": 0.00926581764062462,
+              "clustered_se": 0.009381920620377031,
+              "n_clusters": 98
+            }
+          },
+          "274": {
+            "returning": {
+              "n_matches": 0,
+              "mean": NaN,
+              "sd": NaN,
+              "naive_se": NaN,
+              "clustered_se": NaN,
+              "n_clusters": 0
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.011465769702959405,
+              "sd": 0.12105330758514808,
+              "naive_se": 0.0073399349044698395,
+              "clustered_se": 0.007469165869312942,
+              "n_clusters": 98
+            }
+          },
+          "365": {
+            "returning": {
+              "n_matches": 0,
+              "mean": NaN,
+              "sd": NaN,
+              "naive_se": NaN,
+              "clustered_se": NaN,
+              "n_clusters": 0
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.009932011015739059,
+              "sd": 0.09843613359495444,
+              "naive_se": 0.005968567296903062,
+              "clustered_se": 0.006082813270697505,
+              "n_clusters": 98
+            }
+          },
+          "548": {
+            "returning": {
+              "n_matches": 0,
+              "mean": NaN,
+              "sd": NaN,
+              "naive_se": NaN,
+              "clustered_se": NaN,
+              "n_clusters": 0
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.007644633943252832,
+              "sd": 0.07021541428892226,
+              "naive_se": 0.004257434847937207,
+              "clustered_se": 0.004341362752328012,
+              "n_clusters": 98
+            }
+          },
+          "730": {
+            "returning": {
+              "n_matches": 0,
+              "mean": NaN,
+              "sd": NaN,
+              "naive_se": NaN,
+              "clustered_se": NaN,
+              "n_clusters": 0
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.006148471706217886,
+              "sd": 0.05418696306224901,
+              "naive_se": 0.0032855672387808125,
+              "clustered_se": 0.0033497847774852643,
+              "n_clusters": 98
+            }
+          },
+          "1095": {
+            "returning": {
+              "n_matches": 0,
+              "mean": NaN,
+              "sd": NaN,
+              "naive_se": NaN,
+              "clustered_se": NaN,
+              "n_clusters": 0
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.004374758812549578,
+              "sd": 0.03694662640810169,
+              "naive_se": 0.002240218282218207,
+              "clustered_se": 0.0022828180496078433,
+              "n_clusters": 98
+            }
+          },
+          "1460": {
+            "returning": {
+              "n_matches": 0,
+              "mean": NaN,
+              "sd": NaN,
+              "naive_se": NaN,
+              "clustered_se": NaN,
+              "n_clusters": 0
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.003382701710103516,
+              "sd": 0.02796337439943291,
+              "naive_se": 0.0016955286220228633,
+              "clustered_se": 0.0017270659788607013,
+              "n_clusters": 98
+            }
+          },
+          "inf": {
+            "returning": {
+              "n_matches": 0,
+              "mean": NaN,
+              "sd": NaN,
+              "naive_se": NaN,
+              "clustered_se": NaN,
+              "n_clusters": 0
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 98
+            }
+          }
+        }
+      },
+      {
+        "target": "1920",
+        "history": "1415..1819",
+        "n_history_seasons": 5,
+        "fitted": {
+          "target": "1920",
+          "history": [
+            "1415",
+            "1516",
+            "1617",
+            "1718",
+            "1819"
+          ],
+          "unseen_teams": [
+            "Sheffield United"
+          ],
+          "returning_teams": [
+            "Aston Villa",
+            "Norwich"
+          ],
+          "n_full": 380,
+          "n_common": 342,
+          "arms": {
+            "poisson_tw_h183": {
+              "half_life_days": "183",
+              "glm_converged": true,
+              "is_home_coef": 0.25020644406069,
+              "attack_sd": 0.33306119870928547,
+              "defence_sd": 0.2748170188574715,
+              "spearman_net_strength_vs_static": 0.9610837438423644,
+              "n_history_matches": 1900,
+              "sum_of_weights": 320.20124979993096,
+              "kish_ess": 583.6752639067336,
+              "last_season_weight_share": 0.748624887331293,
+              "team_kish_ess_min": 34.65216437449921,
+              "team_kish_ess_median": 58.04914285311917,
+              "team_kish_ess": {
+                "Arsenal": 58.3177512293398,
+                "Aston Villa": 51.56077416628402,
+                "Bournemouth": 58.04914285311917,
+                "Brighton": 51.094913420816624,
+                "Burnley": 57.10066311902456,
+                "Cardiff": 34.89451032741273,
+                "Chelsea": 58.30700000330178,
+                "Crystal Palace": 58.33473480991471,
+                "Everton": 58.49230097305023,
+                "Fulham": 34.98116827907332,
+                "Huddersfield": 51.46468751218571,
+                "Hull": 39.10436155863086,
+                "Leicester": 58.523443991856745,
+                "Liverpool": 58.424088526625034,
+                "Man City": 58.363041995915026,
+                "Man United": 58.33877942443393,
+                "Middlesbrough": 34.65216437449921,
+                "Newcastle": 53.18455873399776,
+                "Norwich": 34.72788630717142,
+                "QPR": 34.79165901194736,
+                "Southampton": 58.3533169408883,
+                "Stoke": 58.50812391880229,
+                "Sunderland": 55.513298284515024,
+                "Swansea": 58.14386645109005,
+                "Tottenham": 58.32593016061119,
+                "Watford": 57.85659026145279,
+                "West Brom": 58.61181831962856,
+                "West Ham": 58.52212685780233,
+                "Wolves": 34.87708523275734
+              }
+            },
+            "poisson_tw_h274": {
+              "half_life_days": "274",
+              "glm_converged": true,
+              "is_home_coef": 0.25400529701306857,
+              "attack_sd": 0.3241814955757747,
+              "defence_sd": 0.25318938894780396,
+              "spearman_net_strength_vs_static": 0.9704433497536943,
+              "n_history_matches": 1900,
+              "sum_of_weights": 455.42298129573004,
+              "kish_ess": 833.6704973657899,
+              "last_season_weight_share": 0.6073929925245747,
+              "team_kish_ess_min": 36.40554498484336,
+              "team_kish_ess_median": 80.86753018798339,
+              "team_kish_ess": {
+                "Arsenal": 83.3640525301897,
+                "Aston Villa": 61.788745153981075,
+                "Bournemouth": 80.86753018798339,
+                "Brighton": 61.42157059345114,
+                "Burnley": 77.42558127574533,
+                "Cardiff": 36.533903661352106,
+                "Chelsea": 83.31309495779536,
+                "Crystal Palace": 83.33698551504347,
+                "Everton": 83.49003886521041,
+                "Fulham": 36.575520005222614,
+                "Huddersfield": 61.64728796892632,
+                "Hull": 47.66966554069374,
+                "Leicester": 83.49607235893367,
+                "Liverpool": 83.429124534981,
+                "Man City": 83.38760939073443,
+                "Man United": 83.37962904517617,
+                "Middlesbrough": 36.40554498484336,
+                "Newcastle": 69.470604131638,
+                "Norwich": 36.44776285673539,
+                "QPR": 36.48612462595537,
+                "Southampton": 83.37449662157918,
+                "Stoke": 81.19569104784387,
+                "Sunderland": 73.9795404342596,
+                "Swansea": 80.93232184789476,
+                "Tottenham": 83.32686722202048,
+                "Watford": 80.76816690495139,
+                "West Brom": 81.27906417100006,
+                "West Ham": 83.46751766412703,
+                "Wolves": 36.524969002689005
+              }
+            },
+            "poisson_tw_h365": {
+              "half_life_days": "365",
+              "glm_converged": true,
+              "is_home_coef": 0.2562797750442489,
+              "attack_sd": 0.31899621802970585,
+              "defence_sd": 0.2402882666736625,
+              "spearman_net_strength_vs_static": 0.9807881773399012,
+              "n_history_matches": 1900,
+              "sum_of_weights": 579.4295634881128,
+              "kish_ess": 1051.0388696529883,
+              "last_season_weight_share": 0.5148066238671927,
+              "team_kish_ess_min": 37.07885625586417,
+              "team_kish_ess_median": 98.65281058613738,
+              "team_kish_ess": {
+                "Arsenal": 105.1086853048805,
+                "Aston Villa": 67.02693195860276,
+                "Bournemouth": 98.65281058613738,
+                "Brighton": 66.76465857068287,
+                "Burnley": 93.09872917117377,
+                "Cardiff": 37.15602605163059,
+                "Chelsea": 105.06276868985765,
+                "Crystal Palace": 105.08396280631048,
+                "Everton": 105.22639753529863,
+                "Fulham": 37.17986944201179,
+                "Huddersfield": 66.9080453448589,
+                "Hull": 54.56246645508917,
+                "Leicester": 105.20469467934097,
+                "Liverpool": 105.18136249455006,
+                "Man City": 105.12134039334946,
+                "Man United": 105.12281074302302,
+                "Middlesbrough": 37.07885625586417,
+                "Newcastle": 83.53434561325223,
+                "Norwich": 37.10442018444843,
+                "QPR": 37.12900360676198,
+                "Southampton": 105.10398181133226,
+                "Stoke": 98.84848857779822,
+                "Sunderland": 86.2001811145922,
+                "Swansea": 98.65626320167725,
+                "Tottenham": 105.05913817763498,
+                "Watford": 98.6051798237931,
+                "West Brom": 98.90829318740529,
+                "West Ham": 105.16890545243244,
+                "Wolves": 37.15070335528298
+              }
+            },
+            "poisson_tw_h548": {
+              "half_life_days": "548",
+              "glm_converged": true,
+              "is_home_coef": 0.2584827432056757,
+              "attack_sd": 0.31297131234506925,
+              "defence_sd": 0.22682063741634237,
+              "spearman_net_strength_vs_static": 0.9817733990147782,
+              "n_history_matches": 1900,
+              "sum_of_weights": 787.552708070038,
+              "kish_ess": 1361.8971669453294,
+              "last_season_weight_share": 0.4096228481339851,
+              "team_kish_ess_min": 37.58349322849209,
+              "team_kish_ess_median": 120.85890295705302,
+              "team_kish_ess": {
+                "Arsenal": 136.1860406926079,
+                "Aston Villa": 71.64106731868785,
+                "Bournemouth": 120.86767804895644,
+                "Brighton": 71.5015054620298,
+                "Burnley": 114.01473741158622,
+                "Cardiff": 37.61948440799984,
+                "Chelsea": 136.16889864298875,
+                "Crystal Palace": 136.18291149189747,
+                "Everton": 136.2928365090554,
+                "Fulham": 37.630083987687854,
+                "Huddersfield": 71.57018843244539,
+                "Hull": 63.387528490591,
+                "Leicester": 136.25082936054054,
+                "Liverpool": 136.27063542840665,
+                "Man City": 136.19282885775385,
+                "Man United": 136.1964901038528,
+                "Middlesbrough": 37.58349322849209,
+                "Newcastle": 105.45819631975775,
+                "Norwich": 37.595382329499,
+                "QPR": 37.607600546376325,
+                "Southampton": 136.17044724801792,
+                "Stoke": 120.9416273033992,
+                "Sunderland": 99.19492111372968,
+                "Swansea": 120.83514963619936,
+                "Tottenham": 136.14635480554637,
+                "Watford": 120.85890295705302,
+                "West Brom": 120.9701777328307,
+                "West Ham": 136.2203350057405,
+                "Wolves": 37.617013514256364
+              }
+            },
+            "poisson_tw_h730": {
+              "half_life_days": "730",
+              "glm_converged": true,
+              "is_home_coef": 0.25941849692866464,
+              "attack_sd": 0.30964178622735994,
+              "defence_sd": 0.22041078083728222,
+              "spearman_net_strength_vs_static": 0.9857142857142855,
+              "n_history_matches": 1900,
+              "sum_of_weights": 945.559858054148,
+              "kish_ess": 1543.040779246886,
+              "last_season_weight_share": 0.35505635666409513,
+              "team_kish_ess_min": 37.76360618982458,
+              "team_kish_ess_median": 132.2738506102911,
+              "team_kish_ess": {
+                "Arsenal": 154.2948469974216,
+                "Aston Villa": 73.4595613158516,
+                "Bournemouth": 132.2738506102911,
+                "Brighton": 73.37577980798524,
+                "Burnley": 126.09541773791231,
+                "Cardiff": 37.784280245706256,
+                "Chelsea": 154.29360066041397,
+                "Crystal Palace": 154.30224675158127,
+                "Everton": 154.3821032594296,
+                "Fulham": 37.79022617291448,
+                "Huddersfield": 73.41515059391747,
+                "Hull": 67.98465241823797,
+                "Leicester": 154.3434753998787,
+                "Liverpool": 154.37059787268626,
+                "Man City": 154.3003798714432,
+                "Man United": 154.3018962384235,
+                "Middlesbrough": 37.76360618982458,
+                "Newcastle": 119.70934315527857,
+                "Norwich": 37.77040292633297,
+                "QPR": 37.77764442479025,
+                "Southampton": 154.27951130868564,
+                "Stoke": 132.31026040901347,
+                "Sunderland": 105.03497799540608,
+                "Swansea": 132.24593556429548,
+                "Tottenham": 154.26910546126376,
+                "Watford": 132.27424283610696,
+                "West Brom": 132.3246106745016,
+                "West Ham": 154.3210503041039,
+                "Wolves": 37.78286190340315
+              }
+            },
+            "poisson_tw_h1095": {
+              "half_life_days": "1095",
+              "glm_converged": true,
+              "is_home_coef": 0.26017950031647524,
+              "attack_sd": 0.30611304838740383,
+              "defence_sd": 0.21448869552670824,
+              "spearman_net_strength_vs_static": 0.991133004926108,
+              "n_history_matches": 1900,
+              "sum_of_weights": 1162.8665070721208,
+              "kish_ess": 1718.120540244819,
+              "last_season_weight_share": 0.3006871781104786,
+              "team_kish_ess_min": 37.89435063241022,
+              "team_kish_ess_median": 142.36782299340882,
+              "team_kish_ess": {
+                "Arsenal": 171.80214871058553,
+                "Aston Villa": 74.84252518530873,
+                "Bournemouth": 142.36782299340882,
+                "Brighton": 74.80367926586966,
+                "Burnley": 138.1841171616774,
+                "Cardiff": 37.90368121255368,
+                "Chelsea": 171.80901925161945,
+                "Crystal Palace": 171.81260921915919,
+                "Everton": 171.85589704515095,
+                "Fulham": 37.906301772803815,
+                "Huddersfield": 74.8211917224447,
+                "Hull": 72.07896365633349,
+                "Leicester": 171.83157538918945,
+                "Liverpool": 171.85191949107917,
+                "Man City": 171.80612615437963,
+                "Man United": 171.80546625684147,
+                "Middlesbrough": 37.89435063241022,
+                "Newcastle": 134.7772049757016,
+                "Norwich": 37.89739697679904,
+                "QPR": 37.900768582606894,
+                "Southampton": 171.7919582246579,
+                "Stoke": 142.38332350779237,
+                "Sunderland": 109.79276810231124,
+                "Swansea": 142.35409262756443,
+                "Tottenham": 171.7912749561504,
+                "Watford": 142.37047502600123,
+                "West Brom": 142.38785172124014,
+                "West Ham": 171.81918177183366,
+                "Wolves": 37.90304086551839
+              }
+            },
+            "poisson_tw_h1460": {
+              "half_life_days": "1460",
+              "glm_converged": true,
+              "is_home_coef": 0.26047968394113447,
+              "attack_sd": 0.30429996258496805,
+              "defence_sd": 0.2117926757738833,
+              "spearman_net_strength_vs_static": 0.9940886699507386,
+              "n_history_matches": 1900,
+              "sum_of_weights": 1301.7593759532701,
+              "kish_ess": 1792.1419341653211,
+              "last_season_weight_share": 0.2741863972425055,
+              "team_kish_ess_min": 37.94044326317416,
+              "team_kish_ess_median": 146.38650730168348,
+              "team_kish_ess": {
+                "Arsenal": 179.20647847387465,
+                "Aston Villa": 75.34314989822306,
+                "Bournemouth": 146.38650730168348,
+                "Brighton": 75.32102135269831,
+                "Burnley": 143.55945275973352,
+                "Cardiff": 37.945724441108965,
+                "Chelsea": 179.21317599410693,
+                "Crystal Palace": 179.21494873153028,
+                "Everton": 179.24093288437246,
+                "Fulham": 37.947190224145956,
+                "Huddersfield": 75.33081212285116,
+                "Hull": 73.713969183436,
+                "Leicester": 179.2256290343855,
+                "Liverpool": 179.2391317488105,
+                "Man City": 179.20930736607698,
+                "Man United": 179.2082683840786,
+                "Middlesbrough": 37.94044326317416,
+                "Newcastle": 141.58059156284642,
+                "Norwich": 37.94216024316497,
+                "QPR": 37.94409833344869,
+                "Southampton": 179.19989494775908,
+                "Stoke": 146.39580646666116,
+                "Sunderland": 111.58695456268063,
+                "Swansea": 146.3795575643353,
+                "Tottenham": 179.20120445624136,
+                "Watford": 146.3885915652608,
+                "West Brom": 146.39759707218323,
+                "West Ham": 179.21802406468322,
+                "Wolves": 37.945361797240345
+              }
+            },
+            "poisson": {
+              "half_life_days": "inf",
+              "glm_converged": true,
+              "is_home_coef": 0.2610258747963693,
+              "attack_sd": 0.29882547484240296,
+              "defence_sd": 0.20503134103459286,
+              "spearman_net_strength_vs_static": 0.9999999999999998,
+              "n_history_matches": 1900,
+              "sum_of_weights": 1900.0,
+              "kish_ess": 1900.0,
+              "last_season_weight_share": 0.2,
+              "team_kish_ess_min": 38.0,
+              "team_kish_ess_median": 152.0,
+              "team_kish_ess": {
+                "Arsenal": 190.0,
+                "Aston Villa": 76.0,
+                "Bournemouth": 152.0,
+                "Brighton": 76.0,
+                "Burnley": 152.0,
+                "Cardiff": 38.0,
+                "Chelsea": 190.0,
+                "Crystal Palace": 190.0,
+                "Everton": 190.0,
+                "Fulham": 38.0,
+                "Huddersfield": 76.0,
+                "Hull": 76.0,
+                "Leicester": 190.0,
+                "Liverpool": 190.0,
+                "Man City": 190.0,
+                "Man United": 190.0,
+                "Middlesbrough": 38.0,
+                "Newcastle": 152.0,
+                "Norwich": 38.0,
+                "QPR": 38.0,
+                "Southampton": 190.0,
+                "Stoke": 152.0,
+                "Sunderland": 114.0,
+                "Swansea": 152.0,
+                "Tottenham": 190.0,
+                "Watford": 152.0,
+                "West Brom": 152.0,
+                "West Ham": 190.0,
+                "Wolves": 38.0
+              }
+            }
+          },
+          "reproduction_max_abs_diff": 9.71445146547012e-17
+        },
+        "scores": {
+          "183": {
+            "log_loss": 0.9711966423102102,
+            "brier": 0.5764402489833556
+          },
+          "274": {
+            "log_loss": 0.9671037518201892,
+            "brier": 0.5740697239988624
+          },
+          "365": {
+            "log_loss": 0.9657492626398577,
+            "brier": 0.5733036538863747
+          },
+          "548": {
+            "log_loss": 0.965435147390152,
+            "brier": 0.5731755515388554
+          },
+          "730": {
+            "log_loss": 0.965890019728546,
+            "brier": 0.5734975688752452
+          },
+          "1095": {
+            "log_loss": 0.9668878476913179,
+            "brier": 0.5741720465386785
+          },
+          "1460": {
+            "log_loss": 0.9676174172432498,
+            "brier": 0.5746613860411527
+          },
+          "inf": {
+            "log_loss": 0.9708023688102,
+            "brier": 0.5767956730687969
+          }
+        },
+        "paired_vs_static": {
+          "183": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": 0.0003942735000102654,
+              "sd": 0.19622798525958113,
+              "naive_se": 0.010610794211478525,
+              "clustered_se": 0.010676965410836304,
+              "n_clusters": 110
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.00035542408544122676,
+              "sd": 0.12595926968419047,
+              "naive_se": 0.006811097244254117,
+              "clustered_se": 0.00686847273770176,
+              "n_clusters": 110
+            }
+          },
+          "274": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.0036986169900107856,
+              "sd": 0.1525277258983288,
+              "naive_se": 0.008247754819023437,
+              "clustered_se": 0.008098610696041687,
+              "n_clusters": 110
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0027259490699343353,
+              "sd": 0.09883803985299804,
+              "naive_se": 0.0053445490955774284,
+              "clustered_se": 0.0052592958547698215,
+              "n_clusters": 110
+            }
+          },
+          "365": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.005053106170342151,
+              "sd": 0.12380614842348951,
+              "naive_se": 0.006694669780661529,
+              "clustered_se": 0.006510132065575229,
+              "n_clusters": 110
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0034920191824220443,
+              "sd": 0.08096431165481087,
+              "naive_se": 0.004378048565839126,
+              "clustered_se": 0.004264987972995658,
+              "n_clusters": 110
+            }
+          },
+          "548": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.005367221420047789,
+              "sd": 0.08861754227370765,
+              "naive_se": 0.004791887881585427,
+              "clustered_se": 0.004634967184855406,
+              "n_clusters": 110
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.003620121529941436,
+              "sd": 0.05865128900528364,
+              "naive_se": 0.003171498484529393,
+              "clustered_se": 0.003069526732514147,
+              "n_clusters": 110
+            }
+          },
+          "730": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.004912349081653963,
+              "sd": 0.06858041998071786,
+              "naive_se": 0.003708404397005531,
+              "clustered_se": 0.0035858291108208885,
+              "n_clusters": 110
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.003298104193551593,
+              "sd": 0.04568373881149671,
+              "naive_se": 0.002470293677522523,
+              "clustered_se": 0.002387623894161651,
+              "n_clusters": 110
+            }
+          },
+          "1095": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.0039145211188817775,
+              "sd": 0.0468893379990369,
+              "naive_se": 0.002535485015361477,
+              "clustered_se": 0.002455430094394641,
+              "n_clusters": 110
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0026236265301182345,
+              "sd": 0.03143256067701797,
+              "naive_se": 0.001699678220934926,
+              "clustered_se": 0.0016430382762459,
+              "n_clusters": 110
+            }
+          },
+          "1460": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.0031849515669499875,
+              "sd": 0.035529213602165356,
+              "naive_se": 0.0019211998407338943,
+              "clustered_se": 0.0018633137985470348,
+              "n_clusters": 110
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0021342870276441226,
+              "sd": 0.02388791609120267,
+              "naive_se": 0.0012917105653891025,
+              "clustered_se": 0.0012495181399537793,
+              "n_clusters": 110
+            }
+          },
+          "inf": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 110
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 110
+            }
+          }
+        },
+        "sharpness_and_calibration": {
+          "183": {
+            "mean_predicted": {
+              "H": 0.4558917630360374,
+              "D": 0.2212954228019723,
+              "A": 0.32281281416199037
+            },
+            "observed": {
+              "H": 0.45614035087719296,
+              "D": 0.23391812865497075,
+              "A": 0.30994152046783624
+            },
+            "mean_entropy_nats": 0.9374532756386382
+          },
+          "274": {
+            "mean_predicted": {
+              "H": 0.45619405828142107,
+              "D": 0.22337982940541362,
+              "A": 0.3204261123131653
+            },
+            "observed": {
+              "H": 0.45614035087719296,
+              "D": 0.23391812865497075,
+              "A": 0.30994152046783624
+            },
+            "mean_entropy_nats": 0.9439702521168697
+          },
+          "365": {
+            "mean_predicted": {
+              "H": 0.45630217153995295,
+              "D": 0.22488142615095205,
+              "A": 0.318816402309095
+            },
+            "observed": {
+              "H": 0.45614035087719296,
+              "D": 0.23391812865497075,
+              "A": 0.30994152046783624
+            },
+            "mean_entropy_nats": 0.9485909557071993
+          },
+          "548": {
+            "mean_predicted": {
+              "H": 0.45627310927089093,
+              "D": 0.22680041075293944,
+              "A": 0.3169264799761697
+            },
+            "observed": {
+              "H": 0.45614035087719296,
+              "D": 0.23391812865497075,
+              "A": 0.30994152046783624
+            },
+            "mean_entropy_nats": 0.9545015008126264
+          },
+          "730": {
+            "mean_predicted": {
+              "H": 0.4561709646719668,
+              "D": 0.2279049173192735,
+              "A": 0.3159241180087597
+            },
+            "observed": {
+              "H": 0.45614035087719296,
+              "D": 0.23391812865497075,
+              "A": 0.30994152046783624
+            },
+            "mean_entropy_nats": 0.9578813261326138
+          },
+          "1095": {
+            "mean_predicted": {
+              "H": 0.45599139822229334,
+              "D": 0.22909298187137186,
+              "A": 0.31491561990633476
+            },
+            "observed": {
+              "H": 0.45614035087719296,
+              "D": 0.23391812865497075,
+              "A": 0.30994152046783624
+            },
+            "mean_entropy_nats": 0.961468415940675
+          },
+          "1460": {
+            "mean_predicted": {
+              "H": 0.455869742842463,
+              "D": 0.22970796144561,
+              "A": 0.314422295711927
+            },
+            "observed": {
+              "H": 0.45614035087719296,
+              "D": 0.23391812865497075,
+              "A": 0.30994152046783624
+            },
+            "mean_entropy_nats": 0.9632960169794856
+          },
+          "inf": {
+            "mean_predicted": {
+              "H": 0.4553752849578302,
+              "D": 0.23157928430449842,
+              "A": 0.3130454307376714
+            },
+            "observed": {
+              "H": 0.45614035087719296,
+              "D": 0.23391812865497075,
+              "A": 0.30994152046783624
+            },
+            "mean_entropy_nats": 0.9686819727850327
+          }
+        },
+        "returning_vs_continuous_log_loss_vs_static": {
+          "183": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.031288816709809576,
+              "sd": 0.15687828716129223,
+              "naive_se": 0.018750541699855298,
+              "clustered_se": 0.017775284883239303,
+              "n_clusters": 56
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.007556528061335143,
+              "sd": 0.20463446246869574,
+              "naive_se": 0.012407786814704785,
+              "clustered_se": 0.012200484641366598,
+              "n_clusters": 100
+            }
+          },
+          "274": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.020167080778793978,
+              "sd": 0.11293521733380202,
+              "naive_se": 0.01349834027587577,
+              "clustered_se": 0.012739569573016668,
+              "n_clusters": 56
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.009840524504041423,
+              "sd": 0.1607533395613895,
+              "naive_se": 0.00974710292179987,
+              "clustered_se": 0.009313400411452335,
+              "n_clusters": 100
+            }
+          },
+          "365": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.014633451163326379,
+              "sd": 0.08831184934999237,
+              "naive_se": 0.010555284888633986,
+              "clustered_se": 0.009938537809553515,
+              "n_clusters": 56
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.010119499601800967,
+              "sd": 0.13105580820839274,
+              "naive_se": 0.007946425589616078,
+              "clustered_se": 0.007500456991268086,
+              "n_clusters": 100
+            }
+          },
+          "548": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.009163986755179284,
+              "sd": 0.06106716056904485,
+              "naive_se": 0.007298921740293959,
+              "clustered_se": 0.0068606399821888745,
+              "n_clusters": 56
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.009106870582790054,
+              "sd": 0.09414593675115188,
+              "naive_se": 0.005708435903642923,
+              "clustered_se": 0.005343657806562822,
+              "n_clusters": 100
+            }
+          },
+          "730": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.006558587194373064,
+              "sd": 0.0465186055390439,
+              "naive_se": 0.005560036820660666,
+              "clustered_se": 0.005224222869616829,
+              "n_clusters": 56
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.007864428270337388,
+              "sd": 0.07296869332213081,
+              "naive_se": 0.004424376910741873,
+              "clustered_se": 0.004133863012520455,
+              "n_clusters": 100
+            }
+          },
+          "1095": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.004102380871961646,
+              "sd": 0.0313355128837409,
+              "naive_se": 0.0037453101486813615,
+              "clustered_se": 0.0035193207299870316,
+              "n_clusters": 56
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.0059776944253488356,
+              "sd": 0.04995633356944514,
+              "naive_se": 0.00302904764669723,
+              "clustered_se": 0.0028299996612426892,
+              "n_clusters": 100
+            }
+          },
+          "1460": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.002959529233831573,
+              "sd": 0.023576830191669045,
+              "naive_se": 0.0028179701962501736,
+              "clustered_se": 0.00264849623396255,
+              "n_clusters": 56
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.0047662517730334775,
+              "sd": 0.037876038342337895,
+              "naive_se": 0.0022965721583147586,
+              "clustered_se": 0.0021471937692721836,
+              "n_clusters": 100
+            }
+          },
+          "inf": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 56
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 100
+            }
+          }
+        }
+      },
+      {
+        "target": "2021",
+        "history": "1415..1920",
+        "n_history_seasons": 6,
+        "fitted": {
+          "target": "2021",
+          "history": [
+            "1415",
+            "1516",
+            "1617",
+            "1718",
+            "1819",
+            "1920"
+          ],
+          "unseen_teams": [
+            "Leeds"
+          ],
+          "returning_teams": [
+            "Fulham",
+            "West Brom"
+          ],
+          "n_full": 380,
+          "n_common": 342,
+          "arms": {
+            "poisson_tw_h183": {
+              "half_life_days": "183",
+              "glm_converged": true,
+              "is_home_coef": 0.25350314985841393,
+              "attack_sd": 0.35724637045890845,
+              "defence_sd": 0.2410381462773831,
+              "spearman_net_strength_vs_static": 0.9439377085650723,
+              "n_history_matches": 2280,
+              "sum_of_weights": 263.6837956064629,
+              "kish_ess": 507.8761206738803,
+              "last_season_weight_share": 0.7714892473227873,
+              "team_kish_ess_min": 31.570273812344343,
+              "team_kish_ess_median": 50.74030581000743,
+              "team_kish_ess": {
+                "Arsenal": 50.54832519413973,
+                "Aston Villa": 31.859782429836237,
+                "Bournemouth": 50.73633322771455,
+                "Brighton": 49.53138500653852,
+                "Burnley": 50.57454634092691,
+                "Cardiff": 34.89451032741272,
+                "Chelsea": 50.93390732141008,
+                "Crystal Palace": 50.87604344259708,
+                "Everton": 50.744278392300295,
+                "Fulham": 34.98116827907331,
+                "Huddersfield": 51.4646875121857,
+                "Hull": 39.10436155863087,
+                "Leicester": 50.87179903057641,
+                "Liverpool": 50.81039555455476,
+                "Man City": 50.44752879480956,
+                "Man United": 50.90485598451769,
+                "Middlesbrough": 34.65216437449919,
+                "Newcastle": 49.729961836798445,
+                "Norwich": 31.934203884688475,
+                "QPR": 34.79165901194737,
+                "Sheffield United": 31.570273812344343,
+                "Southampton": 50.91733951031131,
+                "Stoke": 58.5081239188023,
+                "Sunderland": 55.513298284515024,
+                "Swansea": 58.14386645109003,
+                "Tottenham": 50.90890784863069,
+                "Watford": 50.8139197265606,
+                "West Brom": 58.611818319628554,
+                "West Ham": 50.82996403495186,
+                "Wolves": 45.38504464858964
+              }
+            },
+            "poisson_tw_h274": {
+              "half_life_days": "274",
+              "glm_converged": true,
+              "is_home_coef": 0.24927028149425298,
+              "attack_sd": 0.33704954824825234,
+              "defence_sd": 0.23388356970877894,
+              "spearman_net_strength_vs_static": 0.9617352614015572,
+              "n_history_matches": 2280,
+              "sum_of_weights": 394.5033143086048,
+              "kish_ess": 783.4334819933009,
+              "last_season_weight_share": 0.6216795620819313,
+              "team_kish_ess_min": 34.91071411537193,
+              "team_kish_ess_median": 77.51508612750771,
+              "team_kish_ess": {
+                "Arsenal": 78.05978776697644,
+                "Aston Villa": 37.18489684709628,
+                "Bournemouth": 77.46935914116844,
+                "Brighton": 70.05337061908959,
+                "Burnley": 76.20035370985607,
+                "Cardiff": 36.533903661352106,
+                "Chelsea": 78.5229327659446,
+                "Crystal Palace": 78.45111628392559,
+                "Everton": 78.34015276695843,
+                "Fulham": 36.575520005222636,
+                "Huddersfield": 61.647287968926314,
+                "Hull": 47.669665540693785,
+                "Leicester": 78.45798542353164,
+                "Liverpool": 78.31425801059048,
+                "Man City": 77.95883417671865,
+                "Man United": 78.49693734526532,
+                "Middlesbrough": 36.40554498484339,
+                "Newcastle": 72.94207397867807,
+                "Norwich": 36.64083248168459,
+                "QPR": 36.4861246259554,
+                "Sheffield United": 34.91071411537193,
+                "Southampton": 78.52784145671735,
+                "Stoke": 81.19569104784384,
+                "Sunderland": 73.9795404342596,
+                "Swansea": 80.93232184789476,
+                "Tottenham": 78.4894694669218,
+                "Watford": 77.56081311384699,
+                "West Brom": 81.27906417100006,
+                "West Ham": 78.34199338728918,
+                "Wolves": 58.135755076562084
+              }
+            },
+            "poisson_tw_h365": {
+              "half_life_days": "365",
+              "glm_converged": true,
+              "is_home_coef": 0.24894503813488078,
+              "attack_sd": 0.32651677260220924,
+              "defence_sd": 0.22979059552751058,
+              "spearman_net_strength_vs_static": 0.9688542825361514,
+              "n_history_matches": 2280,
+              "sum_of_weights": 522.237829167138,
+              "kish_ess": 1037.1272179378634,
+              "last_season_weight_share": 0.519800052244388,
+              "team_kish_ess_min": 36.227855580119936,
+              "team_kish_ess_median": 98.75237588973769,
+              "team_kish_ess": {
+                "Arsenal": 103.45904520658866,
+                "Aston Villa": 42.78849713090157,
+                "Bournemouth": 100.5819530298201,
+                "Brighton": 83.59492375111505,
+                "Burnley": 97.70759326709441,
+                "Cardiff": 37.1560260516306,
+                "Chelsea": 103.88260196463295,
+                "Crystal Palace": 103.81114298393369,
+                "Everton": 103.73776283530502,
+                "Fulham": 37.17986944201179,
+                "Huddersfield": 66.9080453448589,
+                "Hull": 54.562466455089144,
+                "Leicester": 103.83078640621869,
+                "Liverpool": 103.6750828711759,
+                "Man City": 103.36996225057881,
+                "Man United": 103.8641641840999,
+                "Middlesbrough": 37.07885625586414,
+                "Newcastle": 92.19119277067303,
+                "Norwich": 40.61157826159711,
+                "QPR": 37.12900360676197,
+                "Sheffield United": 36.227855580119936,
+                "Southampton": 103.89580999154062,
+                "Stoke": 98.8484885777982,
+                "Sunderland": 86.20018111459217,
+                "Swansea": 98.6562632016772,
+                "Tottenham": 103.84359051445213,
+                "Watford": 100.6718631292623,
+                "West Brom": 98.90829318740529,
+                "West Ham": 103.6907705068323,
+                "Wolves": 64.76847422990353
+              }
+            },
+            "poisson_tw_h548": {
+              "half_life_days": "548",
+              "glm_converged": true,
+              "is_home_coef": 0.2502104106063777,
+              "attack_sd": 0.3153358983094851,
+              "defence_sd": 0.22436159948060802,
+              "spearman_net_strength_vs_static": 0.9759733036707454,
+              "n_history_matches": 2280,
+              "sum_of_weights": 753.039294985894,
+              "kish_ess": 1437.423107044562,
+              "last_season_weight_share": 0.40129932321439393,
+              "team_kish_ess_min": 37.21087208037591,
+              "team_kish_ess_median": 121.18317233536504,
+              "team_kish_ess": {
+                "Arsenal": 143.56535872697782,
+                "Aston Villa": 56.26258556412774,
+                "Bournemouth": 133.52898860183575,
+                "Brighton": 97.91584945750527,
+                "Burnley": 128.50297528901254,
+                "Cardiff": 37.61948440799985,
+                "Chelsea": 143.86809229563195,
+                "Crystal Palace": 143.81234491741967,
+                "Everton": 143.79473678368905,
+                "Fulham": 37.630083987687854,
+                "Huddersfield": 71.57018843244539,
+                "Hull": 63.387528490591,
+                "Leicester": 143.83955040152387,
+                "Liverpool": 143.7258684644408,
+                "Man City": 143.50457459084322,
+                "Man United": 143.85455633394687,
+                "Middlesbrough": 37.58349322849205,
+                "Newcastle": 121.39616693789938,
+                "Norwich": 48.40928153165032,
+                "QPR": 37.60760054637628,
+                "Sheffield United": 37.21087208037591,
+                "Southampton": 143.87324634081432,
+                "Stoke": 120.94162730339924,
+                "Sunderland": 99.19492111372968,
+                "Swansea": 120.83514963619938,
+                "Tottenham": 143.82457182414453,
+                "Watford": 133.60060615132318,
+                "West Brom": 120.97017773283069,
+                "West Ham": 143.71219913980704,
+                "Wolves": 70.59997656681276
+              }
+            },
+            "poisson_tw_h730": {
+              "half_life_days": "730",
+              "glm_converged": true,
+              "is_home_coef": 0.25137497520945185,
+              "attack_sd": 0.30962107769482977,
+              "defence_sd": 0.22108988181228834,
+              "spearman_net_strength_vs_static": 0.9853170189098998,
+              "n_history_matches": 2280,
+              "sum_of_weights": 941.4218019800284,
+              "kish_ess": 1697.0716400547815,
+              "last_season_weight_share": 0.3392309874667402,
+              "team_kish_ess_min": 37.556839579020334,
+              "team_kish_ess_median": 136.58333769144366,
+              "team_kish_ess": {
+                "Arsenal": 169.58439831153711,
+                "Aston Villa": 69.28206330054671,
+                "Bournemouth": 152.65632859908845,
+                "Brighton": 104.30596393347996,
+                "Burnley": 147.27768149183484,
+                "Cardiff": 37.78428024570625,
+                "Chelsea": 169.79574756494904,
+                "Crystal Palace": 169.75562287692418,
+                "Everton": 169.76153729412692,
+                "Fulham": 37.790226172914494,
+                "Huddersfield": 73.41515059391747,
+                "Hull": 67.98465241823803,
+                "Leicester": 169.7797702776501,
+                "Liverpool": 169.7076604435273,
+                "Man City": 169.54465164034178,
+                "Man United": 169.78183673511992,
+                "Middlesbrough": 37.763606189824586,
+                "Newcastle": 140.84206470838572,
+                "Norwich": 54.952920434887176,
+                "QPR": 37.777644424790275,
+                "Sheffield United": 37.556839579020334,
+                "Southampton": 169.79059817602436,
+                "Stoke": 132.31026040901344,
+                "Sunderland": 105.03497799540604,
+                "Swansea": 132.24593556429545,
+                "Tottenham": 169.75566100481896,
+                "Watford": 152.70885874759165,
+                "West Brom": 132.3246106745016,
+                "West Ham": 169.68189799970278,
+                "Wolves": 72.87685794550895
+              }
+            },
+            "poisson_tw_h1095": {
+              "half_life_days": "1095",
+              "glm_converged": true,
+              "is_home_coef": 0.2527793578113735,
+              "attack_sd": 0.3039909550002233,
+              "defence_sd": 0.21753899234195845,
+              "spearman_net_strength_vs_static": 0.9924360400444937,
+              "n_history_matches": 2280,
+              "sum_of_weights": 1217.6096571079534,
+              "kish_ess": 1970.287341651794,
+              "last_season_weight_share": 0.2775878522962563,
+              "team_kish_ess_min": 37.804406116399555,
+              "team_kish_ess_median": 152.47868480597572,
+              "team_kish_ess": {
+                "Arsenal": 196.96374157949242,
+                "Aston Villa": 87.67888575608701,
+                "Bournemouth": 171.057090997297,
+                "Brighton": 109.47639242952094,
+                "Burnley": 166.78063700659632,
+                "Cardiff": 37.90368121255366,
+                "Chelsea": 197.07512457439663,
+                "Crystal Palace": 197.0537116003092,
+                "Everton": 197.06856006782908,
+                "Fulham": 37.90630177280381,
+                "Huddersfield": 74.8211917224447,
+                "Hull": 72.07896365633347,
+                "Leicester": 197.06922362850463,
+                "Liverpool": 197.03881465375017,
+                "Man City": 196.94554069509357,
+                "Man United": 197.06230282102055,
+                "Middlesbrough": 37.89435063241022,
+                "Newcastle": 162.56951789071132,
+                "Norwich": 63.50997798591959,
+                "QPR": 37.90076858260689,
+                "Sheffield United": 37.804406116399555,
+                "Southampton": 197.06351587507245,
+                "Stoke": 142.3833235077924,
+                "Sunderland": 109.79276810231123,
+                "Swansea": 142.35409262756443,
+                "Tottenham": 197.04715912785522,
+                "Watford": 171.08573126314403,
+                "West Brom": 142.3878517212401,
+                "West Ham": 197.013949273818,
+                "Wolves": 74.5903352719335
+              }
+            },
+            "poisson_tw_h1460": {
+              "half_life_days": "1460",
+              "glm_converged": true,
+              "is_home_coef": 0.2535261880210993,
+              "attack_sd": 0.3012947758102882,
+              "defence_sd": 0.21572559737998975,
+              "spearman_net_strength_vs_static": 0.992880978865406,
+              "n_history_matches": 2280,
+              "sum_of_weights": 1403.729885330984,
+              "kish_ess": 2093.065602291139,
+              "last_season_weight_share": 0.24782375287392724,
+              "team_kish_ess_min": 37.89050132608778,
+              "team_kish_ess_median": 159.68572565977308,
+              "team_kish_ess": {
+                "Arsenal": 209.26754729378965,
+                "Aston Villa": 97.627847023226,
+                "Bournemouth": 178.79729137195577,
+                "Brighton": 111.41373981265072,
+                "Burnley": 175.6925508748018,
+                "Cardiff": 37.94572444110897,
+                "Chelsea": 209.33386338615057,
+                "Crystal Palace": 209.3211481906698,
+                "Everton": 209.3337294234482,
+                "Fulham": 37.947190224145956,
+                "Huddersfield": 75.33081212285116,
+                "Hull": 73.713969183436,
+                "Leicester": 209.33121698596122,
+                "Liverpool": 209.31610824818156,
+                "Man City": 209.25792378874692,
+                "Man United": 209.32367702085287,
+                "Middlesbrough": 37.940443263174174,
+                "Newcastle": 172.97385424736296,
+                "Norwich": 68.05027929723249,
+                "QPR": 37.944098333448686,
+                "Sheffield United": 37.89050132608778,
+                "Southampton": 209.32321786352344,
+                "Stoke": 146.39580646666113,
+                "Sunderland": 111.58695456268059,
+                "Swansea": 146.37955756433533,
+                "Tottenham": 209.31489756446007,
+                "Watford": 178.8145008906401,
+                "West Brom": 146.39759707218323,
+                "West Ham": 209.29758863891774,
+                "Wolves": 75.20425749844469
+              }
+            },
+            "poisson": {
+              "half_life_days": "inf",
+              "glm_converged": true,
+              "is_home_coef": 0.25570643123625475,
+              "attack_sd": 0.2940202419713491,
+              "defence_sd": 0.21055639665252304,
+              "spearman_net_strength_vs_static": 1.0,
+              "n_history_matches": 2280,
+              "sum_of_weights": 2280.0,
+              "kish_ess": 2280.0,
+              "last_season_weight_share": 0.16666666666666666,
+              "team_kish_ess_min": 38.0,
+              "team_kish_ess_median": 171.0,
+              "team_kish_ess": {
+                "Arsenal": 228.0,
+                "Aston Villa": 114.0,
+                "Bournemouth": 190.0,
+                "Brighton": 114.0,
+                "Burnley": 190.0,
+                "Cardiff": 38.0,
+                "Chelsea": 228.0,
+                "Crystal Palace": 228.0,
+                "Everton": 228.0,
+                "Fulham": 38.0,
+                "Huddersfield": 76.0,
+                "Hull": 76.0,
+                "Leicester": 228.0,
+                "Liverpool": 228.0,
+                "Man City": 228.0,
+                "Man United": 228.0,
+                "Middlesbrough": 38.0,
+                "Newcastle": 190.0,
+                "Norwich": 76.0,
+                "QPR": 38.0,
+                "Sheffield United": 38.0,
+                "Southampton": 228.0,
+                "Stoke": 152.0,
+                "Sunderland": 114.0,
+                "Swansea": 152.0,
+                "Tottenham": 228.0,
+                "Watford": 190.0,
+                "West Brom": 152.0,
+                "West Ham": 228.0,
+                "Wolves": 76.0
+              }
+            }
+          },
+          "reproduction_max_abs_diff": 1.1102230246251565e-16
+        },
+        "scores": {
+          "183": {
+            "log_loss": 1.0366797502825065,
+            "brier": 0.6174315137236494
+          },
+          "274": {
+            "log_loss": 1.036921636620409,
+            "brier": 0.6178126738101222
+          },
+          "365": {
+            "log_loss": 1.038153172019928,
+            "brier": 0.6188635596798662
+          },
+          "548": {
+            "log_loss": 1.0403176776925422,
+            "brier": 0.620634683774857
+          },
+          "730": {
+            "log_loss": 1.0418363183629655,
+            "brier": 0.6218104051026316
+          },
+          "1095": {
+            "log_loss": 1.0436881293618858,
+            "brier": 0.6231785709854741
+          },
+          "1460": {
+            "log_loss": 1.044726882427352,
+            "brier": 0.6239222017154825
+          },
+          "inf": {
+            "log_loss": 1.048152918250259,
+            "brier": 0.6263073022405723
+          }
+        },
+        "paired_vs_static": {
+          "183": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.011473167967752598,
+              "sd": 0.16926249820019273,
+              "naive_se": 0.0091526676673928,
+              "clustered_se": 0.009195958988445314,
+              "n_clusters": 128
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.008875788516922948,
+              "sd": 0.10581176940190254,
+              "naive_se": 0.0057216452015790556,
+              "clustered_se": 0.005602444131958833,
+              "n_clusters": 128
+            }
+          },
+          "274": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.011231281629849953,
+              "sd": 0.1450243026467136,
+              "naive_se": 0.007842016157949229,
+              "clustered_se": 0.008057045924115566,
+              "n_clusters": 128
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.008494628430450058,
+              "sd": 0.08970574332483243,
+              "naive_se": 0.004850731055248577,
+              "clustered_se": 0.004858502023711488,
+              "n_clusters": 128
+            }
+          },
+          "365": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.009999746230331076,
+              "sd": 0.12687925410797138,
+              "naive_se": 0.006860844304468753,
+              "clustered_se": 0.007114044756367863,
+              "n_clusters": 128
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.007443742560706061,
+              "sd": 0.07810912125548543,
+              "naive_se": 0.0042236575511132995,
+              "clustered_se": 0.004271918162709657,
+              "n_clusters": 128
+            }
+          },
+          "548": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.007835240557716684,
+              "sd": 0.09803424874604806,
+              "naive_se": 0.005301085050356864,
+              "clustered_se": 0.005522862253171383,
+              "n_clusters": 128
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.005672618465715251,
+              "sd": 0.060372738818981524,
+              "naive_se": 0.0032645838295905123,
+              "clustered_se": 0.0033199240599472743,
+              "n_clusters": 128
+            }
+          },
+          "730": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.006316599887293475,
+              "sd": 0.07828340938453703,
+              "naive_se": 0.004233081973773623,
+              "clustered_se": 0.004410814901773941,
+              "n_clusters": 128
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.004496897137940605,
+              "sd": 0.04837657245732788,
+              "naive_se": 0.002615905444487678,
+              "clustered_se": 0.0026611259586786706,
+              "n_clusters": 128
+            }
+          },
+          "1095": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.004464788888373111,
+              "sd": 0.054785562057361875,
+              "naive_se": 0.0029624639114642754,
+              "clustered_se": 0.003082212218670858,
+              "n_clusters": 128
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0031287312550981397,
+              "sd": 0.03406999163835801,
+              "naive_se": 0.0018422941538292113,
+              "clustered_se": 0.0018713011188399567,
+              "n_clusters": 128
+            }
+          },
+          "1460": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.003426035822906985,
+              "sd": 0.04185301982781423,
+              "naive_se": 0.002263152118360669,
+              "clustered_se": 0.0023513880183276214,
+              "n_clusters": 128
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0023851005250897367,
+              "sd": 0.026138582069000226,
+              "naive_se": 0.0014134126431920948,
+              "clustered_se": 0.0014336121597961968,
+              "n_clusters": 128
+            }
+          },
+          "inf": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 128
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 128
+            }
+          }
+        },
+        "sharpness_and_calibration": {
+          "183": {
+            "mean_predicted": {
+              "H": 0.4486778106745325,
+              "D": 0.23481724612657964,
+              "A": 0.31650494319888783
+            },
+            "observed": {
+              "H": 0.3713450292397661,
+              "D": 0.22807017543859648,
+              "A": 0.40058479532163743
+            },
+            "mean_entropy_nats": 0.9550044068244273
+          },
+          "274": {
+            "mean_predicted": {
+              "H": 0.4480162708986979,
+              "D": 0.23495025584834775,
+              "A": 0.31703347325295445
+            },
+            "observed": {
+              "H": 0.3713450292397661,
+              "D": 0.22807017543859648,
+              "A": 0.40058479532163743
+            },
+            "mean_entropy_nats": 0.9590524058740281
+          },
+          "365": {
+            "mean_predicted": {
+              "H": 0.44799470764181754,
+              "D": 0.23521892692008609,
+              "A": 0.31678636543809646
+            },
+            "observed": {
+              "H": 0.3713450292397661,
+              "D": 0.22807017543859648,
+              "A": 0.40058479532163743
+            },
+            "mean_entropy_nats": 0.9610082856965111
+          },
+          "548": {
+            "mean_predicted": {
+              "H": 0.4481774984584492,
+              "D": 0.23584802232997346,
+              "A": 0.3159744792115773
+            },
+            "observed": {
+              "H": 0.3713450292397661,
+              "D": 0.22807017543859648,
+              "A": 0.40058479532163743
+            },
+            "mean_entropy_nats": 0.963377140001279
+          },
+          "730": {
+            "mean_predicted": {
+              "H": 0.44829502681003397,
+              "D": 0.2363591740358956,
+              "A": 0.31534579915407046
+            },
+            "observed": {
+              "H": 0.3713450292397661,
+              "D": 0.22807017543859648,
+              "A": 0.40058479532163743
+            },
+            "mean_entropy_nats": 0.9648169401956834
+          },
+          "1095": {
+            "mean_predicted": {
+              "H": 0.4483875956317402,
+              "D": 0.2370258488080901,
+              "A": 0.3145865555601697
+            },
+            "observed": {
+              "H": 0.3713450292397661,
+              "D": 0.22807017543859648,
+              "A": 0.40058479532163743
+            },
+            "mean_entropy_nats": 0.9664713866746779
+          },
+          "1460": {
+            "mean_predicted": {
+              "H": 0.4484143501536338,
+              "D": 0.23741539269295978,
+              "A": 0.3141702571534064
+            },
+            "observed": {
+              "H": 0.3713450292397661,
+              "D": 0.22807017543859648,
+              "A": 0.40058479532163743
+            },
+            "mean_entropy_nats": 0.9673770812267345
+          },
+          "inf": {
+            "mean_predicted": {
+              "H": 0.4483857663532112,
+              "D": 0.2387564929926961,
+              "A": 0.31285774065409266
+            },
+            "observed": {
+              "H": 0.3713450292397661,
+              "D": 0.22807017543859648,
+              "A": 0.40058479532163743
+            },
+            "mean_entropy_nats": 0.9703336257885816
+          }
+        },
+        "returning_vs_continuous_log_loss_vs_static": {
+          "183": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.0030938102579257847,
+              "sd": 0.15074115825920453,
+              "naive_se": 0.01801701449556048,
+              "clustered_se": 0.017672153531124883,
+              "n_clusters": 63
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.013629620319546263,
+              "sd": 0.17390161152478406,
+              "naive_se": 0.010544334011497267,
+              "clustered_se": 0.010571294544810378,
+              "n_clusters": 123
+            }
+          },
+          "274": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.0029657756921619405,
+              "sd": 0.1270857928370926,
+              "naive_se": 0.015189657543883702,
+              "clustered_se": 0.014903330088361599,
+              "n_clusters": 63
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.013358433893225543,
+              "sd": 0.14943325080045294,
+              "naive_se": 0.009060721721024739,
+              "clustered_se": 0.009168528239911766,
+              "n_clusters": 123
+            }
+          },
+          "365": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.0024277694993817237,
+              "sd": 0.10904061933976529,
+              "naive_se": 0.013032846781442866,
+              "clustered_se": 0.012752628985321885,
+              "n_clusters": 63
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.011948416712560691,
+              "sd": 0.131189410807119,
+              "naive_se": 0.007954526437063215,
+              "clustered_se": 0.008067259052220332,
+              "n_clusters": 123
+            }
+          },
+          "548": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.0016318016007021636,
+              "sd": 0.08245616379381539,
+              "naive_se": 0.009855396598233094,
+              "clustered_se": 0.009594471154976022,
+              "n_clusters": 63
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.009431713818713067,
+              "sd": 0.10173284785647606,
+              "naive_se": 0.006168459960399147,
+              "clustered_se": 0.006254875393572611,
+              "n_clusters": 123
+            }
+          },
+          "730": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.0011595552896851143,
+              "sd": 0.06516875289690563,
+              "naive_se": 0.0077891557897025255,
+              "clustered_se": 0.007556631229868852,
+              "n_clusters": 63
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.007643780482266214,
+              "sd": 0.08137123248224587,
+              "naive_se": 0.004933855682514566,
+              "clustered_se": 0.004997232644451474,
+              "n_clusters": 123
+            }
+          },
+          "1095": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.0006749646562100106,
+              "sd": 0.045144568545054685,
+              "naive_se": 0.005395807988110692,
+              "clustered_se": 0.005213326809483043,
+              "n_clusters": 63
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.005440111301062143,
+              "sd": 0.05703655737260697,
+              "naive_se": 0.003458349273071474,
+              "clustered_se": 0.003495904799704307,
+              "n_clusters": 123
+            }
+          },
+          "1460": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.00045145686737210517,
+              "sd": 0.03430707868237063,
+              "naive_se": 0.004100480194385547,
+              "clustered_se": 0.003952947423355398,
+              "n_clusters": 63
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.00419155246587552,
+              "sd": 0.043607236537668154,
+              "naive_se": 0.0026440770924426407,
+              "clustered_se": 0.00266934150758906,
+              "n_clusters": 123
+            }
+          },
+          "inf": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 63
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 123
+            }
+          }
+        }
+      },
+      {
+        "target": "2122",
+        "history": "1415..2021",
+        "n_history_seasons": 7,
+        "fitted": {
+          "target": "2122",
+          "history": [
+            "1415",
+            "1516",
+            "1617",
+            "1718",
+            "1819",
+            "1920",
+            "2021"
+          ],
+          "unseen_teams": [
+            "Brentford"
+          ],
+          "returning_teams": [
+            "Norwich",
+            "Watford"
+          ],
+          "n_full": 380,
+          "n_common": 342,
+          "arms": {
+            "poisson_tw_h183": {
+              "half_life_days": "183",
+              "glm_converged": true,
+              "is_home_coef": 0.07488825516902103,
+              "attack_sd": 0.3716273451461992,
+              "defence_sd": 0.2240724559526116,
+              "spearman_net_strength_vs_static": 0.908467741935484,
+              "n_history_matches": 2660,
+              "sum_of_weights": 334.63638974560575,
+              "kish_ess": 585.8825611177016,
+              "last_season_weight_share": 0.7480156861735872,
+              "team_kish_ess_min": 31.934203884688475,
+              "team_kish_ess_median": 58.08351343037971,
+              "team_kish_ess": {
+                "Arsenal": 58.8330507176549,
+                "Aston Villa": 52.21911081533852,
+                "Bournemouth": 50.73633322771459,
+                "Brighton": 58.14760113282326,
+                "Burnley": 58.54332435863371,
+                "Cardiff": 34.89451032741273,
+                "Chelsea": 58.673930942969136,
+                "Crystal Palace": 58.40161323091601,
+                "Everton": 58.08351343037971,
+                "Fulham": 39.52631398877179,
+                "Huddersfield": 51.464687512185726,
+                "Hull": 39.10436155863087,
+                "Leeds": 35.343037123086184,
+                "Leicester": 58.64134690346824,
+                "Liverpool": 58.56291016560365,
+                "Man City": 59.13513561080199,
+                "Man United": 58.69412568422742,
+                "Middlesbrough": 34.6521643744992,
+                "Newcastle": 58.24632049290068,
+                "Norwich": 31.934203884688475,
+                "QPR": 34.79165901194738,
+                "Sheffield United": 52.400316455947284,
+                "Southampton": 58.4205392500879,
+                "Stoke": 58.508123918802305,
+                "Sunderland": 55.51329828451504,
+                "Swansea": 58.14386645109004,
+                "Tottenham": 58.51541123921967,
+                "Watford": 50.81391972656062,
+                "West Brom": 36.691631237092864,
+                "West Ham": 58.5904709748398,
+                "Wolves": 56.946572701445994
+              }
+            },
+            "poisson_tw_h274": {
+              "half_life_days": "274",
+              "glm_converged": true,
+              "is_home_coef": 0.10602787984330447,
+              "attack_sd": 0.3514228203858344,
+              "defence_sd": 0.21151310163541126,
+              "spearman_net_strength_vs_static": 0.9245967741935486,
+              "n_history_matches": 2660,
+              "sum_of_weights": 469.41080446743297,
+              "kish_ess": 833.089436745646,
+              "last_season_weight_share": 0.6075321924666003,
+              "team_kish_ess_min": 36.40554498484337,
+              "team_kish_ess_median": 79.72371951093328,
+              "team_kish_ess": {
+                "Arsenal": 83.58008343975578,
+                "Aston Villa": 62.74245559682492,
+                "Bournemouth": 77.46935914116838,
+                "Brighton": 79.72371951093328,
+                "Burnley": 82.25111680874329,
+                "Cardiff": 36.53390366135211,
+                "Chelsea": 83.48007570747471,
+                "Crystal Palace": 83.24425193449161,
+                "Everton": 82.81640688861154,
+                "Fulham": 47.50135732753672,
+                "Huddersfield": 61.6472879689263,
+                "Hull": 47.669665540693764,
+                "Leeds": 36.75366688354932,
+                "Leicester": 83.41285506403233,
+                "Liverpool": 83.34391599807596,
+                "Man City": 83.6150328952377,
+                "Man United": 83.353015955854,
+                "Middlesbrough": 36.40554498484337,
+                "Newcastle": 80.93784195399991,
+                "Norwich": 36.64083248168457,
+                "QPR": 36.48612462595538,
+                "Sheffield United": 61.9249702909179,
+                "Southampton": 83.22860943118711,
+                "Stoke": 81.19569104784385,
+                "Sunderland": 73.97954043425963,
+                "Swansea": 80.93232184789476,
+                "Tottenham": 83.2452655959021,
+                "Watford": 77.56081311384692,
+                "West Brom": 43.96564048387908,
+                "West Ham": 83.36514257031449,
+                "Wolves": 74.22599102945402
+              }
+            },
+            "poisson_tw_h365": {
+              "half_life_days": "365",
+              "glm_converged": true,
+              "is_home_coef": 0.1287796937771315,
+              "attack_sd": 0.34038053919919237,
+              "defence_sd": 0.2043167895874761,
+              "spearman_net_strength_vs_static": 0.9350806451612904,
+              "n_history_matches": 2660,
+              "sum_of_weights": 600.2472073996037,
+              "kish_ess": 1079.1050487611176,
+              "last_season_weight_share": 0.5087624855163468,
+              "team_kish_ess_min": 37.07885625586415,
+              "team_kish_ess_median": 98.84848857779822,
+              "team_kish_ess": {
+                "Arsenal": 108.16201661079792,
+                "Aston Villa": 70.62509302743747,
+                "Bournemouth": 100.58195302982004,
+                "Brighton": 97.07307677294652,
+                "Burnley": 104.54490008889844,
+                "Cardiff": 37.15602605163059,
+                "Chelsea": 108.12227948402901,
+                "Crystal Palace": 107.90719905125091,
+                "Everton": 107.47030508556664,
+                "Fulham": 54.16782507114472,
+                "Huddersfield": 66.90804534485888,
+                "Hull": 54.56246645508916,
+                "Leeds": 37.284040316692725,
+                "Leicester": 108.0417881731065,
+                "Liverpool": 107.96456879354389,
+                "Man City": 108.06774314193122,
+                "Man United": 107.93162827971656,
+                "Middlesbrough": 37.07885625586415,
+                "Newcastle": 101.64585479167056,
+                "Norwich": 40.611578261597124,
+                "QPR": 37.129003606761984,
+                "Sheffield United": 66.93451447989467,
+                "Southampton": 107.89105577964742,
+                "Stoke": 98.84848857779822,
+                "Sunderland": 86.20018111459221,
+                "Swansea": 98.6562632016772,
+                "Tottenham": 107.86751125901442,
+                "Watford": 100.6718631292623,
+                "West Brom": 54.91903464817197,
+                "West Ham": 107.98117978886744,
+                "Wolves": 85.94245287867
+              }
+            },
+            "poisson_tw_h548": {
+              "half_life_days": "548",
+              "glm_converged": true,
+              "is_home_coef": 0.15740668209117004,
+              "attack_sd": 0.3280199128968782,
+              "defence_sd": 0.1962777643041476,
+              "spearman_net_strength_vs_static": 0.9504032258064516,
+              "n_history_matches": 2660,
+              "sum_of_weights": 842.4218234148951,
+              "kish_ess": 1511.841060775824,
+              "last_season_weight_share": 0.38914059835755993,
+              "team_kish_ess_min": 37.583493228492074,
+              "team_kish_ess_median": 120.9416273033992,
+              "team_kish_ess": {
+                "Arsenal": 151.3687005735874,
+                "Aston Villa": 84.91043452654222,
+                "Bournemouth": 133.5289886018358,
+                "Brighton": 119.44587251690793,
+                "Burnley": 140.66429795636475,
+                "Cardiff": 37.61948440799985,
+                "Chelsea": 151.3983997830767,
+                "Crystal Palace": 151.22661136992,
+                "Everton": 150.87252139926866,
+                "Fulham": 62.96110194076789,
+                "Huddersfield": 71.5701884324454,
+                "Hull": 63.387528490590995,
+                "Leeds": 37.67760535852289,
+                "Leicester": 151.32285530298364,
+                "Liverpool": 151.24713955413614,
+                "Man City": 151.1976988476769,
+                "Man United": 151.19147436756967,
+                "Middlesbrough": 37.583493228492074,
+                "Newcastle": 135.54537681425697,
+                "Norwich": 48.40928153165032,
+                "QPR": 37.60760054637631,
+                "Sheffield United": 71.48673654291508,
+                "Southampton": 151.21682174312554,
+                "Stoke": 120.9416273033992,
+                "Sunderland": 99.19492111372963,
+                "Swansea": 120.83514963619935,
+                "Tottenham": 151.16539496663634,
+                "Watford": 133.60060615132326,
+                "West Brom": 83.16154514881127,
+                "West Ham": 151.2470110520941,
+                "Wolves": 98.76618534588754
+              }
+            },
+            "poisson_tw_h730": {
+              "half_life_days": "730",
+              "glm_converged": true,
+              "is_home_coef": 0.17336856215728697,
+              "attack_sd": 0.3213321417536793,
+              "defence_sd": 0.1921398560090734,
+              "spearman_net_strength_vs_static": 0.9536290322580645,
+              "n_history_matches": 2660,
+              "sum_of_weights": 1047.2433341955757,
+              "kish_ess": 1827.1115425397486,
+              "last_season_weight_share": 0.3245187163341738,
+              "team_kish_ess_min": 37.763606189824564,
+              "team_kish_ess_median": 132.3102604090134,
+              "team_kish_ess": {
+                "Arsenal": 182.83793631178867,
+                "Aston Villa": 97.75445010209462,
+                "Bournemouth": 152.65632859908843,
+                "Brighton": 131.2247913106633,
+                "Burnley": 165.16494883240392,
+                "Cardiff": 37.78428024570626,
+                "Chelsea": 182.8897052885713,
+                "Crystal Palace": 182.75927431337445,
+                "Everton": 182.50204927265355,
+                "Fulham": 67.6485693285291,
+                "Huddersfield": 73.41515059391745,
+                "Hull": 67.984652418238,
+                "Leeds": 37.81728175624605,
+                "Leicester": 182.83032738026876,
+                "Liverpool": 182.7704982226853,
+                "Man City": 182.67820491105738,
+                "Man United": 182.71354077538464,
+                "Middlesbrough": 37.763606189824564,
+                "Newcastle": 159.6463188296193,
+                "Norwich": 54.95292043488717,
+                "QPR": 37.77764442479026,
+                "Sheffield United": 73.33408758054601,
+                "Southampton": 182.75044357922437,
+                "Stoke": 132.3102604090134,
+                "Sunderland": 105.03497799540605,
+                "Swansea": 132.24593556429545,
+                "Tottenham": 182.70092649254107,
+                "Watford": 152.70885874759162,
+                "West Brom": 109.99206732143709,
+                "West Ham": 182.7580929645896,
+                "Wolves": 104.68071416447675
+              }
+            },
+            "poisson_tw_h1095": {
+              "half_life_days": "1095",
+              "glm_converged": true,
+              "is_home_coef": 0.1898048050908577,
+              "attack_sd": 0.3144549530062042,
+              "defence_sd": 0.18825100899681618,
+              "spearman_net_strength_vs_static": 0.9681451612903226,
+              "n_history_matches": 2660,
+              "sum_of_weights": 1358.9260066121633,
+              "kish_ess": 2193.7067328877374,
+              "last_season_weight_share": 0.25943464827282486,
+              "team_kish_ess_min": 37.89435063241022,
+              "team_kish_ess_median": 145.5765388331012,
+              "team_kish_ess": {
+                "Arsenal": 219.4313455057433,
+                "Aston Villa": 116.97450362126675,
+                "Bournemouth": 171.05709099729694,
+                "Brighton": 141.80002374606624,
+                "Burnley": 192.62293027733614,
+                "Cardiff": 37.90368121255368,
+                "Chelsea": 219.48057427078024,
+                "Crystal Palace": 219.40633783672763,
+                "Everton": 219.27308911522894,
+                "Fulham": 71.88501011223994,
+                "Huddersfield": 74.8211917224447,
+                "Hull": 72.07896365633351,
+                "Leeds": 37.918420609972365,
+                "Leicester": 219.44682949833745,
+                "Liverpool": 219.41417358130803,
+                "Man City": 219.32737549812413,
+                "Man United": 219.3687576395737,
+                "Middlesbrough": 37.89435063241022,
+                "Newcastle": 188.28428473309188,
+                "Norwich": 63.509977985919605,
+                "QPR": 37.90076858260689,
+                "Sheffield United": 74.76845345143673,
+                "Southampton": 219.39701297246793,
+                "Stoke": 142.38332350779237,
+                "Sunderland": 109.79276810231124,
+                "Swansea": 142.35409262756443,
+                "Tottenham": 219.365076318217,
+                "Watford": 171.08573126314403,
+                "West Brom": 145.5765388331012,
+                "West Ham": 219.39575429905022,
+                "Wolves": 109.58351384522629
+              }
+            },
+            "poisson_tw_h1460": {
+              "half_life_days": "1460",
+              "glm_converged": true,
+              "is_home_coef": 0.1979046538377315,
+              "attack_sd": 0.31107782006171275,
+              "defence_sd": 0.1865352674653744,
+              "spearman_net_strength_vs_static": 0.9778225806451613,
+              "n_history_matches": 2660,
+              "sum_of_weights": 1575.9591021279784,
+              "kish_ess": 2371.6045836546673,
+              "last_season_weight_share": 0.2278939779623441,
+              "team_kish_ess_min": 37.94044326317415,
+              "team_kish_ess_median": 163.36063551804853,
+              "team_kish_ess": {
+                "Arsenal": 237.19276475297428,
+                "Aston Villa": 128.60542886148733,
+                "Bournemouth": 178.79729137195577,
+                "Brighton": 146.0454822896407,
+                "Burnley": 205.85534283550987,
+                "Cardiff": 37.94572444110897,
+                "Chelsea": 237.22975741136528,
+                "Crystal Palace": 237.18450656048154,
+                "Everton": 237.10894289811785,
+                "Fulham": 73.59356123720535,
+                "Huddersfield": 75.33081212285117,
+                "Hull": 73.71396918343602,
+                "Leeds": 37.95402720115721,
+                "Leicester": 237.209560057352,
+                "Liverpool": 237.1908927934422,
+                "Man City": 237.12661141939478,
+                "Man United": 237.1575335499694,
+                "Middlesbrough": 37.94044326317415,
+                "Newcastle": 202.78503780814378,
+                "Norwich": 68.05027929723248,
+                "QPR": 37.944098333448686,
+                "Sheffield United": 75.29627068318561,
+                "Southampton": 237.1761848855136,
+                "Stoke": 146.3958064666611,
+                "Sunderland": 111.58695456268066,
+                "Swansea": 146.37955756433527,
+                "Tottenham": 237.1564453556802,
+                "Watford": 178.81450089064,
+                "West Brom": 163.36063551804853,
+                "West Ham": 237.17503099052584,
+                "Wolves": 111.4556172528014
+              }
+            },
+            "poisson": {
+              "half_life_days": "inf",
+              "glm_converged": true,
+              "is_home_coef": 0.22021182105416598,
+              "attack_sd": 0.3020138422781707,
+              "defence_sd": 0.1828188618988903,
+              "spearman_net_strength_vs_static": 1.0,
+              "n_history_matches": 2660,
+              "sum_of_weights": 2660.0,
+              "kish_ess": 2660.0,
+              "last_season_weight_share": 0.14285714285714285,
+              "team_kish_ess_min": 38.0,
+              "team_kish_ess_median": 190.0,
+              "team_kish_ess": {
+                "Arsenal": 266.0,
+                "Aston Villa": 152.0,
+                "Bournemouth": 190.0,
+                "Brighton": 152.0,
+                "Burnley": 228.0,
+                "Cardiff": 38.0,
+                "Chelsea": 266.0,
+                "Crystal Palace": 266.0,
+                "Everton": 266.0,
+                "Fulham": 76.0,
+                "Huddersfield": 76.0,
+                "Hull": 76.0,
+                "Leeds": 38.0,
+                "Leicester": 266.0,
+                "Liverpool": 266.0,
+                "Man City": 266.0,
+                "Man United": 266.0,
+                "Middlesbrough": 38.0,
+                "Newcastle": 228.0,
+                "Norwich": 76.0,
+                "QPR": 38.0,
+                "Sheffield United": 76.0,
+                "Southampton": 266.0,
+                "Stoke": 152.0,
+                "Sunderland": 114.0,
+                "Swansea": 152.0,
+                "Tottenham": 266.0,
+                "Watford": 190.0,
+                "West Brom": 190.0,
+                "West Ham": 266.0,
+                "Wolves": 114.0
+              }
+            }
+          },
+          "reproduction_max_abs_diff": 9.71445146547012e-17
+        },
+        "scores": {
+          "183": {
+            "log_loss": 0.9593880504057581,
+            "brier": 0.570442257354014
+          },
+          "274": {
+            "log_loss": 0.9538795051488133,
+            "brier": 0.5663737520057626
+          },
+          "365": {
+            "log_loss": 0.9507991926230535,
+            "brier": 0.5640791609577647
+          },
+          "548": {
+            "log_loss": 0.9483225872588591,
+            "brier": 0.562124914335745
+          },
+          "730": {
+            "log_loss": 0.9478657183209829,
+            "brier": 0.5616407916039414
+          },
+          "1095": {
+            "log_loss": 0.9484055916933375,
+            "brier": 0.5618090813698146
+          },
+          "1460": {
+            "log_loss": 0.9491816152274597,
+            "brier": 0.5622312438145793
+          },
+          "inf": {
+            "log_loss": 0.9539193488540336,
+            "brier": 0.5651336552038487
+          }
+        },
+        "paired_vs_static": {
+          "183": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": 0.005468701551724585,
+              "sd": 0.21908867059484877,
+              "naive_se": 0.011846958499181957,
+              "clustered_se": 0.012314420526246029,
+              "n_clusters": 119
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": 0.005308602150165285,
+              "sd": 0.15023222766441874,
+              "naive_se": 0.00812362849045409,
+              "clustered_se": 0.008444563570285446,
+              "n_clusters": 119
+            }
+          },
+          "274": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -3.984370522018465e-05,
+              "sd": 0.17926929692466018,
+              "naive_se": 0.009693773370743671,
+              "clustered_se": 0.009783063280359439,
+              "n_clusters": 119
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": 0.0012400968019139148,
+              "sd": 0.12351934826562175,
+              "naive_se": 0.006679161404264916,
+              "clustered_se": 0.00672484290071115,
+              "n_clusters": 119
+            }
+          },
+          "365": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.003120156230980084,
+              "sd": 0.15265520465306795,
+              "naive_se": 0.00825464808060936,
+              "clustered_se": 0.008184531963393783,
+              "n_clusters": 119
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0010544942460840921,
+              "sd": 0.10533515564787514,
+              "naive_se": 0.005695872881409458,
+              "clustered_se": 0.005619499575606865,
+              "n_clusters": 119
+            }
+          },
+          "548": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.0055967615951744605,
+              "sd": 0.11691428953125955,
+              "naive_se": 0.006322000732751453,
+              "clustered_se": 0.006181431496605001,
+              "n_clusters": 119
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0030087408681037024,
+              "sd": 0.08070141964044691,
+              "naive_se": 0.00436383299378111,
+              "clustered_se": 0.004229343528156304,
+              "n_clusters": 119
+            }
+          },
+          "730": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.006053630533050763,
+              "sd": 0.09389069500467304,
+              "naive_se": 0.005077027324871016,
+              "clustered_se": 0.004948206565061317,
+              "n_clusters": 119
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.003492863599907309,
+              "sd": 0.0647596568928731,
+              "naive_se": 0.0035018011910341517,
+              "clustered_se": 0.0033749356304070737,
+              "n_clusters": 119
+            }
+          },
+          "1095": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.005513757160696005,
+              "sd": 0.06634204858548053,
+              "naive_se": 0.003587367134087582,
+              "clustered_se": 0.00349650873924714,
+              "n_clusters": 119
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.0033245738340342075,
+              "sd": 0.04567237116359083,
+              "naive_se": 0.0024696789855231213,
+              "clustered_se": 0.0023739387529430863,
+              "n_clusters": 119
+            }
+          },
+          "1460": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": -0.004737733626573798,
+              "sd": 0.050901611325588146,
+              "naive_se": 0.0027524439090275423,
+              "clustered_se": 0.0026860334448201087,
+              "n_clusters": 119
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": -0.00290241138926942,
+              "sd": 0.03499302692137519,
+              "naive_se": 0.001892206185617505,
+              "clustered_se": 0.0018184774559796267,
+              "n_clusters": 119
+            }
+          },
+          "inf": {
+            "log_loss": {
+              "n_matches": 342,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 119
+            },
+            "brier": {
+              "n_matches": 342,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 119
+            }
+          }
+        },
+        "sharpness_and_calibration": {
+          "183": {
+            "mean_predicted": {
+              "H": 0.4056699201897449,
+              "D": 0.229155868294362,
+              "A": 0.365174211515893
+            },
+            "observed": {
+              "H": 0.4298245614035088,
+              "D": 0.23684210526315788,
+              "A": 0.3333333333333333
+            },
+            "mean_entropy_nats": 0.9624886446958774
+          },
+          "274": {
+            "mean_predicted": {
+              "H": 0.4139817305696005,
+              "D": 0.22992804686170307,
+              "A": 0.3560902225686965
+            },
+            "observed": {
+              "H": 0.4298245614035088,
+              "D": 0.23684210526315788,
+              "A": 0.3333333333333333
+            },
+            "mean_entropy_nats": 0.9684844071668793
+          },
+          "365": {
+            "mean_predicted": {
+              "H": 0.4202270485906842,
+              "D": 0.23018978314079497,
+              "A": 0.34958316826852076
+            },
+            "observed": {
+              "H": 0.4298245614035088,
+              "D": 0.23684210526315788,
+              "A": 0.3333333333333333
+            },
+            "mean_entropy_nats": 0.9710053790700282
+          },
+          "548": {
+            "mean_predicted": {
+              "H": 0.4280903438599537,
+              "D": 0.23057361806498056,
+              "A": 0.34133603807506574
+            },
+            "observed": {
+              "H": 0.4298245614035088,
+              "D": 0.23684210526315788,
+              "A": 0.3333333333333333
+            },
+            "mean_entropy_nats": 0.9735678535465137
+          },
+          "730": {
+            "mean_predicted": {
+              "H": 0.43243462174245556,
+              "D": 0.2309008351277,
+              "A": 0.33666454312984434
+            },
+            "observed": {
+              "H": 0.4298245614035088,
+              "D": 0.23684210526315788,
+              "A": 0.3333333333333333
+            },
+            "mean_entropy_nats": 0.974989289457692
+          },
+          "1095": {
+            "mean_predicted": {
+              "H": 0.43685327193823303,
+              "D": 0.23135673641384116,
+              "A": 0.3317899916479258
+            },
+            "observed": {
+              "H": 0.4298245614035088,
+              "D": 0.23684210526315788,
+              "A": 0.3333333333333333
+            },
+            "mean_entropy_nats": 0.9764916990864937
+          },
+          "1460": {
+            "mean_predicted": {
+              "H": 0.43900259300322236,
+              "D": 0.2316323426748741,
+              "A": 0.32936506432190366
+            },
+            "observed": {
+              "H": 0.4298245614035088,
+              "D": 0.23684210526315788,
+              "A": 0.3333333333333333
+            },
+            "mean_entropy_nats": 0.9772336103375413
+          },
+          "inf": {
+            "mean_predicted": {
+              "H": 0.44477458029351086,
+              "D": 0.23261513165372297,
+              "A": 0.32261028805276604
+            },
+            "observed": {
+              "H": 0.4298245614035088,
+              "D": 0.23684210526315788,
+              "A": 0.3333333333333333
+            },
+            "mean_entropy_nats": 0.9792324869625949
+          }
+        },
+        "returning_vs_continuous_log_loss_vs_static": {
+          "183": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.035696383518824884,
+              "sd": 0.25142579939251064,
+              "naive_se": 0.030051130855869874,
+              "clustered_se": 0.03275974484055441,
+              "n_clusters": 50
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": 0.01606265726841011,
+              "sd": 0.20917136129137165,
+              "naive_se": 0.012682876712625862,
+              "clustered_se": 0.01321974335002439,
+              "n_clusters": 115
+            }
+          },
+          "274": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.03192097510331741,
+              "sd": 0.19966481885473106,
+              "naive_se": 0.02386451037727438,
+              "clustered_se": 0.02555316762485053,
+              "n_clusters": 50
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": 0.008164859228113656,
+              "sd": 0.17308430090623422,
+              "naive_se": 0.010494777276067563,
+              "clustered_se": 0.010867491793065712,
+              "n_clusters": 115
+            }
+          },
+          "365": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.028948648855131622,
+              "sd": 0.16696537885245644,
+              "naive_se": 0.01995617975728117,
+              "clustered_se": 0.021084254642990737,
+              "n_clusters": 50
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": 0.00352688231200009,
+              "sd": 0.1483522379049546,
+              "naive_se": 0.008995175686454233,
+              "clustered_se": 0.00927566064457223,
+              "n_clusters": 115
+            }
+          },
+          "548": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.024199844612213698,
+              "sd": 0.12482562400392878,
+              "naive_se": 0.01491951569875137,
+              "clustered_se": 0.01551185616680762,
+              "n_clusters": 50
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.0008092034657893654,
+              "sd": 0.11454278675025771,
+              "naive_se": 0.006945176594469288,
+              "clustered_se": 0.007141747504806012,
+              "n_clusters": 115
+            }
+          },
+          "730": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.02054697584194512,
+              "sd": 0.09879902469921278,
+              "naive_se": 0.01180874208948345,
+              "clustered_se": 0.012177128968116752,
+              "n_clusters": 50
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.0023237254903205984,
+              "sd": 0.0924065016015182,
+              "naive_se": 0.00560296715583628,
+              "clustered_se": 0.005760170945519473,
+              "n_clusters": 115
+            }
+          },
+          "1095": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.015499304050781726,
+              "sd": 0.0687352483794439,
+              "naive_se": 0.008215433533281687,
+              "clustered_se": 0.008407218502469888,
+              "n_clusters": 50
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.0029439472992768864,
+              "sd": 0.0655958572465112,
+              "naive_se": 0.003977333059269166,
+              "clustered_se": 0.004091906005564944,
+              "n_clusters": 115
+            }
+          },
+          "1460": {
+            "returning": {
+              "n_matches": 70,
+              "mean": -0.01233121588849806,
+              "sd": 0.052329407300251,
+              "naive_se": 0.006254560471477206,
+              "clustered_se": 0.006378895780579264,
+              "n_clusters": 50
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": -0.0027835286326962313,
+              "sd": 0.05044085421117687,
+              "naive_se": 0.0030584260258685824,
+              "clustered_se": 0.0031488970102532886,
+              "n_clusters": 115
+            }
+          },
+          "inf": {
+            "returning": {
+              "n_matches": 70,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 50
+            },
+            "continuous": {
+              "n_matches": 272,
+              "mean": 0.0,
+              "sd": 0.0,
+              "naive_se": 0.0,
+              "clustered_se": 0.0,
+              "n_clusters": 115
+            }
+          }
+        }
+      }
+    ],
+    "predictions": {
+      "file": "results/time_weighted_poisson_development/predictions.csv",
+      "sha256": "96831b967d1841a71bbd95f141147446691891e55e8a939477036ea521c1c3ba",
+      "n_rows": 1604
+    }
+  },
+  "provenance": {
+    "git_commit": "ae547570c8d8368bfe30fd91f6a763237637d5f9",
+    "git_dirty": false,
+    "data_file": "data/processed/matches_dev_v2.csv",
+    "data_sha256": "c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807",
+    "python": "3.13.15",
+    "packages": {
+      "numpy": "2.5.2",
+      "pandas": "3.0.5",
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "scikit-learn": "1.9.0",
+      "matplotlib": "3.11.1"
+    }
+  }
+}

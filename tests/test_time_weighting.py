@@ -487,8 +487,11 @@ def test_experiment_is_not_in_run_all():
 
 # --- Validation-stage lock -------------------------------------------------------------------------
 
-def test_committed_protocol_is_unlocked_and_validation_refuses_before_loading_data(monkeypatch):
-    assert TCFG["locked"]["status"] == "unlocked" and TCFG["locked"]["half_life_days"] == ""
+def test_unlocked_protocol_refuses_validation_before_loading_data(monkeypatch):
+    unlocked = json.loads(json.dumps(TCFG))
+    unlocked["locked"] = {"status": "unlocked", "half_life_days": "", "development_metrics_sha256": "",
+                          "development_commit": ""}
+    monkeypatch.setattr(twp, "load_all_configs", lambda: (unlocked, VCFG, DCFG, load_config()))
 
     def forbidden(*args, **kwargs):
         raise AssertionError("validation data must not be loaded while H* is unlocked")
@@ -498,6 +501,21 @@ def test_committed_protocol_is_unlocked_and_validation_refuses_before_loading_da
     monkeypatch.setattr(twp, "verify_file", forbidden)
     with pytest.raises(twp.LockError, match="not locked"):
         twp.run_validation(write=False)
+
+
+def test_committed_lock_is_the_development_selection():
+    """The committed [locked] H* is on the grid and, when the development metrics exist, equals their H*."""
+    lock = TCFG["locked"]
+    assert lock["status"] == "locked" and lock["half_life_days"] == 730.0 and 730.0 in GRID
+    assert lock["development_commit"] == "ae547570c8d8368bfe30fd91f6a763237637d5f9"
+    path = PROJECT_ROOT / "results" / TCFG["development_stage"]["results_name"] / "metrics.json"
+    if path.exists():
+        from eplmodel.data.checksums import content_sha256
+        assert content_sha256(path) == lock["development_metrics_sha256"]
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        assert payload["results"]["selection"]["h_star"] == tw.half_life_label(lock["half_life_days"])
+        assert payload["provenance"]["git_commit"] == lock["development_commit"]
+        assert payload["provenance"]["git_dirty"] is False
 
 
 def _locked_setup(tmp_path, monkeypatch, h_star="365", lock_h=365.0, dirty=False, commit="abc", clean=True,

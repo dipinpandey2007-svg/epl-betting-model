@@ -170,10 +170,10 @@ segments_labels = ["0-9", "10-18", "19-28", "29+"]
 
 [locked]
 # Written ONLY from the development stage output, in a separate commit, before the validation stage.
-status = "unlocked"
-half_life_days = ""
-development_metrics_sha256 = ""
-development_commit = ""
+status = "locked"
+half_life_days = 730.0
+development_metrics_sha256 = "e21495a1a7695179787d319ad8954014274669582ad53634c9831de181d5a215"
+development_commit = "ae547570c8d8368bfe30fd91f6a763237637d5f9"
 
 [outputs]
 in_run_all = false
