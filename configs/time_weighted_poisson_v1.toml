@@ -1,0 +1,180 @@
+# Pre-registered protocol time_weighted_poisson_v1: does recency-weighting the history of the
+# static Poisson goal model improve its forecasts? (RESULTS_LOG Experiment 12, when recorded.)
+#
+# Registered BEFORE any time-weighted model was fitted on real data (access-log entry V3,
+# docs/TEST_SET_ACCESS_LOG.md). Changing anything here after the first development-stage run is a
+# protocol change that must be logged. The only section written after registration is [locked], and
+# only with the output of the development stage (see [validation_stage]).
+#
+# The candidate stays STATIC during the target season: it is fitted once on a recency-weighted
+# history, never updated in-season, and never fitted on target-season outcomes. The experiment
+# isolates history weighting; it is not combined with online updating.
+#
+# Established specifications (configs/baselines_v1.toml, protocols validation_2425_v1 and
+# update_policy_diagnostic_v1) are used unchanged and reproduced from their recorded predictions.
+
+[protocol]
+protocol_id = "time_weighted_poisson_v1"
+registered = "2026-10-01"
+dataset = "dev_v2"
+data_file = "data/processed/matches_dev_v2.csv"
+data_sha256 = "c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807"
+# Development: the historical selection folds (eplmodel.splits.selection_folds), used to select H.
+development_targets = ["1718", "1819", "1920", "2021", "2122"]
+# Validation: scored once, for the locked H* only, after the lock is committed.
+validation_target = "2425"
+# The full half-life grid is NEVER scored on 2024-25 (decision 3).
+score_grid_on_validation = false
+# 2025-26 (sealed holdout) and 2026-27 are never accessed; 2022-23 and 2023-24 are history only.
+
+[candidate]
+spec_id = "poisson_time_weighted_v1"           # the locked candidate, at H*
+base_spec = "poisson_static_v1"
+grid_arm_prefix = "poisson_tw_h"               # development arms: poisson_tw_h<days>_dev, inf -> "inf"
+grid_arm_suffix = "_dev"
+formula = "Goals ~ Team + Opponent + IsHome"   # unchanged
+max_goals = 10                                 # unchanged scoreline grid; H/D/A renormalised by captured mass
+fit = "once_on_history"                        # static during the target season
+in_season_updates = false
+unseen_team_rule = "exclude_match"             # unchanged; no new promoted-team treatment
+# Weighted log-likelihood: sum_i w_i [log Pois(x_i; lambda_i) + log Pois(y_i; mu_i)]
+# Weight of history match i:   w_i = 2 ** (-age_i / H) = exp(-ln(2) * age_i / H)
+# age_i = (reference_date - Date_i) in whole days (no kickoff times; same-day matches share a weight).
+weighting = "exponential_half_life_days"
+reference_date = "latest_history_date"         # point estimates are invariant to this choice (common factor)
+age_unit = "days"                              # the summer break counts as elapsed time (decision 6)
+weights_apply_to = "both_goal_rows_of_a_match_equally"
+glm_weights = "var_weights"                    # statsmodels GLM; same point estimates as freq_weights
+truncation = "none"                            # every history match keeps w_i > 0, so the set of seen teams is unchanged
+glm_standard_errors_used = false               # only point estimates are used
+# Candidate grid of half-lives in days (decision: chosen a priori from season length, ~365 days).
+# Approximate seasons: 0.5, 0.75, 1, 1.5, 2, 3, 4, static. H = inf gives w_i = 1 and is poisson_static_v1.
+half_life_grid_days = [183.0, 274.0, 365.0, 548.0, 730.0, 1095.0, 1460.0, inf]
+
+[selection]
+# Applied to a set of development targets ("inner targets"); the locked H* uses all five.
+group = "common"
+metric = "log_loss"
+# 1. Score every H on each inner target's common group.
+# 2. Criterion: mean over inner targets of each target's mean log loss (equal target weights, as for Elo K).
+criterion = "mean_of_target_mean_log_loss"
+# 3. H_min = argmin of the criterion; exact ties are broken towards the longer half-life.
+tie_break = "longer_half_life"
+# 4. One-SE rule (decision 4): H_sel = the LONGEST H whose pooled per-match paired log-loss difference
+#    (H - H_min) over the inner targets is <= 1 x its date-clustered SE (clusters = (target, date)).
+#    H_min itself always qualifies (difference 0).
+rule = "one_se_longest"
+se_multiple = 1.0
+se_type = "clustered"
+# 5. If H_sel = inf, no weighting is selected.
+
+[nested]
+# Forward-chaining nested estimate of the selection PROCEDURE on the historical folds:
+# for each outer target s, H is selected by [selection] using only development targets strictly
+# before s, then s is scored with that H. 1718 has no earlier development target, so it is not an
+# outer target; 1819 selects from 1718 alone.
+outer_targets = ["1819", "1920", "2021", "2122"]
+inner_targets = "development_targets_strictly_before_outer"
+# The in-sample grid table on all five development targets is reported but is optimistically
+# biased (H is selected on the same outcomes).
+in_sample_grid_is_unbiased = false
+# Descriptive: H selected with each development target left out in turn.
+leave_one_target_out = true
+
+[evidence]
+# Fixed before any result (decision 5); cannot be changed after seeing results.
+practical_floor_log_loss = 0.002
+clustered_se_multiple = 2.0
+# Primary estimand: mean per-match (TW - static) on identical common-group matches. Negative = weighting helps.
+primary_difference = "poisson_tw_minus_poisson"
+# Development criterion D (nested outer folds 1819..2122, nested-selected H per fold):
+#   pooled mean log-loss difference < -practical_floor, AND |mean| > 2 x clustered SE (clusters (target, date)),
+#   AND the difference is < 0 in at least 3 of the 4 outer folds, AND the pooled Brier difference is < 0.
+#   A fold whose nested H is inf has difference exactly 0 (not negative).
+development_min_negative_outer_folds = 3
+# Validation criterion V (2024-25, locked H*):
+#   mean log-loss difference < -practical_floor, AND |mean| > 2 x date-clustered SE, AND Brier difference < 0.
+# Readings:
+#   D and V            -> out-of-sample evidence that recency weighting improves static Poisson (two lines of evidence);
+#                         says nothing more about the mechanism of the Experiment 11 gap than in [experiment_11].
+#   D, not V           -> the historical benefit does not replicate in 2024-25.
+#   V, not D           -> 2024-25-specific observation; consistent with the hypothesis but cannot confirm it
+#                         (the hypothesis was prompted by 2024-25). Confirmation needs a future pre-registered season.
+#   neither            -> no evidence that recency weighting helps.
+#   H* = inf           -> no weighting selected; no time-weighted arm is scored on 2024-25 (no new exposure).
+# Brier is secondary; it is used only for the sign agreement above.
+
+[groups]
+# Defined from fixtures only (teams absent from the fold history). Unchanged by weighting (no zero weights).
+expected_common = { "1718" = 306, "1819" = 272, "1920" = 342, "2021" = 342, "2122" = 342, "2425" = 342 }
+expected_full = { "1718" = 380, "1819" = 380, "1920" = 380, "2021" = 380, "2122" = 380, "2425" = 380 }
+expected_unseen_teams = { "1718" = ["Brighton", "Huddersfield"], "1819" = ["Cardiff", "Fulham", "Wolves"], "1920" = ["Sheffield United"], "2021" = ["Leeds"], "2122" = ["Brentford"], "2425" = ["Ipswich"] }
+
+[reproduction]
+# H = inf must reproduce the recorded poisson_static_v1 predictions (Experiment 10) row for row.
+# The validation stage also reproduces every established arm before anything is scored.
+experiment_10_predictions = "results/validation_2425/predictions.csv"
+experiment_10_sha256 = "4e1db61efe28c9961cc5dc46c4ffe5cee6e5ac67c5672a6d8fec63507029c80f"
+experiment_10_models = ["elo", "frequency_baseline", "poisson", "dixon_coles"]
+experiment_11_predictions = "results/update_policy_diagnostic/predictions.csv"
+experiment_11_sha256 = "73251375050967fd00c81f66c1c0d5c640e975aa43a2d1042fa234304eacf5e8"
+experiment_11_models = ["elo_f1", "elo_f2"]
+tolerance = 1e-12
+
+[development_stage]
+# python -m experiments.time_weighted_poisson --stage development
+# The match table is restricted to seasons <= max_season BEFORE anything else happens, and the stage
+# refuses to run if any later season is present.
+max_season = "2122"
+arms = ["poisson", "poisson_tw_grid"]          # static (H = inf) and every grid value
+results_name = "time_weighted_poisson_development"
+diagnostics = [
+  "per_target_log_loss_and_brier_per_h",
+  "paired_differences_naive_and_date_clustered_se",
+  "nested_selected_h_and_outer_scores",
+  "leave_one_target_out_selected_h",
+  "is_home_coef_per_h",                          # 2020-21 was played largely without crowds (public knowledge)
+  "attack_defence_sd_per_h",
+  "spearman_team_strength_vs_static",
+  "sum_of_weights_kish_ess_last_season_share",
+  "per_team_kish_ess",
+  "glm_converged",
+  "mean_entropy_and_calibration_in_the_large",
+  "returning_vs_continuous_team_matches",
+]
+
+[validation_stage]
+# python -m experiments.time_weighted_poisson --stage validation
+# Refuses to run unless ALL of:
+#  - [locked] status = "locked" with half_life_days equal to the development stage's selected H*,
+#  - the development metrics file matches [locked] development_metrics_sha256,
+#  - the working tree is clean outside results/ and [locked] is committed at HEAD.
+# If H* = inf the stage writes no time-weighted prediction: there is nothing new to score.
+arms = ["elo", "elo_f1", "elo_f2", "poisson", "poisson_tw", "dixon_coles", "frequency_baseline"]
+results_name = "time_weighted_poisson_validation"
+# Identity on the 2024-25 common group, checked per match to 1e-12:
+identity = "poisson - elo = (poisson - poisson_tw) + (poisson_tw - elo_f2) + (elo_f2 - elo_f1) + (elo_f1 - elo)"
+components = ["poisson_minus_poisson_tw", "poisson_tw_minus_elo_f2", "elo_f2_minus_elo_f1", "elo_f1_minus_elo"]
+identity_tolerance = 1e-12
+# Context comparisons only (they mix model family and/or updating; not effects of weighting):
+context_pairs = [["poisson_tw", "elo"], ["poisson_tw", "elo_f2"], ["poisson_tw", "dixon_coles"], ["poisson_tw", "frequency_baseline"]]
+segments_lower_edges = [0, 10, 19, 29]           # Experiment 11 segments; descriptive
+segments_labels = ["0-9", "10-18", "19-28", "29+"]
+
+[experiment_11]
+# On the 2024-25 common group: poisson - elo_f2 = (poisson - poisson_tw) + (poisson_tw - elo_f2).
+# poisson - poisson_tw is the part of Experiment 11's "history_weighting_or_model_family" component
+# closed by THIS weighting at the H* chosen without 2024-25. poisson_tw - elo_f2 is NOT pure model
+# family: it also contains goals vs results, Elo's own implicit recency, the weighting's functional
+# form and the gap between H* and any 2024-25-optimal H.
+
+[locked]
+# Written ONLY from the development stage output, in a separate commit, before the validation stage.
+status = "unlocked"
+half_life_days = ""
+development_metrics_sha256 = ""
+development_commit = ""
+
+[outputs]
+in_run_all = false
+not_registered_for = ["dev_test", "holdout"]
