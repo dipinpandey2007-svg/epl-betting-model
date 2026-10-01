@@ -1,0 +1,87 @@
+# Pre-registered protocol validation_2425_v1: evaluate the established specifications on the
+# selection folds, with 2024-25 as the primary new validation result.
+#
+# Registered BEFORE any 2024-25 prediction was generated (access-log entry V1,
+# docs/TEST_SET_ACCESS_LOG.md). Changing anything here after the first run is a protocol change
+# that must be logged. No decision about the established specifications may be taken from these
+# results: they are the baseline row of each fold for future comparisons.
+#
+# The frozen hyperparameters below repeat configs/baselines_v1.toml for readability; the experiment
+# refuses to run if they disagree.
+
+[protocol]
+protocol_id = "validation_2425_v1"
+registered = "2026-10-01"
+dataset = "dev_v2"
+data_file = "data/processed/matches_dev_v2.csv"
+data_sha256 = "c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807"
+# eplmodel.splits.selection_folds(): each target is predicted from every development season before it.
+# 2022-23 and 2023-24 are history only (in the 2024-25 fold), never targets.
+targets = ["1718", "1819", "1920", "2021", "2122", "2425"]
+primary_target = "2425"
+# Folds 1-5 were used during development, including the selection of K = 25 for Elo.
+previously_used_targets = ["1718", "1819", "1920", "2021", "2122"]
+# The pooled six-fold result is descriptive context only. It is NOT an unbiased estimate of
+# out-of-sample performance: K = 25 was selected on folds 1-5.
+pooled_is_unbiased = false
+
+[elo]
+spec_id = "elo_k25_logreg_v1"
+k = 25                              # frozen hyperparameter (walk-forward selection, Experiment 2a)
+initial_rating = 1500.0
+update_home_advantage = 0.0         # ratings updated WITHOUT a home-advantage term
+apply_home_shift = true             # redundant feature shift, kept to reproduce recorded numbers
+logistic_C = 1.0
+logistic_tol = 1e-4
+# Ratings are updated online through the target season: each prediction uses pre-match ratings,
+# which depend only on matches dated strictly earlier (no team plays twice on one date).
+rating_updates = "online"
+# Home shift and logistic regression are re-estimated once on the fold history and held fixed
+# for the whole target season.
+calibration_layer = "fit_once_on_history"
+new_team_rule = "start_at_initial_rating"   # returning teams resume their last rating
+
+[poisson]
+spec_id = "poisson_static_v1"
+formula = "Goals ~ Team + Opponent + IsHome"
+max_goals = 10                      # scoreline grid truncation; H/D/A renormalised
+fit = "once_on_history"             # coefficients re-estimated on the fold history; never updated in-season
+unseen_team_rule = "exclude_match"  # a target match with a team absent from the history is not scored
+
+[dixon_coles]
+spec_id = "dixon_coles_staged_v1"
+fit = "staged"                      # Poisson coefficients fixed; rho by history log-likelihood grid
+rho_estimation = "reestimate_on_history"   # decision A: never uses the target season
+rho_grid_start = -0.30
+rho_grid_stop = 0.30                # exclusive; last grid value 0.28
+rho_grid_step = 0.02
+rho_validity = "exclude_outside_rho_bounds"
+rho_reference_experiment_5 = -0.04  # history 2014-15..2021-22; recorded for comparison only, not used
+
+[baseline]
+spec_id = "frequency_baseline_v1"
+fit = "history_HDA_rates"
+
+[groups]
+# Every comparison between models is made within one group, aligned by match_id.
+full_models = ["elo", "frequency_baseline"]
+full_rule = "all target-season matches"
+common_models = ["elo", "frequency_baseline", "poisson", "dixon_coles"]
+common_rule = "target-season matches in which neither team is absent from the fold history"
+# Derived from the 2024-25 fixture list before scoring (Ipswich is the only team absent from 2014-15..2023-24).
+expected_2425_full = 380
+expected_2425_common = 342
+expected_2425_unseen_teams = ["Ipswich"]
+
+[metrics]
+primary = ["log_loss", "brier"]     # eplmodel.evaluation.metrics; (H, D, A) columns; Brier summed over outcomes
+paired_reference_models = ["elo", "frequency_baseline"]
+paired_difference = "model_minus_reference_per_match"   # negative = model better
+paired_uncertainty = "naive_standard_error"             # ignores correlation between same-date matches
+calibration_event = "home_win"
+calibration_bins = 10               # descriptive only; too few matches per bin to interpret
+
+[outputs]
+predictions_file = "results/validation_2425/predictions.csv"   # git-ignored; SHA-256 recorded in metrics.json
+report_stale_registered_fits = false                            # decision C
+frozen_start_elo_diagnostic = "deferred"                        # decision D: later all-fold diagnostic

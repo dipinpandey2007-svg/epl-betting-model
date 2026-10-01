@@ -47,6 +47,19 @@ def multiclass_brier(results, probs, outcomes=OUTCOMES) -> float:
     return float(((probs - one_hot(results, outcomes)) ** 2).sum(axis=1).mean())
 
 
+def per_match_log_loss(results, probs, outcomes=OUTCOMES) -> np.ndarray:
+    """Negative log probability of the observed outcome, one value per match (mean = multiclass_log_loss)."""
+    results, probs = _check(results, probs, outcomes)
+    idx = np.array([outcomes.index(r) for r in results])
+    return -np.log(np.clip(probs[np.arange(len(results)), idx], _EPS, 1.0))
+
+
+def per_match_brier(results, probs, outcomes=OUTCOMES) -> np.ndarray:
+    """Squared error summed over outcomes, one value per match (mean = multiclass_brier)."""
+    results, probs = _check(results, probs, outcomes)
+    return ((probs - one_hot(results, outcomes)) ** 2).sum(axis=1)
+
+
 def score(results, probs, outcomes=OUTCOMES) -> dict:
     return {
         "n_matches": int(len(results)),

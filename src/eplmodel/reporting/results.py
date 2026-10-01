@@ -55,10 +55,30 @@ def _jsonable(obj):
     return obj
 
 
-def write_results(experiment: str, results: dict, results_dir: Path = RESULTS_DIR) -> Path:
+def write_results(
+    experiment: str, results: dict, results_dir: Path = RESULTS_DIR, data_path: Path = PROCESSED_MATCHES
+) -> Path:
+    """Write results/<experiment>/metrics.json; provenance records `data_path` (default: dataset v1)."""
     out_dir = Path(results_dir) / experiment
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / "metrics.json"
-    payload = {"experiment": experiment, "results": _jsonable(results), "provenance": provenance()}
+    payload = {"experiment": experiment, "results": _jsonable(results), "provenance": provenance(data_path)}
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return path
+
+
+def write_predictions(experiment: str, predictions: pd.DataFrame, results_dir: Path = RESULTS_DIR) -> dict:
+    """Write results/<experiment>/predictions.csv (git-ignored) and return its path, SHA-256 and row count.
+
+    Predictions are derived from third-party match data, so they are not committed;
+    the checksum, recorded in metrics.json, identifies the exact file.
+    """
+    out_dir = Path(results_dir) / experiment
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = out_dir / "predictions.csv"
+    predictions.to_csv(path)
+    try:
+        shown = path.resolve().relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        shown = str(path)
+    return {"file": shown, "sha256": content_sha256(path), "n_rows": int(len(predictions))}

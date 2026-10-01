@@ -13,3 +13,6 @@ data/processed/
 # Sealed final holdout data (docs/HOLDOUT_PROTOCOL.md). Only data/holdout_manifest.json,
 # which records their checksums, is committed.
 data/holdout/
+
+# Per-match predictions are derived from third-party match data; metrics.json records their checksum.
+results/*/predictions.csv
