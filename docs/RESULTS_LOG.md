@@ -6,8 +6,9 @@ conversations. Every model result in Experiments 2–7 is reproduced by `python 
 `python -m experiments.validation_2425`, Experiment 11 by `python -m experiments.update_policy_diagnostic`, and
 Experiment 12 by `python -m experiments.time_weighted_poisson --stage development` then `--stage validation`,
 Experiment 13 by `python -m experiments.online_tw_poisson_diagnostic --stage historical` then `--stage validation`,
-Experiment 14 by `python -m experiments.market_benchmark`, and Experiment 15 by
-`python -m experiments.full_coverage_poisson`. None of them is in `run_all`. The recorded predictions
+Experiment 14 by `python -m experiments.market_benchmark`, Experiment 15 by
+`python -m experiments.full_coverage_poisson`, and the descriptive 2024-25 validation V5 by
+`python -m experiments.exposed_validation_descriptive`. None of them is in `run_all`. The recorded predictions
 of Experiments 10-13 are regenerated row by row by `tests/test_reproduction_recorded.py`, and Experiment 14's
 metrics by `tests/test_market.py` (both golden). Data-acquisition records are not
 produced by `run_all`. Their checksums and coverage are locked by `tests/test_data.py` against
@@ -1747,6 +1748,117 @@ clustered SE of about 0.01.
 | Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0, scikit-learn 1.9.0 |
 
 Reproduced by `tests/test_full_coverage.py::test_recorded_experiment_15_reproduces` (golden). Not in `experiments.run_all`.
+
+## Descriptive validation V5 — frozen Experiments 14 and 15 on 2024-25 (2026-10-02)
+
+Protocol `exposed_validation_descriptive_v1` (`configs/exposed_validation_descriptive_v1.toml`). Access-log entry
+**V5**, registered before any 2024-25 data was read for it. Script `experiments/exposed_validation_descriptive.py`.
+Results `results/exposed_validation_descriptive/metrics.json`, locked in `[locked]`.
+
+**Evidence class: exposed and descriptive only.** 2024-25 has now been scored five times (V1-V5). These results cannot
+select, tune or confirm anything, and no criterion is applied. In particular, the Experiment 15 non-inferiority rule is
+not applied to this season. No parameter, prior, hyperparameter, arm, market specification, scoring rule or evidence
+criterion was changed, before or after.
+
+### Run sequence
+
+| Step | Commit | What |
+|---|---|---|
+| Registration | `4ad86fe` | Entry V5. The logged-access registry (`LOGGED_EXPOSED_VALIDATION_ACCESSES`), separate from the unchanged V1-V4 reproduction set. `build_exposed_validation_fold`, which opens the season only for a logged entry and exactly its specs. The stage code |
+| First run | at `4ad86fe` | **Aborted at a pre-scoring check, before any outcome was joined.** The registered EB team-season count [24, 136] was an arithmetic slip (8 seasons instead of 9); nothing was written |
+| Correction | `9aa1ad8` | [27, 153], verified from the fixture lists only and recorded in the V5 entry |
+| **Recorded run** | at `9aa1ad8`, `git_dirty: false` | Every pre-scoring check passed; metrics reproduce exactly on a rerun |
+
+### What was run (all frozen, unchanged)
+
+- **Experiment 15:**
+  - M1 `fc_promoted`, M2 `fc_hier` (primary) and S1 `fc_hier_break`, using the same code path as the locked historical
+    stage. History is 2014-15 … 2023-24, with 2022-24 as history only.
+  - EB priors from 2015-16 … 2023-24 (27 promoted and 153 continuing team-seasons): a_P −0.293, b_P +0.198,
+    τ_att 0.261, τ_def 0.206. The floor does not bind.
+  - 109 refits per arm, all converged (≤ 6 iterations, max |gradient| ≤ 6.1e-13).
+  - The M0 anchor reproduces the recorded Experiment 13 2024-25 predictions to **2.3e-15**.
+- **M0** is the recorded Experiment 13 online arm. It **cannot score Ipswich's 38 matches** under its registered
+  definition, so it covers 342 of 380.
+- **Experiment 14:** all six market arms, with closing odds + Shin as primary. The validity rules are unchanged. Odds
+  are valid for 380 of 380 matches in both snapshots. Book sums: closing 1.0063 / 1.0294 / 1.0423, pre-closing
+  1.0272 / 1.0357 / 1.0534 (min / median / max).
+- **Promoted teams:**
+  - Ipswich is unseen in the history. Its Experiment 7 category is **unclassified**, because `team_history.csv` has no
+    Ipswich row and none was invented.
+  - Leicester and Southampton are returning teams, one season out, so they are recent yo-yo teams.
+
+### Coverage and scores (log loss / Brier)
+
+| Arm | full (380) | common (342) | unseen: Ipswich (38) | returning / recent yo-yo (74) | continuing-only (272) |
+|---|---|---|---|---|---|
+| M1 `fc_promoted` | 1.0088 / 0.6048 | 1.0169 | 0.9359 | 0.8220 | 1.0714 |
+| **M2 `fc_hier`** | **1.0037 / 0.6010** | 1.0114 | 0.9342 | 0.8172 | 1.0657 |
+| S1 `fc_hier_break` | 0.9888 / 0.5912 | 0.9938 | 0.9434 | 0.7406 | 1.0662 |
+| M0 (Exp 13, recorded) | — (342 only) | 1.0187 / 0.6118 | not scorable | 0.8105 (70) | 1.0722 |
+| market close, Shin (primary) | 0.9666 / 0.5753 | 0.9651 | 0.9794 | 0.7338 | 1.0318 |
+| market close, proportional / power | 0.9664 / 0.9667 | | | | |
+| market pre-closing, Shin / proportional / power | 0.9705 / 0.9703 / 0.9709 | | | | |
+| online Elo (Exp 10, recorded) | 0.9848 / 0.5887 | 0.9836 | 0.9957 | 0.7262 | 1.0594 |
+| frequency baseline | 1.0812 / 0.6558 | 1.0760 | 1.1281 | 1.0514 | 1.0847 |
+
+### Paired differences (left − right; date-clustered SE; descriptive, no reading)
+
+| Comparison (group, matches) | 2024-25 | Historical Experiment 15 (2017-22, locked) |
+|---|---|---|
+| M2 − M0 (common, 342) | **−0.0073** (0.0021) | +0.0037 (0.0014) |
+| M1 − M0 (common) | −0.0017 (0.0009) | +0.0001 (0.0007) |
+| M2 − M1 (full, 380) | −0.0052 (0.0018) | +0.0031 (0.0011) |
+| M2 − M1 (continuing-only, 272) | −0.0057 (0.0024) | +0.0043 (0.0014) |
+| M2 − M1 (promoted, 108) | −0.0039 (0.0024) | +0.0001 (0.0017) |
+| S1 − M2 (returning, 74) | **−0.0766** (0.0207) | +0.0064 (0.0054) |
+| M2 − Elo (unseen, 38) | −0.0615 (0.0279) | −0.0097 (0.0107) |
+| M2 − baseline (unseen) | −0.1939 (0.0679) | −0.0832 (0.0226) |
+| M2 − Elo (full, 380; context) | +0.0189 (0.0111) | −0.0095 (0.0045) |
+| M2 − market (full; context) | +0.0371 (0.0121) | +0.0147 (0.0047) |
+
+Market (Experiment 14 registered comparisons, full 380):
+
+- proportional − Shin, closing: −0.0001 (0.0007); power − Shin, closing: +0.0002 (0.0003). The pre-closing
+  equivalents are similar.
+- pre-closing Shin − closing Shin: +0.0040 (0.0039).
+- Context: market − Elo −0.0182 (0.0082); market − online time-weighted Poisson (common) −0.0535 (0.0128).
+
+Segments of M2 − M0 (common): −0.0035, −0.0152, −0.0083, −0.0023 (0-9, 10-18, 19-28, 29+).
+
+### Comparison with the historical findings (descriptive)
+
+- **The market benchmark behaves as it did historically.** The margin-removal methods differ by about 1e-4, closing is
+  at least as good as pre-closing, and the market leads every model arm.
+- **The Experiment 15 within-family differences reverse sign in 2024-25.**
+  - M2 is better than M0 and M1 here, whereas historically it was worse on the common group.
+  - The identity break (S1) is much better on Leicester's and Southampton's matches (−0.0766), whereas historically it
+    was slightly worse and not distinguishable.
+  - Experiment 13 had already recorded that 2024-25's online gain was concentrated in these two returning teams.
+- **What the reversals mean.** They are features of one exposed season, which had already been used four times, and
+  they are not confirmation of anything. Under the pre-registration they **cannot** be used to choose M1 or M2, to
+  change the continuing-team prior, or to change the returning-team rule.
+- **Online Elo stays ahead of M2 on the full group in 2024-25** (+0.0189). The historical folds showed the opposite
+  sign. This too is descriptive only.
+
+### Decision
+
+- **Recorded and locked as is.** Nothing was selected, tuned or changed.
+- **The historical Experiment 14 and 15 results are unchanged and remain the evidence of record.**
+- **Confirmation** of any of these specifications is possible only on the sealed 2025-26 holdout, if they are
+  pre-registered there, or on a later season.
+
+### Provenance
+
+| Item | Value |
+|---|---|
+| Run | commit `9aa1ad8781d8ddbc21c6bd5b755dbe48b300cca1`, `git_dirty: false` |
+| Metrics | `results/exposed_validation_descriptive/metrics.json`, content SHA-256 `b036f5bf70f1db7a975426131eb3ee831ffae6058629922207e8d951b2c2a267` |
+| Predictions | `results/exposed_validation_descriptive/predictions.csv`, 380 rows, git-ignored, content SHA-256 `2a025f3e696bf7c1a6a0b0bd38bbd2238d70742e01d0289db8e6edf379569b31` |
+| Data | `data/processed/matches_dev_v2.csv`, SHA-256 `c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807`; raw `E0_2425.csv` matching `data/checksums.json` |
+| Frozen inputs | Experiment 15 config at `10e99d1` + lock (metrics `c50267ce…a3ca`); Experiment 14 metrics `55a77b4f…cf56` |
+
+Reproduced by `tests/test_exposed_validation_descriptive.py::test_recorded_descriptive_validation_reproduces` (golden).
 
 ## Future experiment template
 

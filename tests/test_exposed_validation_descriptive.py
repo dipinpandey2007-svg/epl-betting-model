@@ -96,3 +96,35 @@ def test_frozen_inputs_of_experiments_14_and_15_are_verified():
 def test_stage_is_not_in_run_all():
     from experiments import run_all
     assert evd not in run_all.EXPERIMENTS
+
+
+def test_descriptive_results_are_locked_to_the_recorded_run():
+    from eplmodel.data.checksums import content_sha256
+    from eplmodel.paths import RESULTS_DIR
+
+    lock = SCFG["locked"]
+    metrics = RESULTS_DIR / SCFG["outputs"]["results_name"] / "metrics.json"
+    assert lock["status"] == "locked" and content_sha256(metrics) == lock["metrics_sha256"]
+    payload = json.loads(metrics.read_text(encoding="utf-8"))
+    assert payload["provenance"]["git_commit"] == lock["run_commit"] and payload["provenance"]["git_dirty"] is False
+    assert payload["results"]["predictions"]["sha256"] == lock["predictions_sha256"]
+    assert payload["results"]["criteria_applied"] is False and payload["results"]["access_entry"] == "V5"
+
+
+@pytest.mark.golden
+def test_recorded_descriptive_validation_reproduces():
+    from eplmodel.data.checksums import content_sha256
+    from eplmodel.paths import PROCESSED_DEV_V2, RESULTS_DIR
+    from eplmodel.reporting.results import _jsonable
+
+    out = RESULTS_DIR / SCFG["outputs"]["results_name"]
+    if not PROCESSED_DEV_V2.exists() or not (out / "predictions.csv").exists():
+        pytest.skip("dev_v2 or the recorded predictions missing")
+    assert content_sha256(out / "predictions.csv") == SCFG["locked"]["predictions_sha256"]
+    recorded = json.loads((out / "metrics.json").read_text(encoding="utf-8"))["results"]
+    recorded.pop("predictions")
+    again = json.loads(json.dumps(_jsonable(evd.run(write=False))))
+    # The stage config hash changes only because [locked] was written after the run.
+    for result in (recorded, again):
+        result["frozen_inputs"].pop("stage_config_sha256")
+    assert again == recorded

@@ -84,7 +84,10 @@ ranking_claims = false
 
 [locked]
 # Written only from this single scored run, in the results commit.
-status = "not_run"
+status = "locked"
+run_commit = "9aa1ad8781d8ddbc21c6bd5b755dbe48b300cca1"
+metrics_sha256 = "b036f5bf70f1db7a975426131eb3ee831ffae6058629922207e8d951b2c2a267"
+predictions_sha256 = "2a025f3e696bf7c1a6a0b0bd38bbd2238d70742e01d0289db8e6edf379569b31"
 
 [outputs]
 results_name = "exposed_validation_descriptive"

@@ -294,8 +294,20 @@ PA1, implemented in `eplmodel.models.full_coverage`, run once and locked
   INCONCLUSIVE: M2 − M0 +0.0037 (clustered SE 0.0014). The cost comes from the
   continuing-team prior (M2 − M1 on continuing-only +0.0043).
 - On unseen-team matches, M2 − Elo is −0.0097 (SE 0.0107), not distinguishable.
-- M2 stays primary; nothing is adopted or swapped. No 2024-25 stage has been
-  run: it needs its own access-log entry first.
+- M2 stays primary; nothing is adopted or swapped.
+
+Descriptive 2024-25 validation V5 (access-log entry V5, 2026-10-02, locked) ran
+the frozen Experiment 14-15 specs unchanged. It is exposed and descriptive only,
+and selects nothing.
+
+- Scores: M2 1.0037, Elo 0.9848, closing market 0.9666 log loss.
+- M0 cannot score Ipswich (342 of 380).
+- The Experiment 15 within-family differences reverse sign versus history
+  (M2 − M0 −0.0073; S1 − M2 −0.0766 on Leicester and Southampton). They must
+  not be used to choose M1 or M2 or to change any prior or rule.
+- 2024-25 has now been scored five times (V1-V5). A new descriptive access
+  needs a log entry, `LOGGED_EXPOSED_VALIDATION_ACCESSES` and
+  `build_exposed_validation_fold`.
 
 ---
 

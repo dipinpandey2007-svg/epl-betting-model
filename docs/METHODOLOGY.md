@@ -50,7 +50,10 @@ A model that fits training data better is not automatically a better predictive 
 - **2024-25 is an exposed validation season** (amendment A1, [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) §9, access-log
   entry P1, 2026-10-01). It was scored in four pre-registered protocols (Experiments 10-13). It may be used as
   historical fitting information for later seasons, but never to select, tune or confirm anything. It may be
-  re-scored only to reproduce those protocols (`eplmodel.splits.require_registered_exposed_validation_spec`). Before
+  re-scored only to reproduce those protocols (`eplmodel.splits.require_registered_exposed_validation_spec`). A new,
+  descriptive-only access needs an access-log entry first, a matching registry entry
+  (`eplmodel.splits.LOGGED_EXPOSED_VALIDATION_ACCESSES`), and opening through
+  `eplmodel.evaluation.folds.build_exposed_validation_fold`. The first such access was V5 (Experiments 14-15). Before
   A1 it was a selection target alongside the training folds; the recorded protocols keep that legacy definition
   (`SELECTION_VALIDATION_SEASONS`) so they reproduce unchanged.
 - The final holdout is 2025-26, sealed by [HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) before any of its data were

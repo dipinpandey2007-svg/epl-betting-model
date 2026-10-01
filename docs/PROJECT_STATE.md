@@ -32,8 +32,15 @@ Since then:
   - **Where the cost comes from:** the continuing-team prior (M2 − M1 on continuing-only matches +0.0043). Admitting
     promoted teams costs nothing on the common group (M1 − M0 +0.0001).
   - **Unseen-team matches:** M2 − online Elo is −0.0097 (SE 0.0107), not distinguishable.
-  - M2 stays the registered primary arm; nothing is adopted or swapped. No 2024-25 stage has been run. See
-    `RESULTS_LOG.md` Experiment 15.
+  - M2 stays the registered primary arm; nothing is adopted or swapped. See `RESULTS_LOG.md` Experiment 15.
+- **Descriptive 2024-25 validation V5** (2026-10-02; access-log entry V5; exposed and descriptive only; locked): the
+  frozen Experiment 14 and 15 specifications, unchanged.
+  - **Coverage:** 380 of 380 for M1, M2, S1 and the market; 342 for M0, which cannot score Ipswich.
+  - **Scores:** M2 1.0037, online Elo 0.9848, closing market 0.9666 log loss.
+  - **The within-family Experiment 15 differences reverse sign versus history.** M2 − M0 is −0.0073 on the common
+    group, and S1 − M2 is −0.0766 on Leicester's and Southampton's matches.
+  - These cannot select, tune or confirm anything. 2024-25 has now been scored five times (V1-V5). See
+    `RESULTS_LOG.md` "Descriptive validation V5".
 
 No established model or specification has been changed. `poisson_time_weighted_v1` is a new candidate, not a
 replacement for `poisson_static_v1`.
@@ -55,7 +62,7 @@ Completed baseline stages: data pipeline, Elo, static Poisson, staged Dixon-Cole
 |---|---|---|
 | Training (fitting + walk-forward selection) | 2014-15 … 2021-22 | 3,040 |
 | **Exposed development test benchmark** | 2022-23, 2023-24 | 760 |
-| **Exposed validation season** (history only for new work; amendment A1) | 2024-25 | 380, **scored in four pre-registered runs** (2026-10-01: Experiments 10, 11, 12 and 13), then retired from selection |
+| **Exposed validation season** (history only for new work; amendment A1) | 2024-25 | 380, **scored in four pre-registered runs** (2026-10-01: Experiments 10, 11, 12 and 13), then retired from selection; one logged descriptive access since (V5, 2026-10-02) |
 | **Sealed final holdout** ([protocol](HOLDOUT_PROTOCOL.md)) | 2025-26 (next: 2026-27) | not yet downloaded |
 
 The development test has been scored several times (`TEST_SET_ACCESS_LOG.md`). It may be re-scored only for the
