@@ -6,6 +6,7 @@
 | Config (frozen choices) | `configs/full_coverage_poisson_v1.toml` |
 | Typed view of the config | `eplmodel.models.full_coverage_spec` |
 | Status | design only; no prediction or result exists |
+| Amendments | PA1 (2026-10-02): clarifies the identifiability parameterisation and records the rationale of the inherited 0.002 criterion (section 11) |
 | Builds on | Experiment 12 (H = 730 locked), Experiment 13 (online refitting), Experiment 7 (promoted-team taxonomy), Experiment 14 (market benchmark, context only), amendment A1 (selection targets) |
 
 ## 1. Research question and motivation
@@ -76,9 +77,86 @@ the prior.
 - **T_S** is the 20 teams of the target fixture list.
 - **F_S(d)** is every fold-history match plus every target match dated strictly before d.
 - **No prior** is placed on mu, h, or the effects of teams that appear only in the history.
-- **Identification.** The sum-to-zero constraints make every effect relative to the average of the current league,
-  which is the same scale as the EB estimates. Without them, a team with no matches would have no defined location.
-- **Uniqueness.** The objective is strictly concave in the constrained parameters, so the optimum is unique.
+
+### Parameterisation and identifiability (exact)
+
+**Team sets at refit date d.**
+
+- **T_S:** the 20 target teams, from the fixture list.
+- **D(d):** the teams with at least one match in F_S(d).
+- **Q_S(d) = D(d) \ T_S:** the *history-only* teams, which appear in the fitting data but not in the target season (for
+  example teams relegated before S). Under arm S1 this set also contains the pre-absence identity of a returning team.
+- **The parameter set** is U = T_S ∪ Q_S(d).
+
+**Parameters.**
+
+- mu (intercept) and h (home advantage);
+- att_t and def_t for every t in U, which is 2|U| effects.
+
+Effect coding:
+
+- For the 20 target teams, the two linear constraints
+
+      (C1)  Σ_{t ∈ T_S} att_t = 0          (C2)  Σ_{t ∈ T_S} def_t = 0
+
+  are imposed by elimination. The target team that is last alphabetically, t*, is not a free parameter:
+  att_{t*} = −Σ_{t ∈ T_S, t ≠ t*} att_t, and likewise for def. Its prior still applies to this implied value.
+- **History-only teams (Q_S(d)) are not constrained and get no prior.** Their att and def are free parameters measured on
+  the same scale, relative to the average of the 20 current teams. Their matches inform mu, h and the target teams'
+  effects through shared opponents, with the usual time-decay weights. They are never predicted.
+- The free vector is θ = (mu, h, att and def of the 19 free target teams, att and def of every history-only team), of
+  dimension 2 + 38 + 2|Q_S(d)|.
+
+**Why the constraints are needed.** The likelihood depends on θ only through the linear predictors (one row per goal
+count, as in the long format of `poisson_static_v1`):
+
+    eta_home(m) = mu + h + att_home + def_away,    eta_away(m) = mu + att_away + def_home
+
+It is unchanged by either shift:
+
+- (S_att) att_t → att_t + c for **every** t in U, with mu → mu − c;
+- (S_def) def_t → def_t + c for every t in U, with mu → mu − c.
+
+So without constraints mu and the effect levels are not identified. C1 and C2 remove exactly these two directions. A
+shift by c changes Σ_{t∈T_S} att_t by c·(number of target teams in U) = 20c ≠ 0, so only c = 0 satisfies C1.
+
+- **The intercept is identified by C1 and C2.** Once the effect levels are fixed, mu is the log goal rate of an
+  average current team (away from home), and h the log home/away ratio.
+- **The constraints change the model, not just its coordinates.** The priors are not invariant to S_att and S_def. The
+  constraints define the scale on which the prior means are stated: effects relative to the average of the 20 teams
+  of the season. This is the scale of the single-season EB fits, which also sum to zero over that season's teams.
+
+**Uniqueness (strict concavity on the constrained space).** Write the objective as f(θ) = ℓ_w(Xθ) − ½(θ − m)ᵀP(θ − m).
+Here P is the diagonal prior precision, with 1/τ² on each penalised target-team effect, including the implied one,
+and 0 elsewhere. Then
+
+    −∇²f(θ) = Xᵀ W(θ) X + P,   W = diag(w_m λ_m) > 0,
+
+so for any free direction v ≠ 0, vᵀ(−∇²f)v = Σ_m w_m λ_m (x_mᵀv)² + vᵀPv. This is zero only if Xv = 0 **and** Pv = 0.
+Three facts show that no such v exists:
+
+1. **Connected comparison graph.** Every season in the data is a complete double round robin, consecutive seasons share
+   17 teams, and the continuing target teams played S − 1. So all teams in D(d) are linked by matches. Hence the
+   only directions with Xv = 0 that move teams with data are the two shifts S_att and S_def. Directions can also move
+   the effects of target teams **without** any match in F_S(d) (never-seen promoted teams before their first match),
+   since those effects appear in no row.
+2. **h is separable.** Every pair of teams in a season meets home and away, so changing h cannot be offset by team
+   effects. h enters Xv = 0 only with coefficient 0.
+3. **Every target team without a match has a prior** in M1, M2 and S1, because such a team was not in S − 1 and is
+   therefore promoted. So Pv = 0 forces the components of these teams to 0. What remains is c₁·S_att + c₂·S_def, and C1
+   (C2) then force c₁ = c₂ = 0, because at least 17 target teams with data enter the sums.
+
+So the Hessian is negative definite on the constrained space, and there is **at most one** maximiser.
+
+**Existence.** A maximiser exists if no unpenalised effect can drift to ±∞ while improving the likelihood. This
+happens, for example, if a team never scored. Before each fit the implementation checks that every **unpenalised**
+team (history-only teams; continuing teams in M1) has positive weighted goals scored and conceded in F_S(d), and that
+the fitting set has positive total weighted goals. Penalised effects are bounded by their priors. If a check fails, or
+the solver fails to reach max |gradient| ≤ 1e-9 with finite parameters, the stage aborts with no fallback (`[solver]`).
+
+**Arm M0** (no priors, unseen-team matches excluded) has the same constraints over the target teams present in its
+data. Its predictions do not depend on this choice, because the maximum-likelihood fit is invariant to the shifts. It
+is therefore identical to the treatment-coded fits of Experiment 13, which is what the anchor test checks.
 
 ## 4. Season-start priors (sections B, C)
 
@@ -232,7 +310,7 @@ forward-chaining selection on 2017-18 … 2021-22 with the one-SE rule (as in Ex
   - **long absence or newcomer:** more than 2 seasons out, or never in the PL;
   - **returning:** present in the fold history;
   - **continuing:** played the previous season.
-  
+
   The group lists are registered in the config and are not revised after scoring.
 - **Evidence rules (`[evidence]`).**
   - **COV:** 1,900/1,900 valid forecasts.
@@ -241,6 +319,47 @@ forward-chaining selection on 2017-18 … 2021-22 with the one-SE rule (as in Ex
     Experiment 13 U rule.
   - **Context only:** M2 − Elo (full group) and M2 − market benchmark (Experiment 14), never selection evidence.
 - **One season decides nothing.** Readings use the five folds pooled, with per-fold sign counts.
+
+### Non-inferiority margin: δ = 0.002 log loss (rationale, fixed before any Experiment 15 output)
+
+**Provenance.**
+
+- The value is the project's *practical floor*, first fixed in the Experiment 12 pre-registration (`b94bba1`,
+  `configs/time_weighted_poisson_v1.toml [evidence]`, "fixed before any result"), before any time-weighted model was
+  fitted. It was reused unchanged as the floor of Experiment 13's criterion U.
+- It was written into this protocol at registration (`5034f56`), when no Experiment 15 model, prediction or score
+  existed (`[historical_locked] status = "not_run"`; no `results/full_coverage_poisson_*`).
+- It was not chosen from, or adjusted to, any Experiment 15 target-season performance.
+- When first registered it had **no written rationale**, and it was defined as a floor for calling a difference an
+  *improvement*, not as a non-inferiority margin. The rationale below closes that gap without changing the value.
+
+**Why this value, used this way, is appropriate.**
+
+1. **One threshold for "practically meaningful", in both directions.** The project already treats a log-loss difference
+   smaller than 0.002 as too small to count as an improvement (criteria D, V and U). Using the same δ as the largest
+   acceptable degradation makes the rule symmetric: M2 may not be worse by an amount that would have counted as a real
+   gain had the sign been reversed. Reusing the inherited value rather than choosing a new one also leaves no room to
+   shop for a margin.
+2. **Interpretable size.** A mean log-loss increase of δ means the probability given to the observed outcome falls by
+   a factor exp(−0.002) ≈ 0.998, about 0.2% in relative terms, on average.
+3. **Small relative to the comparator's own established benefit.**
+   - **What M0's advantage is.** M0's defining feature is online refitting. Its recorded, locked historical gain over
+     the frozen model on the same 1,604 common matches is −0.0117 log loss (Experiment 13, `[historical_locked]`).
+   - **What the margin preserves.** δ is about 17% of that gain. Non-inferiority therefore guarantees that M2 keeps at
+     least about 83% of the benefit that made M0 the comparator. This is the usual effect-preservation reading of a
+     non-inferiority margin.
+   - **Status of this check.** It is a check on the inherited value, not a derivation of it. It uses only a recorded,
+     locked comparator result and no Experiment 15 output.
+4. **Stated in advance: the test may be inconclusive.**
+   - **The bar is strict.** The rule needs the upper 2-SE bound below +0.002, so M2 must be close to M0 with good
+     precision.
+   - **Why the SE is unknown.** Its size depends on how much M2 and M0 differ match by match, which is unknown before
+     the run. For comparison, Experiment 13's online − frozen difference had a clustered SE of 0.0027 on these matches,
+     but those arms differ far more per match.
+   - **What happens if the SE is large.** The reading is "inconclusive_on_common_group". Neither δ nor the 2-SE
+     multiple will be changed after the SE is seen.
+5. **Scope.** δ applies to log loss, the primary metric. Brier differences are reported with their SEs but have no
+   non-inferiority criterion.
 - **After the run.** The historical results are then locked in `[historical_locked]`. A descriptive 2024-25 stage
   would need its own access-log entry; 2025-26 remains the sealed confirmation holdout.
 
@@ -263,9 +382,29 @@ Planned modules (not written yet):
 | Weights × priors | Doubling every weight equals halving tau^2 (scale identity); the weight reference is the refit date |
 | tau → ∞ limit | Reproduces the unpenalised MLE; with unseen teams excluded it reproduces Experiment 13 online predictions within 1e-7 |
 | Home advantage | Estimated from the fitting set only; a single global parameter; changes between refits only through new data |
+| Identification | C1/C2 hold exactly at every optimum; the eliminated team's effects equal minus the sum of the other 19; history-only teams are free and unpenalised; the Hessian is negative definite on the constrained space; with no priors the predictions are invariant to the choice of eliminated team (shift invariance) |
+| Existence checks | A history-only team with zero weighted goals scored (or conceded) aborts the fit before solving; a matchless target team without a prior is refused |
 | Probability validity | Every row finite, ≥ 0 and summing to 1; (H, D, A) order |
 | Full coverage | 380 forecasts per target; registered group sizes and online-fit counts hold before scoring |
 | Deterministic refitting | Two runs give bit-identical predictions; no warm start |
 | Solver | Converges on concave synthetic problems; a forced failure aborts with no fallback |
 | Strict guards | Targets outside the selection set refused; holdout seasons refused; no market/xG input accepted |
 | Protocol | The config agrees with the code and the Experiment 12 lock; arms not registered for dev-test, exposed-validation or holdout |
+
+## 11. Amendments
+
+### PA1 (2026-10-02): identifiability parameterisation and rationale of the inherited 0.002 criterion
+
+Made after the registration commit `5034f56` and **before any implementation**. At the time of this amendment **no
+Experiment 15 model had been implemented, fitted or scored, and no Experiment 15 prediction or result existed**: the
+config's `[historical_locked]` status was `not_run`, and there was no `results/full_coverage_poisson_*` directory. No
+market-benchmark output and no 2024-25 information were used.
+
+| Item | Change | Effect on the frozen specification |
+|---|---|---|
+| Identifiability | The section "Parameterisation and identifiability" was added. It covers the team sets, the free parameter vector, the elimination of the alphabetically last target team, history-only teams as free and unpenalised, how mu is identified, the strict-concavity argument and the pre-fit existence checks. The config gains `eliminated_team`, `history_only_teams` and `[implementation_checks] existence_checks` | None: these make explicit the constraints already registered (sum to zero over the 20 target teams; no prior on history-only teams) |
+| 0.002 criterion | The value is **inherited** from the earlier pre-registered criterion: the practical floor of `time_weighted_poisson_v1`, fixed in `b94bba1` before any time-weighted fit and reused by Experiment 13. It was registered here unchanged in `5034f56`. Its **written rationale is added now, by this amendment** (section 9, "Non-inferiority margin"). The config gains `non_inferiority_margin_log_loss = 0.002` and its source | None: the value 0.002, the 2-SE multiple and every reading are unchanged; the margin was not chosen from any target-season performance |
+
+No other part of the protocol was changed. Recorded as an amendment of this pre-registration rather than in
+`TEST_SET_ACCESS_LOG.md`, whose protocol-change table records changes to season roles or selection rules. This
+amendment changes neither and accesses no data.

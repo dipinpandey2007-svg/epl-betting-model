@@ -41,6 +41,13 @@ intercept_prior = "none"
 # Identification: sum of attack effects = 0 and sum of defence effects = 0 over the 20 teams of the target fixture
 # list, at every refit. Teams present only in the history are free parameters (no prior).
 identification = "sum_to_zero_over_target_teams"
+# Exact parameterisation (pre-registration document, "Parameterisation and identifiability"):
+# free vector = (mu, h, att/def of 19 target teams, att/def of every history-only team); the alphabetically last
+# target team's att and def are minus the sum of the other 19 (its prior applies to that implied value).
+# History-only teams (in the fitting data, not in the target fixture list) are unconstrained and unpenalised.
+# mu is identified by the two constraints (they remove the two shift directions of the likelihood).
+eliminated_team = "alphabetically_last_target_team"
+history_only_teams = "free_unconstrained_unpenalised"
 # Weight reference: age in days from each match date to the refit date d (the target date being predicted).
 # With priors the absolute weight scale matters, so this is fixed here; w <= 1 for every fitted match.
 weight_reference = "refit_date"
@@ -123,6 +130,15 @@ recorded_comparators = ["poisson_tw_online", "elo", "frequency_baseline", "marke
 
 [evidence]
 practical_floor_log_loss = 0.002
+# Non-inferiority margin delta = the inherited practical floor, unchanged. Provenance: fixed in the Experiment 12
+# pre-registration (b94bba1) before any time-weighted fit, reused by Experiment 13, written here at registration
+# (5034f56) before any Experiment 15 output existed; never chosen from target-season performance. Rationale
+# (pre-registration document, "Non-inferiority margin"): one symmetric threshold for practical relevance; about a
+# 0.2% relative change in the probability of the observed outcome; about 17% of M0's recorded, locked updating gain
+# (-0.0117, Experiment 13 historical), i.e. M2 must retain at least ~83% of it. An inconclusive reading is possible
+# and is not a reason to change delta or the SE multiple.
+non_inferiority_margin_log_loss = 0.002
+non_inferiority_margin_source = "practical_floor of time_weighted_poisson_v1 (b94bba1), unchanged"
 clustered_se_multiple = 2.0
 min_folds_same_sign = 4
 # COV: fc_hier produces a valid (H, D, A) distribution for all 1,900 target matches (380 x 5).
@@ -148,10 +164,21 @@ tuned_values = []
 # Must pass before any outcome of a target is joined (see the pre-registration document, section O).
 anchor_tolerance = 1e-7      # M2 with no priors and unseen-team matches excluded reproduces Experiment 13 online predictions
 identity_tolerance = 1e-12
+# Existence checks before every fit (abort, no fallback, if any fails): every UNPENALISED team (history-only teams;
+# continuing teams in M1) has positive weighted goals scored and conceded in the fitting set, and the fitting set
+# has positive total weighted goals. Every target team without a fitted match must carry a prior.
+existence_checks = ["unpenalised_teams_scored_and_conceded", "positive_total_goals", "matchless_target_teams_have_priors"]
 
 [historical_locked]
 # Written only from the scored historical run, in a separate commit.
 status = "not_run"
+
+[amendments]
+# PA1 (2026-10-02), before any implementation, fit, prediction or result of this protocol existed:
+# clarifies the identifiability parameterisation ([model] eliminated_team, history_only_teams;
+# [implementation_checks] existence_checks) and records the rationale of the inherited 0.002 criterion
+# ([evidence] non_inferiority_margin_*). No frozen value changed. See section 11 of the pre-registration document.
+PA1 = "2026-10-02: identifiability parameterisation and inherited 0.002 criterion rationale; no frozen value changed"
 
 [outputs]
 results_name = "full_coverage_poisson_historical"
