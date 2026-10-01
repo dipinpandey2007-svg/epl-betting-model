@@ -3,7 +3,8 @@
 | Path | Committed? | Contents |
 |---|---|---|
 | `raw/E0_<season>.csv` | no | Season files from football-data.co.uk (results, match statistics, bookmaker odds) |
-| `processed/matches.csv` | no | 3,800 matches: Date, HomeTeam, AwayTeam, FTHG, FTAG, FTR, Season |
+| `processed/matches.csv` | no | Dataset **v1**: 3,800 matches, 2014-15 … 2023-24 (Date, HomeTeam, AwayTeam, FTHG, FTAG, FTR, Season). Behind every recorded result |
+| `processed/matches_dev_v2.csv` | no | Dataset **dev_v2**: 4,180 matches, 2014-15 … 2024-25 (v1 plus the 2024-25 validation season), same schema. Load with `load_dev_matches()` |
 | `reference/team_history.csv` | yes | Hand-compiled Premier League history of teams that join the league in the dataset window |
 | `checksums.json` | yes | Content SHA-256 of the files behind all recorded results |
 | `holdout/` | no | Sealed final-holdout data (2025-26), never in `raw/` or `processed/`; see [HOLDOUT_PROTOCOL.md](../docs/HOLDOUT_PROTOCOL.md). Not acquired yet |
@@ -25,6 +26,10 @@ rather than relying on any summary. Then recreate the files with:
 ```bash
 python -m eplmodel.data.download   # skips files that already exist; please don't run it repeatedly
 python -m eplmodel.data.build      # validates the result and checks it against checksums.json
+
+# development dataset with the 2024-25 validation season:
+python -m eplmodel.data.download --seasons 2425
+python -m eplmodel.data.build --dataset dev_v2
 ```
 
 The download requests ten files, pausing one second between them, with up to three attempts per file. The site can

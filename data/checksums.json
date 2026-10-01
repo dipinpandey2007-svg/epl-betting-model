@@ -1,5 +1,5 @@
 {
-  "description": "Content SHA-256 (CRLF normalised to LF) of the data used for all recorded results. data/processed/matches.csv is authoritative; raw-file hashes are informative because the download re-writes files through pandas.",
+  "description": "Content SHA-256 (CRLF normalised to LF) of the data files used for recorded results. data/processed/matches.csv (dataset v1, 2014-15..2023-24) is behind every recorded result; data/processed/matches_dev_v2.csv (dataset dev_v2, adds the 2024-25 validation season, acquired 2026-10-01) is the development dataset for later work. Processed files are authoritative; raw-file hashes are informative because the download re-writes files through pandas.",
   "files": {
     "data/raw/E0_1415.csv": "5f93f5f6489511c86d8136e8cc422889de3171811ef93cf78cc79be89a899505",
     "data/raw/E0_1516.csv": "21f7674afa9175b7508ef6c1dfa28b0a0607fd33e7fbf5ef64e096b1cbcffcf8",
@@ -11,6 +11,8 @@
     "data/raw/E0_2122.csv": "624d02593e0196c271cba9569968eb15c5ffa2214f2eb86fc0fdb7df2237e747",
     "data/raw/E0_2223.csv": "c9a9edcf87acb65b94ccafa37b2e8e05b8da837a4e7fc10a571d382b6a29171e",
     "data/raw/E0_2324.csv": "0b669038e94bf305603d841f02006c7d35ebd41c8722c76e479f2393079b995f",
-    "data/processed/matches.csv": "f51862c7a21ecdb16b3ad76a94c95bee6eede528bbde8c08ef933114f04a45d0"
+    "data/raw/E0_2425.csv": "4b05602b62a84effbf299b85a1d371ed266af0766b0946bb992b4e9e890399a9",
+    "data/processed/matches.csv": "f51862c7a21ecdb16b3ad76a94c95bee6eede528bbde8c08ef933114f04a45d0",
+    "data/processed/matches_dev_v2.csv": "c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807"
   }
 }

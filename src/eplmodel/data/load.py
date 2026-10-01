@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from eplmodel.data.validate import validate_matches
-from eplmodel.paths import PROCESSED_MATCHES
-from eplmodel.splits import assert_not_holdout
+from eplmodel.data.validate import DataValidationError, validate_matches, validate_season_dates
+from eplmodel.paths import PROCESSED_DEV_V2, PROCESSED_MATCHES
+from eplmodel.splits import DATASET_DEV_V2_SEASONS, assert_not_holdout
 
 
 def load_matches(path: Path = PROCESSED_MATCHES, validate: bool = True) -> pd.DataFrame:
@@ -25,6 +25,23 @@ def load_matches(path: Path = PROCESSED_MATCHES, validate: bool = True) -> pd.Da
     assert_not_holdout(df["Season"].unique())
     if validate:
         validate_matches(df)
+    return df
+
+
+def load_dev_matches(path: Path = PROCESSED_DEV_V2, validate: bool = True) -> pd.DataFrame:
+    """Load the development dataset dev_v2 (2014-15 .. 2024-25, including the 2024-25 validation season).
+
+    Raises HoldoutAccessError if the file holds any holdout season, and
+    DataValidationError unless it holds exactly the dev_v2 seasons, each match
+    dated inside its season's window (so no later-season rows can hide under a
+    development label).
+    """
+    df = load_matches(path, validate=validate)
+    seasons = tuple(sorted(df["Season"].unique()))
+    if seasons != DATASET_DEV_V2_SEASONS:
+        raise DataValidationError(f"{Path(path).name} holds seasons {list(seasons)}, "
+                                  f"expected {list(DATASET_DEV_V2_SEASONS)}")
+    validate_season_dates(df)
     return df
 
 

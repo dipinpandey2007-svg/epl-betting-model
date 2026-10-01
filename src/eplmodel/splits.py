@@ -50,6 +50,8 @@ DEVELOPMENT_SEASONS = TRAIN_SEASONS + EXPOSED_DEV_SEASONS + VALIDATION_SEASONS
 
 # The dataset behind every recorded result (data/processed/matches.csv, 3,800 matches).
 DATASET_V1_SEASONS = TRAIN_SEASONS + EXPOSED_DEV_SEASONS
+# The development dataset with the validation season (data/processed/matches_dev_v2.csv, 4,180 matches).
+DATASET_DEV_V2_SEASONS = DEVELOPMENT_SEASONS
 
 SEASON_ROLES = {
     **{s: SeasonRole.TRAIN for s in TRAIN_SEASONS},

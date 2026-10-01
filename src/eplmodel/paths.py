@@ -8,7 +8,8 @@ DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 REFERENCE_DIR = DATA_DIR / "reference"
-PROCESSED_MATCHES = PROCESSED_DIR / "matches.csv"
+PROCESSED_MATCHES = PROCESSED_DIR / "matches.csv"              # dataset v1, 2014-15 .. 2023-24
+PROCESSED_DEV_V2 = PROCESSED_DIR / "matches_dev_v2.csv"        # dataset dev_v2, 2014-15 .. 2024-25
 CHECKSUMS_FILE = DATA_DIR / "checksums.json"
 
 # Sealed final holdout (docs/HOLDOUT_PROTOCOL.md). Data files live under the

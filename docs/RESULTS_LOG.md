@@ -1,8 +1,11 @@
 # EPL Betting Model — Results Log
 
 This file records important experiments and decisions so that results do not exist only inside individual chat
-conversations. Every number below is reproduced by `python -m experiments.run_all` (written to
-`results/<experiment>/metrics.json`) and locked by `tests/test_golden_results.py`.
+conversations. Every model result below is reproduced by `python -m experiments.run_all` (written to
+`results/<experiment>/metrics.json`) and locked by `tests/test_golden_results.py`. Data-acquisition records are not
+produced by `run_all`. Their checksums and coverage are locked by `tests/test_data.py` against
+`data/checksums.json`: dataset v1 also through the golden data fixture, and dataset dev_v2 (Experiment 9) by the
+`dev_v2` tests.
 
 **Terminology.** "Development test" = seasons 2022-23 and 2023-24. These were scored repeatedly during
 exploratory work, so they are an *exposed development test benchmark*, not a final holdout. See
@@ -239,6 +242,65 @@ was reproduced from the same data (processed-file checksum in `data/checksums.js
 
 The golden regression tests use tolerances of 1e-9 for metrics and 1e-6 for log-likelihoods. The original script is
 archived at `archive/exploratory/elo.py`.
+
+## Experiment 9 — Validation-season data acquisition: 2024-25, dataset `dev_v2` (2026-10-01)
+
+### Objective
+
+Add the 2024-25 validation season ([HOLDOUT_PROTOCOL.md](HOLDOUT_PROTOCOL.md) §1) to the development data, without
+changing dataset v1 and without touching the sealed 2025-26 holdout. Nothing was scored: this is data acquisition
+only.
+
+### Acquisition record
+
+| Item | Value |
+|---|---|
+| Source URL | `https://www.football-data.co.uk/mmz4281/2425/E0.csv` (302 redirect to `https://football-data.co.uk/...`) |
+| Accessed | 2026-10-01, 10:49:51–10:49:57 UTC, via `python -m eplmodel.data.download --seasons 2425` |
+| Raw file | `data/raw/E0_2425.csv`: 380 rows, 120 columns, `Div` = `E0` only; SHA-256 `4b05602b…0399a9` |
+| Processed file | `data/processed/matches_dev_v2.csv` (`python -m eplmodel.data.build --dataset dev_v2`): 4,180 rows, 2014-15 … 2024-25, 380 per season; SHA-256 `c726bd5c…39fd807` |
+| 2024-25 coverage | 380 matches, 2024-08-16 to 2025-05-25, 20 teams (Ipswich is the only team absent from dataset v1) |
+
+Full hashes are in `data/checksums.json`. Neither file is committed (Football-Data terms).
+
+### Validation checks (all passed)
+
+- Raw file: only `E0` rows; no missing Date, HomeTeam, AwayTeam, FTHG, FTAG or FTR; 20 teams, each with 19 home and
+  19 away matches; no duplicate fixture.
+- Processed file (`validate_matches`): schema; no nulls; FTR consistent with the score; no team plays itself or twice
+  on one date; no duplicate rows; chronological order; 380 matches per season.
+- `load_dev_matches`: exactly the 11 `dev_v2` seasons and no holdout season (2025-26, 2026-27).
+- Season date windows (`validate_season_dates`, run by the build and by `load_dev_matches`): every match's date lies
+  between 1 August of its season's first year and 31 July of the next. The windows do not overlap, so a match
+  *dated* in 2025-26's window cannot pass under a 2024-25 label. This checks the `Date` column only; it cannot detect
+  a match whose recorded date is itself wrong.
+- The latest date in the file is 2025-05-25. `tests/test_data.py` also requires every `dev_v2` date to be before
+  2025-07-01.
+- Build safety: the build refuses to write any season set other than a dataset's own to that dataset's canonical file,
+  so dev_v2 cannot replace `matches.csv`. A missing checksum record for v1 makes the build fail.
+- Dataset v1 is unchanged. `data/processed/matches.csv` was rebuilt byte-identical to its recorded checksum. The
+  2014-24 rows of `dev_v2` equal v1 match for match.
+- `dev_v2` rebuilds deterministically to the recorded checksum.
+
+These checks are locked by `tests/test_data.py`, not by the golden tests: the `dev_v2` checksum, coverage, v1
+equality and rebuild tests (these skip when the data are absent, as in CI), and the synthetic-data guard tests.
+
+### Note: row order within a date
+
+The build sorts by `Date` with pandas' default sort, which is not stable. Within a date, the 2014-24 rows of `dev_v2`
+are therefore in a different order from v1: 2,045 rows on 452 dates. The dates are in the same sequence, and every
+date has the same matches. No team plays twice on one date, so sequential Elo ratings are unaffected (checked: maximum
+difference 0.0). However, fits that depend on row order only through floating-point summation can differ in the last
+digits. The recorded results remain defined on dataset v1. The sort was not changed, because that would change v1's
+bytes.
+
+### Not done
+
+- No model was fitted, tuned, selected or scored on 2024-25, and no outcome statistics were computed for it. 2024-25
+  has not yet been used for model selection. For
+  the row-order check above, Elo was run through `dev_v2`, but only ratings for 2014-24 matches were compared.
+- `data/reference/team_history.csv` has no row for Ipswich (2024-25 entrant). It must be sourced before the
+  promoted-team analysis is extended to the 2024-25 fold.
 
 ## Future experiment template
 

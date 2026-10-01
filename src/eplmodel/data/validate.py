@@ -47,3 +47,29 @@ def validate_matches(df: pd.DataFrame, matches_per_season: int | None = 380) -> 
 
     if problems:
         raise DataValidationError("; ".join(problems))
+
+
+def season_window(season: str) -> tuple[pd.Timestamp, pd.Timestamp]:
+    """Dates a season's matches may fall on: 1 August of its first year to 31 July of its second (inclusive).
+
+    Consecutive windows do not overlap, so every date belongs to exactly one
+    season. The window ends in late July, not June, because 2019-20 finished on
+    26 July 2020; every season in the data starts on or after 1 August (the
+    earliest is 5 August 2022).
+    """
+    if len(season) != 4 or not season.isdigit() or int(season[2:]) != (int(season[:2]) + 1) % 100:
+        raise DataValidationError(f"Malformed season code {season!r}")
+    start_year = 2000 + int(season[:2])
+    return pd.Timestamp(start_year, 8, 1), pd.Timestamp(start_year + 1, 7, 31)
+
+
+def validate_season_dates(df: pd.DataFrame) -> None:
+    """Raise DataValidationError if any match lies outside the date window of its Season label."""
+    problems = []
+    for season, dates in df.groupby("Season")["Date"]:
+        start, end = season_window(season)
+        n_out = int(((dates < start) | (dates > end)).sum())
+        if n_out:
+            problems.append(f"{n_out} {season} matches outside {start.date()}..{end.date()}")
+    if problems:
+        raise DataValidationError("; ".join(problems))

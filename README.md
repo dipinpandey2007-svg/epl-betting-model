@@ -63,6 +63,8 @@ python -c "import sys, eplmodel; print(sys.executable); print(eplmodel.__file__)
 
 python -m eplmodel.data.download            # fetch season CSVs from football-data.co.uk into data/raw/
 python -m eplmodel.data.build               # build + validate data/processed/matches.csv, verify checksum
+# optional, for new development work: add the 2024-25 validation season (dataset dev_v2)
+python -m eplmodel.data.download --seasons 2425 && python -m eplmodel.data.build --dataset dev_v2
 
 python -m experiments.run_all               # reproduce every recorded result into results/
 python -m pytest                            # unit + golden regression tests (~5 s)

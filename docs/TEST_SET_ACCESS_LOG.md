@@ -58,5 +58,8 @@ table in `configs/holdout_v1.toml`.
 ## Validation season (2024-25) usage
 
 2024-25 is a selection target and will be scored repeatedly. Each comparison scored on it is recorded in
-`RESULTS_LOG.md`, so the number of choices made with it can be audited. None so far: the season has not been
-downloaded.
+`RESULTS_LOG.md`, so the number of choices made with it can be audited.
+
+| # | When | Action | Scored? |
+|---|---|---|---|
+| V0 | 2026-10-01 | Downloaded and validated into dataset `dev_v2` (RESULTS_LOG Experiment 9). Structural checks only: coverage, schema, score/result consistency and date windows. No outcome statistics. | no |
