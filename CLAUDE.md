@@ -327,7 +327,10 @@ run once and locked 2026-10-02): `docs/preregistration/shots_information_v1.md`,
 - Result (locked): ω* = 0 for both B1 and S1, and the nested selection chose
   ω = 0 in every outer fold. The registered reading is
   `no_distinguishable_shot_information`; the forecasts equal B0.
-- No 2024-25 stage has been run.
+- 2024-25 descriptive stage intentionally NOT performed. At ω* = 0, the B1 and S1
+  forecasts equal B0 (the Experiment 13 online arm), whose 2024-25 result is
+  already recorded: 342 matches, log loss 1.0187, Brier 0.6118. No 2024-25
+  access and no new access-log entry; 2024-25 is still at five scored uses.
 
 ---
 

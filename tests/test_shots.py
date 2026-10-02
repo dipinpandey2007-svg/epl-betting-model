@@ -343,3 +343,38 @@ def test_recorded_experiment_16_reproduces():
     for result in (recorded, again):
         result["frozen_state"].pop("config_sha256")
     assert again == recorded
+
+
+# --- 2024-25 descriptive stage not performed (omega* = 0): mechanical verification --------------------------------
+
+def test_locked_omega_star_makes_b1_and_s1_forecasts_identical_to_b0(league, run):
+    """At the locked omega* = 0 the registered forecast gives the shot model weight exactly zero: B1 = S1 = B0."""
+    lock = load_config(exp.SHOTS_CONFIG)["locked"]
+    assert lock["omega_star_b1"] == lock["omega_star_s1"] == 0.0
+    # 1. The construction: whatever the shot model is (even extreme values), omega = 0 returns the goal-only forecast
+    #    bit for bit.
+    idx = pd.Index(["A", "B", "C"])
+    goal = sm.Centred(0.12, 0.27, pd.Series([0.3, -0.1, -0.2], idx), pd.Series([-0.2, 0.05, 0.15], idx))
+    for shot in (sm.Centred(5.0, -3.0, pd.Series([9.0, -9.0, 0.0], idx), pd.Series([-7.0, 7.0, 0.0], idx)),
+                 sm.Centred(0.0, 0.0, pd.Series([0.4, 0.0, -0.4], idx), pd.Series([0.1, -0.2, 0.1], idx))):
+        got = sm.blended_rates(goal, shot, lock["omega_star_b1"], ["A", "B", "C"], ["B", "C", "A"])
+        ref = sm.blended_rates(goal, goal, 0.0, ["A", "B", "C"], ["B", "C", "A"])
+        assert np.array_equal(got[0], ref[0]) and np.array_equal(got[1], ref[1])
+    # 2. The online forecasts: B1 and S1 at omega* are bit-identical, and equal B0 (Experiment 13 online arm).
+    preds, _ = run
+    b1, s1 = preds[_cols("b1", lock["omega_star_b1"])].to_numpy(), preds[_cols("s1", lock["omega_star_s1"])].to_numpy()
+    assert np.array_equal(b1, s1)
+    ref, _ = op.online_fold_predictions(league, HISTORY, TARGET, H, 10, 100, 1000)
+    assert np.max(np.abs(b1 - ref[prob_columns(op.ONLINE_ARM)].to_numpy())) < 1e-12
+
+
+def test_documented_2024_25_b0_figures_are_the_recorded_experiment_13_values():
+    """The figures cited for B0 come from the committed Experiment 13 2024-25 metrics (no match data are read)."""
+    metrics = json.loads((PROJECT_ROOT / "results" / "online_tw_poisson_validation" / "metrics.json")
+                         .read_text(encoding="utf-8"))["results"]
+    b0 = metrics["scores"]["poisson_tw_online"]
+    assert metrics["n_matches"] == 342
+    assert (round(b0["log_loss"], 4), round(b0["brier"], 4)) == (1.0187, 0.6118)
+    log = (PROJECT_ROOT / "docs" / "RESULTS_LOG.md").read_text(encoding="utf-8")
+    assert "2024-25 descriptive stage: not performed (nothing new to score)" in log
+    assert "**342 scored matches**" in log and "**1.0187**" in log and "**0.6118**" in log

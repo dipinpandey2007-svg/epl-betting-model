@@ -39,7 +39,9 @@ Since then:
   - **Selection:** on the 1,604 common matches, the one-SE rule selected **ω\* = 0 for both arms**, and the nested
     selection chose ω = 0 in every outer fold.
   - **Registered reading:** criterion S is **`no_distinguishable_shot_information`**.
-  - No 2024-25 stage has been run. See `RESULTS_LOG.md` Experiment 16.
+  - **2024-25 descriptive stage intentionally not performed.** At ω\* = 0, the B1 and S1 forecasts equal B0 (the
+    Experiment 13 online arm), whose 2024-25 result is already recorded: 342 matches, log loss 1.0187, Brier 0.6118.
+    No 2024-25 data were accessed and no access-log entry was created. See `RESULTS_LOG.md` Experiment 16.
 - **Descriptive 2024-25 validation V5** (2026-10-02; access-log entry V5; exposed and descriptive only; locked): the
   frozen Experiment 14 and 15 specifications, unchanged.
   - **Coverage:** 380 of 380 for M1, M2, S1 and the market; 342 for M0, which cannot score Ipswich.

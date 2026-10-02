@@ -1931,8 +1931,32 @@ Per-target log loss of the grid:
 
 - **Recorded as is and locked:** ω\* = 0 for B1 and S1; reading `no_distinguishable_shot_information`. Nothing is
   adopted or changed.
-- **No 2024-25 stage has been run.** It would need its own access-log entry and logged-access registration.
+- **The 2024-25 descriptive stage is intentionally not performed** (see below). No 2024-25 data were accessed.
 - 2025-26 and 2026-27 remain sealed.
+
+### 2024-25 descriptive stage: not performed (nothing new to score)
+
+The locked historical selection gives **ω\* = 0 for both B1 and S1**. Under the registered forecast (goal model's
+level and home advantage; relative strengths (1 − ω)·goal + ω·shot), the shot model then has weight exactly zero:
+
+- at ω = 0, **B1 forecast = B0 forecast**;
+- at ω = 0, **S1 forecast = B0 forecast**.
+
+B0 is the Experiment 13 online arm, whose 2024-25 result is already recorded: Experiment 13's 2024-25 stage, with
+**342 scored matches** (Ipswich's 38 matches excluded under the registered unseen-team rule), log loss **1.0187**,
+Brier **0.6118**.
+
+**A separate 2024-25 Experiment 16 scoring run would therefore add no new information, and it is intentionally not
+performed**, by analogy with Experiment 12's registered rule ("if H\* = inf … there is nothing new to score"). As a
+consequence:
+
+- no 2024-25 data were accessed, loaded or scored for Experiment 16;
+- no access-log entry was created, and 2024-25's count of scored uses stays at five (V1-V5);
+- the locked historical results and the historical write guard are unchanged.
+
+The identity is verified mechanically by
+`tests/test_shots.py::test_locked_omega_star_makes_b1_and_s1_forecasts_identical_to_b0`, and the B0 figures by
+`tests/test_shots.py::test_documented_2024_25_b0_figures_are_the_recorded_experiment_13_values`.
 
 ### Provenance
 
