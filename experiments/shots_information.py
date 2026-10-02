@@ -38,7 +38,8 @@ from eplmodel.evaluation.scoring import EvaluationSet, evaluation_set, paired_di
 from eplmodel.evaluation.segments import assign_segments, prior_games_played
 from eplmodel.models import shots as sm
 from eplmodel.models.shots_spec import SHOTS_CONFIG, load_shots_spec
-from eplmodel.paths import PROCESSED_DEV_V2, PROJECT_ROOT
+from eplmodel.paths import PROCESSED_DEV_V2, PROJECT_ROOT, RESULTS_DIR
+from eplmodel.reporting.locks import refuse_locked_overwrite
 from eplmodel.reporting.results import write_predictions, write_results
 from eplmodel.splits import SEASON_ORDER, TRAIN_SEASONS, selection_folds
 
@@ -195,6 +196,9 @@ def evaluate(staged: list[dict], matches: pd.DataFrame, omegas, outer_targets, s
 
 def run(write: bool = True) -> dict:
     cfg = load_config(SHOTS_CONFIG)
+    out_dir = RESULTS_DIR / cfg["outputs"]["results_name"]
+    if write:
+        refuse_locked_overwrite(out_dir, cfg["locked"])   # before anything is loaded or computed
     frozen = check_frozen(cfg)
     spec = load_shots_spec()
     data = load_data(spec.max_season, cfg["source"]["require_raw_checksums"])
@@ -218,6 +222,7 @@ def run(write: bool = True) -> dict:
                 "estimate is the evidence. Differences are (left - right) per match.",
     }
     if write:
+        refuse_locked_overwrite(out_dir, cfg["locked"])   # and again just before writing
         frame = pd.concat([s["preds"].assign(fold_target=s["target"]) for s in staged])
         result["predictions"] = write_predictions(cfg["outputs"]["results_name"], frame)
         write_results(cfg["outputs"]["results_name"], result, data_path=PROCESSED_DEV_V2)
