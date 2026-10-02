@@ -107,7 +107,14 @@ shot_rows_must_precede_date = true  # no shot value of a match dated >= d enters
 
 [locked]
 # Written only from the development (historical) stage output, in a separate commit.
-status = "not_run"
+status = "locked"
+omega_star_b1 = 0.0
+omega_star_s1 = 0.0
+reading_b1 = "no_distinguishable_shot_information"
+reading_s1 = "no_distinguishable_shot_information"
+historical_commit = "6a8c68ad6981ad70f2715dc01025177b418344e9"
+historical_metrics_sha256 = "7c4071452136db87acbc315df1ae43095fbd274ce8850afcd6f04a24de635588"
+historical_predictions_sha256 = "6e4534ccec4f3b125b874ed384568c285ef19351202edef396e9ee1647298d56"
 
 [outputs]
 results_name = "shots_information_historical"

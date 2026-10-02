@@ -213,9 +213,10 @@ and `configs/full_coverage_poisson_v1.toml`. It links the earlier stages as foll
 - **Evidence.** Scored only on the amendment-A1 selection targets. The primary reading is coverage plus common-group
   non-inferiority against the Experiment 13 online arm.
 
-### Pre-registered: shots information (`shots_information_v1`, planned Experiment 16)
+### Shots information (`shots_information_v1`, Experiment 16)
 
-Registered 2026-10-02; design only, nothing implemented or scored (`docs/preregistration/shots_information_v1.md`,
+Registered 2026-10-02; historical stage run once and locked (RESULTS_LOG Experiment 16: ω\* = 0, reading
+`no_distinguishable_shot_information`) (`docs/preregistration/shots_information_v1.md`,
 `configs/shots_information_v1.toml`, source record `data/reference/football_data_shot_columns.md`).
 
 - **Model.** At each online refit of the Experiment 13 baseline (H = 730, same fitting set and weights), a Poisson

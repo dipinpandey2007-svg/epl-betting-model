@@ -305,8 +305,41 @@ def test_config_and_document_equal_the_preregistration_commit():
     assert exp.check_frozen(load_config(exp.SHOTS_CONFIG))["prereg_commit"] == exp.PREREG_COMMIT
 
 
-def test_protocol_not_yet_run_and_not_in_run_all():
+def test_historical_results_are_locked_to_the_recorded_run():
+    """The registered historical stage was run once; [locked] matches the committed metrics."""
+    from eplmodel.data.checksums import content_sha256
     from experiments import run_all
-    assert load_config(exp.SHOTS_CONFIG)["locked"]["status"] == "not_run"
-    assert not (PROJECT_ROOT / "results" / "shots_information_historical").exists()
+
+    lock = load_config(exp.SHOTS_CONFIG)["locked"]
+    metrics = PROJECT_ROOT / "results" / "shots_information_historical" / "metrics.json"
+    assert lock["status"] == "locked" and content_sha256(metrics) == lock["historical_metrics_sha256"]
+    payload = json.loads(metrics.read_text(encoding="utf-8"))
+    r = payload["results"]
+    assert payload["provenance"]["git_commit"] == lock["historical_commit"] and payload["provenance"]["git_dirty"] is False
+    assert r["predictions"]["sha256"] == lock["historical_predictions_sha256"]
+    assert r["selection"]["b1"]["omega_selected"] == lock["omega_star_b1"]
+    assert r["selection"]["s1"]["omega_selected"] == lock["omega_star_s1"]
+    assert r["criterion_s"]["b1"]["reading"] == lock["reading_b1"] and r["criterion_s"]["s1"]["reading"] == lock["reading_s1"]
+    assert r["targets"] == ["1718", "1819", "1920", "2021", "2122"] and sum(r["n_scored_per_target"].values()) == 1604
     assert exp not in run_all.EXPERIMENTS
+
+
+@pytest.mark.golden
+def test_recorded_experiment_16_reproduces():
+    """Rerunning the locked historical stage (without writing) gives the recorded predictions and metrics."""
+    from eplmodel.data.checksums import content_sha256
+    from eplmodel.paths import PROCESSED_DEV_V2
+    from eplmodel.reporting.results import _jsonable
+
+    out = PROJECT_ROOT / "results" / "shots_information_historical"
+    if not PROCESSED_DEV_V2.exists() or not (out / "predictions.csv").exists():
+        pytest.skip("dev_v2 or the recorded Experiment 16 predictions missing")
+    lock = load_config(exp.SHOTS_CONFIG)["locked"]
+    assert content_sha256(out / "predictions.csv") == lock["historical_predictions_sha256"]
+    recorded = json.loads((out / "metrics.json").read_text(encoding="utf-8"))["results"]
+    recorded.pop("predictions")
+    again = json.loads(json.dumps(_jsonable(exp.run(write=False))))
+    # The config hash changes only because [locked] was written after the run.
+    for result in (recorded, again):
+        result["frozen_state"].pop("config_sha256")
+    assert again == recorded

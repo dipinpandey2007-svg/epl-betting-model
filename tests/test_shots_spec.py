@@ -51,9 +51,10 @@ def test_no_later_season_appears_in_any_config_value():
         assert season not in values
 
 
-def test_protocol_is_not_yet_run():
-    assert CFG["locked"]["status"] == "not_run"
-    assert not (PROJECT_ROOT / "results" / CFG["outputs"]["results_name"]).exists()
+def test_historical_stage_was_run_once_and_locked():
+    lock = CFG["locked"]
+    assert lock["status"] == "locked" and lock["omega_star_b1"] in ss.OMEGA_GRID and lock["omega_star_s1"] in ss.OMEGA_GRID
+    assert (PROJECT_ROOT / "results" / CFG["outputs"]["results_name"] / "metrics.json").exists()
 
 
 def test_source_record_is_referenced_and_present():

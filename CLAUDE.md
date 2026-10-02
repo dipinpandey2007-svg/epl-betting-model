@@ -309,8 +309,8 @@ and selects nothing.
   needs a log entry, `LOGGED_EXPOSED_VALIDATION_ACCESSES` and
   `build_exposed_validation_fold`.
 
-Experiment 16 (protocol `shots_information_v1`) is PRE-REGISTERED ONLY
-(2026-10-02): `docs/preregistration/shots_information_v1.md`,
+Experiment 16 (protocol `shots_information_v1`, implemented, historical stage
+run once and locked 2026-10-02): `docs/preregistration/shots_information_v1.md`,
 `configs/shots_information_v1.toml`, typed view
 `eplmodel.models.shots_spec`.
 
@@ -324,7 +324,10 @@ Experiment 16 (protocol `shots_information_v1`) is PRE-REGISTERED ONLY
   with a nested estimate.
 - Scoring population: the Experiment 13 common group (1,604 matches).
 - Shot columns HS/AS/HST/AST are verified complete for 2014-22.
-- Nothing is implemented or scored yet.
+- Result (locked): ω* = 0 for both B1 and S1, and the nested selection chose
+  ω = 0 in every outer fold. The registered reading is
+  `no_distinguishable_shot_information`; the forecasts equal B0.
+- No 2024-25 stage has been run.
 
 ---
 

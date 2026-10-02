@@ -7,8 +7,8 @@ conversations. Every model result in Experiments 2–7 is reproduced by `python 
 Experiment 12 by `python -m experiments.time_weighted_poisson --stage development` then `--stage validation`,
 Experiment 13 by `python -m experiments.online_tw_poisson_diagnostic --stage historical` then `--stage validation`,
 Experiment 14 by `python -m experiments.market_benchmark`, Experiment 15 by
-`python -m experiments.full_coverage_poisson`, and the descriptive 2024-25 validation V5 by
-`python -m experiments.exposed_validation_descriptive`. None of them is in `run_all`. The recorded predictions
+`python -m experiments.full_coverage_poisson`, the descriptive 2024-25 validation V5 by
+`python -m experiments.exposed_validation_descriptive`, and Experiment 16 by `python -m experiments.shots_information`. None of them is in `run_all`. The recorded predictions
 of Experiments 10-13 are regenerated row by row by `tests/test_reproduction_recorded.py`, and Experiment 14's
 metrics by `tests/test_market.py` (both golden). Data-acquisition records are not
 produced by `run_all`. Their checksums and coverage are locked by `tests/test_data.py` against
@@ -1859,6 +1859,92 @@ Segments of M2 − M0 (common): −0.0035, −0.0152, −0.0083, −0.0023 (0-9,
 | Frozen inputs | Experiment 15 config at `10e99d1` + lock (metrics `c50267ce…a3ca`); Experiment 14 metrics `55a77b4f…cf56` |
 
 Reproduced by `tests/test_exposed_validation_descriptive.py::test_recorded_descriptive_validation_reproduces` (golden).
+
+## Experiment 16 — Shots information on the online goal model: historical stage (2026-10-02)
+
+Protocol `shots_information_v1`. Pre-registration: `docs/preregistration/shots_information_v1.md` and
+`configs/shots_information_v1.toml`. Code: `eplmodel.data.shots`, `eplmodel.models.shots`,
+`eplmodel.evaluation.shots_selection`, `experiments/shots_information.py`. Results:
+`results/shots_information_historical/metrics.json`. Locked in `[locked]`.
+
+### Run sequence
+
+| Step | Commit | What |
+|---|---|---|
+| Pre-registration | `6dd216b` | Design, config, typed spec, source record of the shot columns |
+| Implementation | `6a8c68a` | Code and synthetic-data tests; no real-data forecast |
+| **Recorded run** | at `6a8c68a`, `git_dirty: false` | Executed once; a rerun without writing reproduces the metrics exactly |
+
+### Data and checks before scoring (all passed)
+
+- **Data.** dev_v2 cut to seasons ≤ 2021-22. Raw shot columns `HST`/`AST` (B1) and `HS`/`AS` (S1) for 2014-15 …
+  2021-22, raw checksums verified. No later season was read.
+- **Frozen state.** The config and document equal the pre-registration.
+- **Population.**
+  - Common groups 306 / 272 / 342 / 342 / 342 = **1,604 scored matches**.
+  - Unseen-team matches excluded (neither fitted nor scored): 74 / 108 / 38 / 38 / 38 = 296.
+  - Refits per target: 98 / 98 / 110 / 128 / 119, every goal and shot fit converged with no retry.
+  - No match was excluded for missing shot values.
+- **B0 reproduction.** ω = 0 reproduces the recorded Experiment 13 online predictions to **2.2e-16** in both arms.
+
+### Registered results
+
+**ω selection on all five targets** (the value locked for later stages). The criterion is the mean of per-target
+log loss; the one-SE rule moves towards the smaller ω.
+
+| ω | B1 (shots on target): criterion | difference to ω_min (clustered SE) | within 1 SE | S1 (total shots): criterion | difference to ω_min (clustered SE) | within 1 SE |
+|---|---|---|---|---|---|---|
+| 0 | **0.95444** | 0 | yes (ω_min) | **0.95444** | 0 | yes (ω_min) |
+| 0.25 | 0.95517 | +0.00060 (0.00098) | yes | 0.95616 | +0.00153 (0.00127) | no |
+| 0.5 | 0.95755 | +0.00285 (0.00195) | no | 0.96079 | +0.00596 (0.00253) | no |
+| 0.75 | 0.96163 | +0.00680 (0.00292) | no | 0.96840 | +0.01338 (0.00379) | no |
+| 1 | 0.96746 | +0.01251 (0.00390) | no | 0.97912 | +0.02391 (0.00505) | no |
+
+- **ω\* = 0 for B1 and for S1.** ω_min = 0 for both.
+- **Nested selection** (outer targets 2018-19 … 2021-22, ω chosen from earlier targets only): **ω = 0 in every outer
+  fold, for both arms.**
+- **Criterion S.** At the nested ω, B1 equals B0 on all 1,298 outer-fold matches: pooled B1 − B0 = 0.00000 log loss
+  (clustered SE 0) and 0.00000 Brier, with no negative fold. Criterion S is not met and its mirror is not met.
+  - **Registered reading: `no_distinguishable_shot_information`**, with `no_shot_weight_selected` (ω\* = 0).
+  - S1 receives the same reading.
+- **B0, B1 and S1 scores.** With ω\* = 0, the locked B1 and S1 forecasts are identical to B0: **0.95444** mean
+  per-target log loss on the 1,604 common matches. That is the Experiment 13 online arm (pooled log loss 0.9572 /
+  Brier 0.5667, Experiment 13).
+
+### Descriptive diagnostics (not evidence; in-sample grid optimistically biased)
+
+Per-target log loss of the grid:
+
+| Target | B1 ω = 0 / 0.25 / 0.5 / 0.75 / 1 | S1 ω = 0 / 0.25 / 0.5 / 0.75 / 1 |
+|---|---|---|
+| 2017-18 | 0.9629 / 0.9631 / 0.9646 / 0.9675 / 0.9719 | 0.9629 / 0.9638 / 0.9670 / 0.9725 / 0.9802 |
+| 2018-19 | 0.8874 / 0.8914 / 0.8972 / 0.9047 / 0.9141 | 0.8874 / 0.8939 / 0.9037 / 0.9168 / 0.9336 |
+| 2019-20 | 0.9620 / 0.9629 / 0.9654 / 0.9696 / 0.9755 | 0.9620 / 0.9642 / 0.9691 / 0.9766 / 0.9869 |
+| 2020-21 | 1.0202 / 1.0169 / 1.0152 / 1.0152 / 1.0170 | 1.0202 / 1.0168 / 1.0165 / 1.0195 / 1.0259 |
+| 2021-22 | 0.9397 / 0.9416 / 0.9454 / 0.9511 / 0.9588 | 0.9397 / 0.9420 / 0.9476 / 0.9566 / 0.9691 |
+
+- **Degenerate blocks.** Because ω\* = 0, the registered descriptive blocks are identically zero: B1 − S1 at the
+  nested ω, and B1(ω\*) − B0 overall, on returning (244) vs continuing (1,360) matches and by segment.
+- **Calibration in the large of B0** (observed − predicted): H −0.0134, D −0.0007, A +0.0141.
+
+### Decision
+
+- **Recorded as is and locked:** ω\* = 0 for B1 and S1; reading `no_distinguishable_shot_information`. Nothing is
+  adopted or changed.
+- **No 2024-25 stage has been run.** It would need its own access-log entry and logged-access registration.
+- 2025-26 and 2026-27 remain sealed.
+
+### Provenance
+
+| Item | Value |
+|---|---|
+| Run | commit `6a8c68ad6981ad70f2715dc01025177b418344e9`, `git_dirty: false` |
+| Metrics | `results/shots_information_historical/metrics.json`, content SHA-256 `7c4071452136db87acbc315df1ae43095fbd274ce8850afcd6f04a24de635588` |
+| Predictions | `results/shots_information_historical/predictions.csv`, 1,604 rows (all arms and ω), git-ignored, content SHA-256 `6e4534ccec4f3b125b874ed384568c285ef19351202edef396e9ee1647298d56` |
+| Data | `data/processed/matches_dev_v2.csv`, SHA-256 `c726bd5cb30315bb18baf5805733059f4075b922cef1243d8533dbf7b39fd807`, cut to ≤ 2021-22; raw `E0_1415.csv` … `E0_2122.csv` matching `data/checksums.json` |
+| Environment | Python 3.13.15; numpy 2.5.2, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0 |
+
+Reproduced by `tests/test_shots.py::test_recorded_experiment_16_reproduces` (golden). Not in `experiments.run_all`.
 
 ## Future experiment template
 
