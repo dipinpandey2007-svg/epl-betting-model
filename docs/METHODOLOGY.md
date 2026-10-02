@@ -213,6 +213,19 @@ and `configs/full_coverage_poisson_v1.toml`. It links the earlier stages as foll
 - **Evidence.** Scored only on the amendment-A1 selection targets. The primary reading is coverage plus common-group
   non-inferiority against the Experiment 13 online arm.
 
+### Pre-registered: shots information (`shots_information_v1`, planned Experiment 16)
+
+Registered 2026-10-02; design only, nothing implemented or scored (`docs/preregistration/shots_information_v1.md`,
+`configs/shots_information_v1.toml`, source record `data/reference/football_data_shot_columns.md`).
+
+- **Model.** At each online refit of the Experiment 13 baseline (H = 730, same fitting set and weights), a Poisson
+  GLM of shots on target with the same structure is fitted. The forecast blends the centred team strengths,
+  (1 − ω)·goal + ω·shot, keeping the goal model's level and home advantage. ω = 0 is the baseline.
+- **Selection.** ω ∈ {0, 0.25, 0.5, 0.75, 1} is the only selected value: the one-SE rule towards the smaller ω, with
+  a nested estimate on 2017-18 … 2021-22. Total shots is a sensitivity arm.
+- **Information.** Shots are post-match statistics, used only from matches dated before the forecast date.
+- **Excluded.** 2024-25, 2025-26 and 2026-27 play no role.
+
 ## 9a. Scoring conventions
 
 - Probability arrays always have columns in the order (H, D, A) (`eplmodel.constants.OUTCOMES`).

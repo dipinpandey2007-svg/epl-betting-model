@@ -1,0 +1,115 @@
+# Pre-registered protocol shots_information_v1 (planned Experiment 16): does pre-match historical shot
+# information add predictive information beyond the established online time-weighted goal model?
+#
+# DESIGN / PRE-REGISTRATION ONLY (registered 2026-10-02). Nothing is implemented, fitted or scored. Rationale:
+# docs/preregistration/shots_information_v1.md. Changing anything here after the first scored run is a protocol
+# change that must be logged. Sections written later: [locked] (development output) only.
+#
+# Evidence roles: historical selection targets only (amendment A1); data cut to seasons <= 2021-22. The exposed
+# seasons, the retired validation season, the sealed holdout (2025-26) and the next holdout (2026-27) play no role.
+# A later descriptive stage on the retired validation season would need its own logged access after [locked].
+# No xG, injury, squad, lineup, tactical, ML or market input.
+
+[protocol]
+protocol_id = "shots_information_v1"
+registered = "2026-10-02"
+status = "registered_not_implemented"
+experiment = 16
+dataset = "dev_v2"
+max_season = "2122"
+targets = ["1718", "1819", "1920", "2021", "2122"]   # = eplmodel.splits.SELECTION_TARGET_SEASONS
+inputs = ["match_results", "fixture_list_of_target", "raw_shot_columns"]
+forbidden_inputs = ["market_odds", "xg", "lineups", "injuries", "squad", "tactics", "ml_features"]
+
+[source]
+record = "data/reference/football_data_shot_columns.md"
+notes_sha256 = "6ecd41a98ad2751372817e7e6f1709bfeb433c53dd9aeda330fd926a5471452d"
+primary_columns = ["HST", "AST"]       # shots on target (home, away)
+sensitivity_columns = ["HS", "AS"]     # total shots (home, away)
+read_columns = ["Date", "HomeTeam", "AwayTeam", "HS", "AS", "HST", "AST"]   # never result columns
+require_raw_checksums = true
+
+[baseline]
+# B0 = the Experiment 13 online arm, unchanged (recorded predictions; re-derived exactly as omega = 0).
+spec_id = "poisson_tw_online_h730_v1_diag"
+protocol = "online_tw_poisson_diagnostic_v1"
+half_life_days = 730.0
+refit_cadence = "once_per_target_date"
+information_policy = "strictly_earlier_dates"
+fit_set = "history_plus_common_target_matches_strictly_before_date"
+unseen_team_rule = "exclude_match"     # matches of teams absent from the fold history are neither fitted nor scored
+max_goals = 10
+
+[shot_model]
+# At each refit date d, on exactly B0's fitting set and weights (w = 2 ** (-age/730)), a Poisson GLM of shot counts
+# with B0's structure:  log E[shots_home] = nu + h_s + sa_i + sd_j ;  log E[shots_away] = nu + sa_j + sd_i.
+# Goal model (B0) and shot model are fitted separately; no parameter is shared.
+form = "poisson_glm_same_structure_as_goal_model"
+home = "global_home_term"              # venue-adjusted by one league-wide h_s; team effects pooled over venue
+weights = "inherited_h730"
+fitting = "IRLS, maxiter 100, tol 1e-8; one retry with maxiter 1000; otherwise abort (no fallback)"
+missing_rule = "exclude_row_from_shot_fit_only"   # a match with any missing/non-integer/negative value in the arm's two columns
+                                                   # is left out of that arm's shot fit only (none in 2014-22)
+
+[blend]
+# Both models' team effects are centred: they sum to zero over the centring set C(d) = the target teams present in
+# the fold history (B0's eligible target teams), with each model's intercept re-expressed accordingly (an exact
+# re-parameterisation of each fit). The B1 forecast keeps the goal model's level and home advantage and blends
+# the relative strengths:
+#   log lambda_home = mu + h + (1 - omega) att_i + omega sa_i + (1 - omega) def_j + omega sd_j
+#   log lambda_away = mu     + (1 - omega) att_j + omega sa_j + (1 - omega) def_i + omega sd_i
+# omega = 0 is B0 exactly; omega = 1 uses the shot-based relative strengths with the goal level.
+centring_set = "target_teams_present_in_fold_history"
+level_and_home_from = "goal_model"
+omega_grid = [0.0, 0.25, 0.5, 0.75, 1.0]
+
+[arms]
+B0 = "poisson_tw_online_h730_v1_diag"              # baseline (Experiment 13 online arm)
+B1 = "poisson_tw_online_sot_blend_h730_v1"         # PRIMARY: shots on target, omega by the selection rule
+S1 = "poisson_tw_online_shots_blend_h730_v1_sens"  # sensitivity: total shots, same procedure
+primary = "B1"
+
+[selection]
+# Applied separately to B1 and S1; never on the retired validation season.
+group = "common"
+metric = "log_loss"
+criterion = "mean_of_target_mean_log_loss"   # equal target weights
+tie_break = "smaller_omega"
+rule = "one_se_smallest_omega"               # smallest omega whose pooled paired difference to omega_min is <= 1 clustered SE
+se_multiple = 1.0
+se_type = "clustered"                        # clusters (target, date)
+nested_outer_targets = ["1819", "1920", "2021", "2122"]   # omega chosen from earlier targets only
+locked_from = "all_five_targets"             # omega* written to [locked] for later stages
+
+[evidence]
+practical_floor_log_loss = 0.002             # inherited (time_weighted_poisson_v1, b94bba1)
+clustered_se_multiple = 2.0
+min_negative_outer_folds = 3
+# Criterion S (B1, nested outer folds): pooled (B1 at nested omega - B0) log loss < -floor, |mean| > 2 clustered SE,
+#   negative in >= 3 of 4 outer folds, pooled Brier < 0 -> "historical_evidence_shots_on_target_add_information".
+#   Mirror (all signs reversed) -> "historical_evidence_shots_on_target_hurt". Otherwise
+#   "no_distinguishable_shot_information". If the locked omega* = 0 -> additionally "no_shot_weight_selected".
+# S1 is read with the same rule, reported separately; it never replaces B1.
+# Descriptive: B1 - S1 at their nested omegas; in-sample grid tables (optimistically biased); returning vs
+#   continuing matches; segments; calibration in the large. Context only, after the evaluation: Elo, Experiment 14.
+readings = ["historical_evidence_shots_on_target_add_information", "historical_evidence_shots_on_target_hurt",
+            "no_distinguishable_shot_information"]
+
+[groups]
+# Inherited from Experiment 13 (registered there from fixtures).
+expected_common = { "1718" = 306, "1819" = 272, "1920" = 342, "2021" = 342, "2122" = 342 }
+expected_unseen_excluded = { "1718" = 74, "1819" = 108, "1920" = 38, "2021" = 38, "2122" = 38 }
+expected_online_fits = { "1718" = 98, "1819" = 98, "1920" = 110, "2021" = 128, "2122" = 119 }
+
+[implementation_checks]
+b0_reproduction_tolerance = 1e-12   # omega = 0 must equal the recorded Experiment 13 online predictions
+shot_rows_must_precede_date = true  # no shot value of a match dated >= d enters any fit used on d
+
+[locked]
+# Written only from the development (historical) stage output, in a separate commit.
+status = "not_run"
+
+[outputs]
+results_name = "shots_information_historical"
+in_run_all = false
+not_registered_for = ["dev_test", "exposed_validation", "holdout"]

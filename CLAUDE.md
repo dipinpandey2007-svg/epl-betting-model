@@ -309,6 +309,23 @@ and selects nothing.
   needs a log entry, `LOGGED_EXPOSED_VALIDATION_ACCESSES` and
   `build_exposed_validation_fold`.
 
+Experiment 16 (protocol `shots_information_v1`) is PRE-REGISTERED ONLY
+(2026-10-02): `docs/preregistration/shots_information_v1.md`,
+`configs/shots_information_v1.toml`, typed view
+`eplmodel.models.shots_spec`.
+
+- Baseline B0: the Experiment 13 online arm.
+- B1 (primary): a shots-on-target Poisson GLM (same structure, fitting set
+  and H = 730 weights), blended with the goal model's centred team
+  strengths: (1 − ω)·goal + ω·shot, keeping the goal level and home
+  advantage.
+- S1: the same with total shots.
+- ω ∈ {0, 0.25, 0.5, 0.75, 1}, chosen by the one-SE rule towards smaller ω,
+  with a nested estimate.
+- Scoring population: the Experiment 13 common group (1,604 matches).
+- Shot columns HS/AS/HST/AST are verified complete for 2014-22.
+- Nothing is implemented or scored yet.
+
 ---
 
 ## 7. Known methodological issues and conventions

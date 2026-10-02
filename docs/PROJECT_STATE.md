@@ -33,6 +33,10 @@ Since then:
     promoted teams costs nothing on the common group (M1 − M0 +0.0001).
   - **Unseen-team matches:** M2 − online Elo is −0.0097 (SE 0.0107), not distinguishable.
   - M2 stays the registered primary arm; nothing is adopted or swapped. See `RESULTS_LOG.md` Experiment 15.
+- **Experiment 16 is pre-registered, not implemented** (`shots_information_v1`, 2026-10-02). It tests whether
+  historical shots on target add information to the Experiment 13 online goal model, through a blend of goal- and
+  shot-based team strengths (ω chosen by a nested one-SE rule on the selection targets; ω = 0 is the baseline). See
+  `docs/preregistration/shots_information_v1.md`. No prediction or result exists.
 - **Descriptive 2024-25 validation V5** (2026-10-02; access-log entry V5; exposed and descriptive only; locked): the
   frozen Experiment 14 and 15 specifications, unchanged.
   - **Coverage:** 380 of 380 for M1, M2, S1 and the market; 342 for M0, which cannot score Ipswich.
