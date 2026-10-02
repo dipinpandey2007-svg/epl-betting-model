@@ -35,7 +35,8 @@ from eplmodel.market import coverage as cov
 from eplmodel.market import devig
 from eplmodel.market.benchmark import MarketArm, arm_from_name, market_forecasts
 from eplmodel.market.odds import SNAPSHOTS, read_odds
-from eplmodel.paths import CONFIG_DIR, HOLDOUT_CONFIG, PROCESSED_DEV_V2
+from eplmodel.paths import CONFIG_DIR, HOLDOUT_CONFIG, PROCESSED_DEV_V2, RESULTS_DIR
+from eplmodel.reporting.locks import refuse_locked_overwrite
 from eplmodel.reporting.results import write_predictions, write_results
 from eplmodel.splits import (
     REGISTERED_DEV_TEST_SPECS,
@@ -131,6 +132,10 @@ def _paired(frames: dict[str, pd.DataFrame], matches: pd.DataFrame, season_of: p
 
 def run(write: bool = True) -> dict:
     cfg = load_config(MARKET_CONFIG)
+    out_dir = RESULTS_DIR / cfg["outputs"]["results_name"]
+    if write:
+        # The historical results are recorded: refuse before anything is checked, loaded or scored.
+        refuse_locked_overwrite(out_dir, cfg.get("locked", {}))
     check_protocol(cfg)
     p, v = cfg["protocol"], cfg["validity"]
     coverage_seasons, scored = list(p["coverage_seasons"]), list(p["scored_seasons"])
@@ -210,6 +215,7 @@ def run(write: bool = True) -> dict:
                 "Context comparisons use recorded predictions and are not model-selection evidence.",
     }
     if write:
+        refuse_locked_overwrite(out_dir, cfg.get("locked", {}))   # and again just before writing
         joined = frames[PRIMARY][["Date", "Season", "HomeTeam", "AwayTeam"]].copy()
         for name, frame in frames.items():
             joined = joined.join(frame[[c for c in frame.columns if c.startswith(f"{name}_")]])

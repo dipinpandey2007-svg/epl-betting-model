@@ -12,6 +12,7 @@ from eplmodel.data.checksums import content_sha256
 from eplmodel.paths import RESULTS_DIR
 from eplmodel.reporting.locks import LockedResultsError, refuse_locked_overwrite
 from eplmodel.reporting.results import write_results
+from experiments import market_benchmark as mb
 from experiments import shots_information as exp
 
 CFG = load_config(exp.SHOTS_CONFIG)
@@ -83,3 +84,56 @@ def test_guard_does_not_change_the_locked_interpretation():
     assert r["criterion_s"]["b1"]["reading"] == lock["reading_b1"] == "no_distinguishable_shot_information"
     assert r["criterion_s"]["s1"]["reading"] == lock["reading_s1"] == "no_distinguishable_shot_information"
     assert r["reading_primary"] == "no_distinguishable_shot_information"
+
+
+# --- Experiment 14 (market benchmark): recorded results, no [locked] section in its frozen config ----------------
+
+MB_DIR = RESULTS_DIR / load_config(mb.MARKET_CONFIG)["outputs"]["results_name"]
+EXP14_METRICS_SHA256 = "55a77b4f57a0f55a8a6daf68aabba12bc552972bda98e837ea05ccac6eebcf56"   # RESULTS_LOG Exp 14
+
+
+def _mb_fingerprint():
+    return {name: ((MB_DIR / name).read_bytes(), (MB_DIR / name).stat().st_mtime_ns)
+            for name in ("metrics.json", "predictions.csv") if (MB_DIR / name).exists()}
+
+
+@pytest.fixture
+def mb_stops_after_guard(monkeypatch):
+    """Any step after the first guard raises Sentinel: no protocol check, odds read, data load, scoring or write."""
+    def stop(*_args, **_kwargs):
+        raise Sentinel()
+    for name in ("check_protocol", "read_odds", "load_outcomes", "market_forecasts", "write_predictions",
+                 "write_results"):
+        monkeypatch.setattr(mb, name, stop)
+
+
+def test_market_benchmark_write_is_refused_before_anything_runs(mb_stops_after_guard):
+    assert (MB_DIR / "metrics.json").exists()
+    before = _mb_fingerprint()
+    with pytest.raises(LockedResultsError, match="already exist"):
+        mb.run(write=True)
+    assert _mb_fingerprint() == before
+
+
+def test_market_benchmark_artifacts_are_byte_identical_to_the_record():
+    assert content_sha256(MB_DIR / "metrics.json") == EXP14_METRICS_SHA256
+    recorded = json.loads((MB_DIR / "metrics.json").read_text(encoding="utf-8"))["results"]["predictions"]
+    if (MB_DIR / "predictions.csv").exists():                     # git-ignored; absent in CI
+        assert content_sha256(MB_DIR / "predictions.csv") == recorded["sha256"]
+
+
+def test_market_benchmark_read_only_path_is_not_blocked(mb_stops_after_guard):
+    """write=False (the golden reproduction path) passes the guard and reaches the protocol check."""
+    with pytest.raises(Sentinel):
+        mb.run(write=False)
+
+
+def test_a_fresh_market_output_path_remains_usable(tmp_path):
+    fresh = tmp_path / "results" / "new_market_protocol"
+    refuse_locked_overwrite(fresh, {})                             # no lock, no files: allowed
+    fresh.mkdir(parents=True)
+    (fresh / "notes.txt").write_text("unrelated file", encoding="utf-8")
+    refuse_locked_overwrite(fresh, {})                             # only metrics/predictions are guarded
+    (fresh / "predictions.csv").write_text("x", encoding="utf-8")
+    with pytest.raises(LockedResultsError):
+        refuse_locked_overwrite(fresh, {})

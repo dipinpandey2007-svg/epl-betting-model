@@ -1592,6 +1592,18 @@ model is refitted.
 
 Reproduced by `tests/test_market.py::test_recorded_market_benchmark_reproduces` (golden). Not in `experiments.run_all`.
 
+### Later notes (2026-10-02, after the run)
+
+- **The 2024-25 exposure is not an Experiment 14 stage.** The six market arms were later scored descriptively on
+  2024-25 (380 matches) under the separately logged access **V5** (protocol `exposed_validation_descriptive_v1`,
+  results `results/exposed_validation_descriptive/`; see "Descriptive validation V5" below). It is recorded there.
+  This protocol's specification, seasons and results are unchanged, and its `not_registered_for` list refers to
+  this protocol only.
+- **Result lock.** `experiments/market_benchmark.run(write=True)` now refuses to write
+  (`eplmodel.reporting.locks.refuse_locked_overwrite`) because `results/market_benchmark/` already holds the
+  recorded results. A rerun or amendment needs a new protocol with its own config and results directory. Reading
+  without writing (the golden reproduction) is unaffected.
+
 ## Experiment 15 — Full-coverage dynamic Poisson with empirical-Bayes season-start priors (2026-10-02)
 
 Protocol `full_coverage_poisson_v1`. Pre-registration: `docs/preregistration/full_coverage_poisson_v1.md` and
